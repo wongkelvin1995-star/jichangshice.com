@@ -5,6 +5,8 @@ import BrandAvatar from "@/components/BrandAvatar.astro";
 import { getProviders } from "@/utils/plans";
 import OwnRunsTable from "@/components/OwnRunsTable.astro";
 import SpeedMeter from "@/components/SpeedMeter.astro";
+import NodeStatusChart from "@/components/NodeStatusChart.astro";
+import { NODE_CHECKS, nodeChecksOf } from "@/data/node-checks";
 import { getTestRecords, recordsOf } from "@/utils/testRecords";
 import { getVerifiedRuns, runHour, runsOf } from "@/utils/testRuns";
 import { breadcrumbJsonLd } from "@/utils/jsonld";
@@ -54,7 +56,7 @@ const path = "/test-records/";
         <ul class="mt-5 grid max-w-2xl grid-cols-2 gap-3 sm:grid-cols-4">
           <li class="card p-3 text-center" data-stat="own">
             <p class="num text-signal text-xl font-extrabold">
-              {ownRuns.length}
+              {ownRuns.length + NODE_CHECKS.length}
             </p>
             <p class="text-muted-foreground text-xs">本站测试（已核验）</p>
           </li>
@@ -84,7 +86,22 @@ const path = "/test-records/";
       <div class="flex flex-wrap items-baseline justify-between gap-2">
         <h2 id="own-tests" class="section-title">本站测试</h2>
       </div>
-      <SpeedMeter />
+      <p class="text-muted-foreground mt-2 max-w-3xl text-sm leading-relaxed">
+        本站自己核对过原始截图或结果的记录。节点在线核验只说明检查时刻节点能否连接，不代表速度。
+      </p>
+      <div class="mt-4 grid grid-cols-[minmax(0,1fr)] gap-5">
+        {
+          NODE_CHECKS.map(c => (
+            <NodeStatusChart
+              check={c}
+              brandName={brandNames[c.brandSlug] ?? c.brandSlug}
+            />
+          ))
+        }
+      </div>
+      <div class="mt-6">
+        <SpeedMeter />
+      </div>
       {
         ownRuns.length > 0 && (
           <div class="mt-6">
@@ -147,7 +164,7 @@ const path = "/test-records/";
                       </span>
                     </td>
                     <td class="num px-4 py-3 text-center">
-                      {own.length || "—"}
+                      {own.length + nodeChecksOf(p.slug).length || "—"}
                     </td>
                     <td class="num px-4 py-3 text-center">{rs.length}</td>
                     <td class="num px-4 py-3 whitespace-nowrap">

@@ -12,6 +12,8 @@ import PlanTable from "@/components/PlanTable.astro";
 import { getTestRecords, recordsOf, recordWindow } from "@/utils/testRecords";
 import { getVerifiedRuns, runsOf } from "@/utils/testRuns";
 import OwnRunsTable from "@/components/OwnRunsTable.astro";
+import NodeStatusChart from "@/components/NodeStatusChart.astro";
+import { nodeChecksOf } from "@/data/node-checks";
 import {
   getProviders,
   getPlans,
@@ -72,6 +74,7 @@ const {
   allProviders,
 } = Astro.props;
 const path = `/airports/${p.slug}/`;
+const checks = nodeChecksOf(p.slug);
 const crumbs = [{ name: "机场目录", href: "/airports/" }, { name: p.name }];
 const Analysis = analysis ? (await render(analysis)).Content : null;
 
@@ -169,8 +172,8 @@ const recordEvidence = records.reduce(
               >
               <span class="chip"
                 >{
-                  ownRuns.length
-                    ? `本站测试 ${ownRuns.length} 条`
+                  ownRuns.length + checks.length
+                    ? `本站测试 ${ownRuns.length + checks.length} 条（已核验）`
                     : records.length
                       ? `公开测速参考 ${records.length} 批`
                       : "资料测评 · 暂无测速记录"
@@ -297,7 +300,9 @@ const recordEvidence = records.reduce(
           <div class="flex flex-wrap items-baseline justify-between gap-2">
             <h2 id="tests" class="section-title">{p.name}测速记录</h2>
             {
-              (records.length > 0 || ownRuns.length > 0) && (
+              (records.length > 0 ||
+                ownRuns.length > 0 ||
+                checks.length > 0) && (
                 <a
                   href={`/test-records/${p.slug}/`}
                   class="text-accent-strong text-sm font-semibold hover:underline"
@@ -307,6 +312,13 @@ const recordEvidence = records.reduce(
               )
             }
           </div>
+          {
+            checks.map(c => (
+              <div class="mt-4">
+                <NodeStatusChart check={c} brandName={p.name} />
+              </div>
+            ))
+          }
           {
             ownRuns.length > 0 && (
               <div class="mt-4">
@@ -323,12 +335,12 @@ const recordEvidence = records.reduce(
           {
             records.length > 0 ? (
               <>
-                {ownRuns.length > 0 && (
+                {ownRuns.length + checks.length > 0 && (
                   <h3 class="mt-6 text-sm font-bold">公开测速参考</h3>
                 )}
                 <p class="text-muted-foreground mt-2 text-sm leading-relaxed">
-                  {ownRuns.length === 0 && "暂无本站测试。"}公开测速参考共{" "}
-                  {records.length} 批，逐条注明来源
+                  {ownRuns.length + checks.length === 0 && "暂无本站测试。"}
+                  公开测速参考共 {records.length} 批，逐条注明来源
                   {recordEvidence > 0 &&
                     `，其中 ${recordEvidence} 条附 Speedtest 原始结果链接`}
                   。不同批次的工具、测试端和单位不同，不能横向比较。
@@ -367,7 +379,7 @@ const recordEvidence = records.reduce(
                   </p>
                 )}
               </>
-            ) : ownRuns.length > 0 ? null : (
+            ) : ownRuns.length + checks.length > 0 ? null : (
               <p class="text-muted-foreground mt-2 text-sm leading-relaxed">
                 目前没有可核对的{p.name}
                 测速记录，本页为资料测评：只根据套餐资料和购买前需要核对的项目分析，不填写估算的速度或解锁结果。想自己测试，可以按

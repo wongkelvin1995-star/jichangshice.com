@@ -1,0 +1,269 @@
+---
+import { regionOf, type NodeCheck } from "@/data/node-checks";
+
+type Props = {
+  check: NodeCheck;
+  brandName: string;
+  headingLevel?: "h2" | "h3";
+};
+const { check: c, brandName, headingLevel = "h3" } = Astro.props;
+const H = headingLevel;
+
+const ORDER = ["香港", "日本", "新加坡", "台湾", "美国"];
+const groups = new Map<string, NodeCheck["nodes"]>();
+for (const n of c.nodes) {
+  const r = regionOf(n.name);
+  groups.set(r, [...(groups.get(r) ?? []), n]);
+}
+const missingBy = new Map<string, NodeCheck["notShown"]>();
+for (const m of c.notShown) {
+  const r = regionOf(m.name);
+  missingBy.set(r, [...(missingBy.get(r) ?? []), m]);
+}
+const regions = [...new Set([...groups.keys(), ...missingBy.keys()])].sort(
+  (a, b) =>
+    (ORDER.indexOf(a) + 1 || 99) - (ORDER.indexOf(b) + 1 || 99) ||
+    a.localeCompare(b)
+);
+const num = (s: string) => Number(s.match(/\d+$/)?.[0] ?? 0);
+const rows = regions.map(r => {
+  const nodes = [...(groups.get(r) ?? [])].sort(
+    (a, b) => num(a.name) - num(b.name)
+  );
+  return {
+    region: r,
+    nodes,
+    online: nodes.filter(n => n.status === "online").length,
+    missing: missingBy.get(r) ?? [],
+  };
+});
+const total = c.nodes.length;
+const online = c.nodes.filter(n => n.status === "online").length;
+const maxCount = Math.max(...rows.map(r => r.nodes.length + r.missing.length));
+const multipliers = [...new Set(c.nodes.map(n => n.multiplier))];
+---
+
+<figure
+  class="card overflow-hidden p-0"
+  data-node-check={c.id}
+  aria-labelledby={`${c.id}-title`}
+>
+  <div class="border-b border-emerald-100 bg-emerald-50/60 px-5 py-4 sm:px-6">
+    <div class="flex flex-wrap items-center gap-2">
+      <span
+        class="inline-flex items-center gap-1 rounded-full bg-emerald-600 px-2.5 py-0.5 text-xs font-bold text-white"
+      >
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="3"
+          aria-hidden="true"><path d="m5 12 5 5 9-10"></path></svg
+        >
+        本站测试 · 已核验
+      </span>
+      <span class="text-muted-foreground text-xs">节点在线状态</span>
+    </div>
+    <H id={`${c.id}-title`} class="mt-2 text-lg font-extrabold sm:text-xl">
+      {brandName}节点在线核验（{c.date}）
+    </H>
+    <p class="text-muted-foreground mt-1 text-sm">
+      {
+        `检查时间 ${c.date} ${c.from}–${c.to}（北京时间） · 来源：${c.source}（截图已逐项核对）`
+      }
+    </p>
+  </div>
+
+  <div
+    class="grid grid-cols-[minmax(0,1fr)] gap-6 px-5 py-5 sm:px-6 lg:grid-cols-[minmax(0,240px)_minmax(0,1fr)]"
+  >
+    <div>
+      <p class="num text-[2.6rem] leading-none font-black text-emerald-700">
+        {online}<span class="text-muted-foreground text-2xl"> / {total}</span>
+      </p>
+      <p class="mt-2 flex items-center gap-1.5 text-sm font-bold">
+        <span
+          class="inline-block size-2.5 rounded-full bg-emerald-500"
+          aria-hidden="true"></span>
+        {
+          online === total
+            ? "截图中的节点全部在线"
+            : `${online} 个在线，${total - online} 个离线`
+        }
+      </p>
+      <dl class="mt-4 grid grid-cols-2 gap-3 text-sm lg:grid-cols-1">
+        <div>
+          <dt class="text-muted-foreground text-xs">覆盖地区</dt>
+          <dd class="font-semibold">{regions.join("、")}</dd>
+        </div>
+        <div>
+          <dt class="text-muted-foreground text-xs">流量倍率</dt>
+          <dd class="font-semibold">
+            {
+              multipliers.length === 1
+                ? `全部 ${multipliers[0]}`
+                : multipliers.join(" / ")
+            }
+          </dd>
+        </div>
+      </dl>
+    </div>
+
+    <div class="min-w-0">
+      <p class="text-muted-foreground mb-2 text-xs font-semibold">
+        各地区在线节点数
+      </p>
+      <ul class="grid gap-2.5" aria-label="各地区在线节点数">
+        {
+          rows.map(r => (
+            <li
+              class="grid grid-cols-[3.2rem_minmax(0,1fr)_5.5rem] items-center gap-2 text-sm"
+              title={`${r.region}：截图中 ${r.nodes.length} 个节点，${r.online} 个在线${r.missing.length ? `；另有 ${r.missing.length} 个未在截图中` : ""}`}
+            >
+              <span class="font-semibold">{r.region}</span>
+              <span class="flex h-3.5 gap-[2px]" aria-hidden="true">
+                <span
+                  class="h-full rounded-e bg-emerald-500"
+                  style={`width:${(r.online / maxCount) * 100}%`}
+                />
+                {r.missing.length > 0 && (
+                  <span
+                    class="h-full rounded-e border border-dashed border-slate-300 bg-slate-100"
+                    style={`width:${(r.missing.length / maxCount) * 100}%`}
+                  />
+                )}
+              </span>
+              <span class="num text-end text-xs">
+                <strong>{r.online}</strong> / {r.nodes.length} 在线
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+      <p
+        class="text-muted-foreground mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs"
+      >
+        <span class="inline-flex items-center gap-1.5"
+          ><span class="inline-block h-2.5 w-4 rounded-sm bg-emerald-500"
+          ></span>在线</span
+        >
+        {
+          c.notShown.length > 0 && (
+            <span class="inline-flex items-center gap-1.5">
+              <span class="inline-block h-2.5 w-4 rounded-sm border border-dashed border-slate-300 bg-slate-100" />
+              未在截图中（不推定状态）
+            </span>
+          )
+        }
+      </p>
+
+      <div class="mt-5 grid gap-3">
+        {
+          rows.map(r => (
+            <div>
+              <p class="mb-1.5 text-xs font-bold">{r.region}</p>
+              <ul class="flex flex-wrap gap-1.5">
+                {r.nodes.map(n => (
+                  <li
+                    class="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-white px-2 py-0.5 text-xs"
+                    title={`${n.name} · 节点 ID ${n.id} · ${n.status === "online" ? "在线" : "离线"} · ${n.multiplier} · 最后检查 ${c.date} ${n.checkedAt}`}
+                  >
+                    <span
+                      class:list={[
+                        "inline-block size-1.5 rounded-full",
+                        n.status === "online" ? "bg-emerald-500" : "bg-red-500",
+                      ]}
+                      aria-hidden="true"
+                    />
+                    {n.name}
+                  </li>
+                ))}
+                {r.missing.map(m => (
+                  <li
+                    class="text-muted-foreground inline-flex items-center rounded-full border border-dashed border-slate-300 px-2 py-0.5 text-xs"
+                    title={`${m.name} · 节点 ID ${m.id} · 未在截图中`}
+                  >
+                    {m.name}（未截图）
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="border-t px-5 py-4 sm:px-6">
+    <details>
+      <summary class="text-accent-strong cursor-pointer text-sm font-semibold">
+        查看逐节点数据表（{total} 个节点）
+      </summary>
+      <div class="mt-3 max-h-96 overflow-auto rounded-lg border">
+        <table class="w-full text-sm">
+          <caption class="sr-only">{brandName}节点在线核验逐节点数据</caption>
+          <thead class="bg-muted sticky top-0">
+            <tr class="text-start">
+              <th class="px-3 py-2 text-start">节点</th>
+              <th class="px-3 py-2 text-start">节点 ID</th>
+              <th class="px-3 py-2 text-start">状态</th>
+              <th class="px-3 py-2 text-start">倍率</th>
+              <th class="px-3 py-2 text-start">最后检查</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y">
+            {
+              rows.flatMap(r =>
+                r.nodes.map(n => (
+                  <tr>
+                    <td class="px-3 py-1.5">{n.name}</td>
+                    <td class="num px-3 py-1.5">{n.id}</td>
+                    <td class="px-3 py-1.5">
+                      {n.status === "online" ? "✓ 在线" : "✗ 离线"}
+                    </td>
+                    <td class="num px-3 py-1.5">{n.multiplier}</td>
+                    <td class="num px-3 py-1.5">{n.checkedAt}</td>
+                  </tr>
+                ))
+              )
+            }
+          </tbody>
+        </table>
+      </div>
+    </details>
+
+    <p class="mt-4 text-xs font-semibold">原始截图（点开看大图）</p>
+    <ul class="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
+      {
+        c.evidence.map((src, i) => (
+          <li>
+            <a
+              href={src}
+              target="_blank"
+              rel="noopener"
+              class="block overflow-hidden rounded-lg border hover:border-emerald-300"
+            >
+              <img
+                src={src}
+                alt={`${brandName}用户面板节点状态截图 ${i + 1}/${c.evidence.length}（${c.date}）`}
+                width="320"
+                height="230"
+                loading="lazy"
+                decoding="async"
+                class="h-24 w-full object-cover object-top"
+              />
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    <p class="text-muted-foreground mt-3 text-xs leading-relaxed">
+      说明：在线状态只代表节点在检查时刻可以连接，不代表速度和晚高峰表现。{
+        c.notShown.length > 0 &&
+          `截图中没有出现${c.notShown.map(m => `${m.name}（ID ${m.id}）`).join("、")}，本站不推定它们的状态。`
+      }
+    </p>
+  </div>
+</figure>

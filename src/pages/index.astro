@@ -18,6 +18,7 @@ import { FEATURED_COUNT } from "@/data/editorial-order";
 import { formatDate } from "@/utils/format";
 import { websiteJsonLd } from "@/utils/jsonld";
 import config from "@/config";
+import { NODE_CHECKS } from "@/data/node-checks";
 
 const providers = await getProviders();
 const plans = await getPlans();
@@ -100,7 +101,7 @@ const homeFaq = [
   },
   {
     q: "测试档案里的数据都是本站测的吗？",
-    a: `不是。「本站测试」只统计本站自己测得并核验的记录（目前 ${ownRuns.length} 条）；其余是公开发布的测速参考，每条都写明来源、时间、环境和局限。`,
+    a: `不是。「本站测试」只统计本站自己测得并核验的记录（目前 ${ownRuns.length + NODE_CHECKS.length} 条，含节点在线核验）；其余是公开发布的测速参考，每条都写明来源、时间、环境和局限。`,
     href: "/test-records/",
   },
 ];
@@ -274,7 +275,7 @@ const homeFaq = [
             <div>
               <dt class="text-muted-foreground text-xs">本站测试（已核验）</dt>
               <dd class="num text-signal mt-1 text-2xl font-extrabold">
-                {ownRuns.length}
+                {ownRuns.length + NODE_CHECKS.length}
               </dd>
             </div>
             <div>

@@ -37,6 +37,7 @@ const config: ResolvedAstroPaperConfig = {
   socials: userConfig.socials ?? [],
   shareLinks: userConfig.shareLinks ?? [],
   telegramUrl: userConfig.telegramUrl ?? "",
+  githubUrl: userConfig.githubUrl ?? "",
 };
 
 export default config;

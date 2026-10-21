@@ -6,6 +6,7 @@ import sitemap from "@astrojs/sitemap";
 import { unified } from "@astrojs/markdown-remark";
 import rehypeCallouts from "rehype-callouts";
 import config from "./astro-paper.config";
+import { NODE_CHECKS } from "./src/data/node-checks";
 import {
   rehypeExternalLinks,
   rehypeTableScroll,
@@ -53,10 +54,22 @@ walkMd(
   r => `/airports/${r}/`
 );
 walkMd(new URL("./src/content/pages/", import.meta.url), r => `/${r}/`);
+// 测试档案页：以本站核验记录真实发布到网站的时间作为 lastmod
+for (const c of NODE_CHECKS) {
+  for (const u of [
+    `${SITE}/test-records/`,
+    `${SITE}/test-records/${c.brandSlug}/`,
+  ])
+    if (
+      !lastmod.get(u) ||
+      Date.parse(c.publishedAt) > Date.parse(lastmod.get(u)!)
+    )
+      lastmod.set(u, c.publishedAt);
+}
 // 首页汇总最新文章与资料：lastmod 取全站内容中最新的真实日期
-const homeDate = [...lastmod.values()].sort(
-  (a, b) => Date.parse(a) - Date.parse(b)
-).at(-1);
+const homeDate = [...lastmod.values()]
+  .sort((a, b) => Date.parse(a) - Date.parse(b))
+  .at(-1);
 if (homeDate) lastmod.set(`${SITE}/`, homeDate);
 
 const NOT_IN_SITEMAP = [

@@ -5,6 +5,8 @@ import BrandAvatar from "@/components/BrandAvatar.astro";
 import EntryLink from "@/components/EntryLink.astro";
 import TestRecordCard from "@/components/TestRecordCard.astro";
 import OwnRunsTable from "@/components/OwnRunsTable.astro";
+import NodeStatusChart from "@/components/NodeStatusChart.astro";
+import { nodeChecksOf } from "@/data/node-checks";
 import { getProviders } from "@/utils/plans";
 import { getTestRecords, recordsOf } from "@/utils/testRecords";
 import { getVerifiedRuns, runsOf } from "@/utils/testRuns";
@@ -25,6 +27,11 @@ export async function getStaticPaths() {
     .map(x => ({ params: { slug: x.p.slug }, props: x }));
 }
 const { p, rs, own } = Astro.props;
+const checks = nodeChecksOf(p.slug);
+const verified = own.length + checks.length;
+const checkSummary = checks[0]
+  ? `节点在线核验 ${checks[0].nodes.filter(n => n.status === "online").length}/${checks[0].nodes.length}`
+  : "";
 const path = `/test-records/${p.slug}/`;
 const crumbs = [
   { name: "机场测试档案", href: "/test-records/" },
@@ -48,8 +55,8 @@ const hasPeak = rs.some(r =>
 ---
 
 <Layout
-  title={`${p.name}测速记录：${own.length ? `本站实测 ${own.length} 条，` : ""}公开测速参考 ${rs.length} 批｜${config.site.title}`}
-  description={`${p.name}机场测试档案（${range}）：${own.length ? `本站实测 ${own.length} 条，` : "暂无本站实测，"}公开测速参考 ${rs.length} 批${evidence ? `（含 ${evidence} 条 Speedtest 原始结果）` : ""}，注明来源、测试时段、工具与数据局限。`}
+  title={`${p.name}测速记录：${verified ? `本站测试 ${verified} 条（已核验），` : ""}公开测速参考 ${rs.length} 批｜${config.site.title}`}
+  description={`${p.name}机场测试档案（${range}）：${verified ? `本站测试 ${verified} 条已核验${checkSummary ? `（${checkSummary}）` : ""}，` : "暂无本站实测，"}公开测速参考 ${rs.length} 批${evidence ? `（含 ${evidence} 条 Speedtest 原始结果）` : ""}，注明来源、测试时段、工具与数据局限。`}
   canonicalPath={path}
   jsonLd={[breadcrumbJsonLd(crumbs, path)]}
 >
@@ -66,7 +73,7 @@ const hasPeak = rs.some(r =>
               {p.name}测速记录
             </h1>
             <p class="text-muted-foreground mt-2 max-w-3xl leading-relaxed">
-              本站测试 {own.length} 条（已核验）；公开测速参考 {rs.length} 批{
+              本站测试 {verified} 条（已核验）；公开测速参考 {rs.length} 批{
                 evidence ? `，其中 ${evidence} 条附 Speedtest 原始结果链接` : ""
               }{
                 hasPeak ? "，包含晚高峰时段" : ""
@@ -96,9 +103,14 @@ const hasPeak = rs.some(r =>
       <section aria-labelledby="own-tests">
         <h2 id="own-tests" class="section-title">本站测试</h2>
         {
-          own.length > 0 ? (
-            <div class="mt-4">
-              <OwnRunsTable runs={own} caption={`${p.name}本站测试记录`} />
+          verified > 0 ? (
+            <div class="mt-4 grid grid-cols-[minmax(0,1fr)] gap-5">
+              {checks.map(c => (
+                <NodeStatusChart check={c} brandName={p.name} />
+              ))}
+              {own.length > 0 && (
+                <OwnRunsTable runs={own} caption={`${p.name}本站测试记录`} />
+              )}
             </div>
           ) : (
             <p class="text-muted-foreground mt-2 text-sm leading-relaxed">

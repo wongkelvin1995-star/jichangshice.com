@@ -104,6 +104,8 @@ interface AstroPaperConfig {
   shareLinks?: ShareLink[];
   /** Telegram 入口；为空时隐藏 TG 图标 */
   telegramUrl?: string;
+  /** GitHub 入口；为空时隐藏 GitHub 图标 */
+  githubUrl?: string;
 }
 
 type ResolvedSiteConfig = Required<
@@ -128,6 +130,7 @@ export interface ResolvedAstroPaperConfig {
   socials: SocialLink[];
   shareLinks: ShareLink[];
   telegramUrl: string;
+  githubUrl: string;
 }
 
 /**

@@ -8,6 +8,7 @@ const isActive = (href: string) =>
   href === "/" ? path === "/" : path === href || path.startsWith(href);
 const host = new URL(config.site.url).hostname;
 const tg = config.telegramUrl;
+const gh = config.githubUrl;
 ---
 
 <a
@@ -45,7 +46,7 @@ const tg = config.telegramUrl;
               <a
                 href={item.href}
                 class:list={[
-                  "relative block rounded-full px-3.5 py-2 text-[0.94rem] transition-colors",
+                  "relative block rounded-full px-2.5 py-2 text-[0.94rem] whitespace-nowrap transition-colors 2xl:px-3.5",
                   isActive(item.href)
                     ? "bg-accent-soft text-accent-strong font-bold"
                     : "text-foreground/80 hover:text-accent-strong",
@@ -64,7 +65,7 @@ const tg = config.telegramUrl;
       <a
         href="/search/"
         id="search-open"
-        class="bg-surface text-muted-foreground hover:border-accent/40 hidden h-11 w-56 items-center gap-2 rounded-full border px-4 text-sm md:flex xl:w-64"
+        class="bg-surface text-muted-foreground hover:border-accent/40 hidden h-11 w-56 items-center gap-2 rounded-full border px-4 text-sm md:flex lg:w-44 2xl:w-64"
         aria-label="搜索（Ctrl+K）"
         aria-haspopup="dialog"
       >
@@ -80,7 +81,7 @@ const tg = config.telegramUrl;
           ><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"
           ></path></svg
         >
-        <span class="flex-1">搜索机场、教程、问题…</span>
+        <span class="flex-1 truncate">搜索机场、教程、问题…</span>
       </a>
       <button
         type="button"
@@ -154,6 +155,28 @@ const tg = config.telegramUrl;
           </a>
         )
       }
+      {
+        gh && (
+          <a
+            href={gh}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="hidden size-11 items-center justify-center rounded-full bg-[#1f2328] text-white shadow-[0_6px_16px_-6px_rgb(31_35_40/0.6)] hover:bg-[#32383f] sm:flex"
+            aria-label="机场测试 GitHub 仓库"
+            title="GitHub 仓库"
+          >
+            <svg
+              width="21"
+              height="21"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.26 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z" />
+            </svg>
+          </a>
+        )
+      }
       <button
         id="menu-btn"
         type="button"
@@ -222,6 +245,20 @@ const tg = config.telegramUrl;
               class="bg-accent text-accent-foreground block rounded-xl px-3 py-3 text-center font-semibold"
             >
               加入 TG 交流频道
+            </a>
+          </li>
+        )
+      }
+      {
+        gh && (
+          <li class="col-span-2 sm:col-span-3">
+            <a
+              href={gh}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="block rounded-xl bg-[#1f2328] px-3 py-3 text-center font-semibold text-white"
+            >
+              GitHub 仓库
             </a>
           </li>
         )
