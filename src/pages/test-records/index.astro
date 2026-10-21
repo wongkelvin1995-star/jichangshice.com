@@ -1,0 +1,249 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Breadcrumbs from "@/components/Breadcrumbs.astro";
+import BrandAvatar from "@/components/BrandAvatar.astro";
+import { getProviders } from "@/utils/plans";
+import OwnRunsTable from "@/components/OwnRunsTable.astro";
+import SpeedMeter from "@/components/SpeedMeter.astro";
+import { getTestRecords, recordsOf } from "@/utils/testRecords";
+import { getVerifiedRuns, runHour, runsOf } from "@/utils/testRuns";
+import { breadcrumbJsonLd } from "@/utils/jsonld";
+import config from "@/config";
+
+const providers = await getProviders();
+const records = await getTestRecords();
+// 「本站测试」只统计已导入且核验通过（verified）的本站实测记录
+const ownRuns = getVerifiedRuns();
+const brandNames = Object.fromEntries(providers.map(p => [p.slug, p.name]));
+const ownBrands = new Set(ownRuns.map(r => r.brandSlug));
+const withRecords = providers
+  .map(p => ({
+    p,
+    rs: recordsOf(records, p.slug),
+    own: runsOf(ownRuns, p.slug),
+  }))
+  .filter(x => x.rs.length > 0 || x.own.length > 0);
+const without = providers.filter(
+  p => !recordsOf(records, p.slug).length && !ownBrands.has(p.slug)
+);
+
+const evidenceLinks = records.reduce(
+  (n, r) => n + r.data.rows.filter(x => x.evidenceUrl).length,
+  0
+);
+const crumbs = [{ name: "机场测试档案" }];
+const path = "/test-records/";
+---
+
+<Layout
+  title={`机场测试档案：在线测速与 ${withRecords.length} 家机场测速记录｜${config.site.title}`}
+  description={`机场测试档案：在线测速表一键测试当前网络的下载、上传、延迟和抖动；收录 ${withRecords.length} 家机场 ${records.length} 批测速记录，逐条写明测试时间、地点、工具、原始结果链接和数据局限。`}
+  canonicalPath={path}
+  jsonLd={[breadcrumbJsonLd(crumbs, path)]}
+>
+  <main id="main-content" data-pagefind-body>
+    <section class="hero-band relative border-b">
+      <div class="app-layout relative py-8 sm:py-10">
+        <Breadcrumbs items={crumbs} />
+        <h1 class="text-[1.8rem] font-black tracking-tight sm:text-[2.4rem]">
+          机场测试档案
+        </h1>
+        <p class="text-muted-foreground mt-3 max-w-3xl leading-relaxed">
+          用下方测速表测一测你当前的网络，并查看各机场的测速记录：测试时间、地点、工具和原始结果逐条列出，数值按原单位展示，没有记录的项目留空，不做推测。
+        </p>
+        <ul class="mt-5 grid max-w-2xl grid-cols-2 gap-3 sm:grid-cols-4">
+          <li class="card p-3 text-center" data-stat="own">
+            <p class="num text-signal text-xl font-extrabold">
+              {ownRuns.length}
+            </p>
+            <p class="text-muted-foreground text-xs">本站测试（已核验）</p>
+          </li>
+          <li class="card p-3 text-center" data-stat="public">
+            <p class="num text-accent-strong text-xl font-extrabold">
+              {records.length}
+            </p>
+            <p class="text-muted-foreground text-xs">公开测速参考</p>
+          </li>
+          <li class="card p-3 text-center">
+            <p class="num text-accent-strong text-xl font-extrabold">
+              {withRecords.length}
+            </p>
+            <p class="text-muted-foreground text-xs">有测速记录的机场</p>
+          </li>
+          <li class="card p-3 text-center">
+            <p class="num text-accent-strong text-xl font-extrabold">
+              {evidenceLinks}
+            </p>
+            <p class="text-muted-foreground text-xs">Speedtest 原始结果</p>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="app-layout pt-10" aria-labelledby="own-tests">
+      <div class="flex flex-wrap items-baseline justify-between gap-2">
+        <h2 id="own-tests" class="section-title">本站测试</h2>
+      </div>
+      <SpeedMeter />
+      {
+        ownRuns.length > 0 && (
+          <div class="mt-6">
+            <OwnRunsTable
+              runs={ownRuns}
+              brandNames={brandNames}
+              caption="本站测试记录（已核验）"
+            />
+          </div>
+        )
+      }
+    </section>
+
+    <section class="app-layout pt-12" aria-labelledby="brands">
+      <h2 id="brands" class="section-title">公开测速参考</h2>
+      <p class="text-muted-foreground mt-3 text-sm">
+        顺序与机场目录一致（编辑顺序，不是测速排名）。不同来源的工具、测试端和单位不同，<strong
+          class="text-foreground">不同批次之间不能直接比较快慢</strong
+        >。
+      </p>
+      <div class="table-scroll card mt-4">
+        <table class="w-full min-w-[520px] text-sm">
+          <caption class="sr-only"
+            >各机场测速记录一览（本站测试与公开测速参考）</caption
+          >
+          <thead class="bg-muted/50 text-muted-foreground text-xs">
+            <tr>
+              <th scope="col" class="px-4 py-3 text-start">机场</th>
+              <th scope="col" class="px-4 py-3 text-center">本站测试</th>
+              <th scope="col" class="px-4 py-3 text-center">参考批次</th>
+              <th scope="col" class="px-4 py-3 text-start">最近一次</th>
+              <th scope="col" class="px-4 py-3 text-start">覆盖时段</th>
+              <th scope="col" class="px-4 py-3 text-center">查看</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              withRecords.map(({ p, rs, own }) => {
+                const windows = [
+                  ...new Set(
+                    rs.flatMap(r =>
+                      [r.data.window, ...r.data.rows.map(x => x.window)].filter(
+                        Boolean
+                      )
+                    )
+                  ),
+                ] as string[];
+                const peak =
+                  windows.some(w => w.includes("晚高峰")) ||
+                  own.some(r => {
+                    const h = runHour(r);
+                    return h !== null && h >= 20 && h < 23;
+                  });
+                return (
+                  <tr class="border-t">
+                    <td class="px-4 py-3">
+                      <span class="flex items-center gap-2.5 font-semibold whitespace-nowrap">
+                        <BrandAvatar name={p.name} size="sm" />
+                        {p.name}
+                      </span>
+                    </td>
+                    <td class="num px-4 py-3 text-center">
+                      {own.length || "—"}
+                    </td>
+                    <td class="num px-4 py-3 text-center">{rs.length}</td>
+                    <td class="num px-4 py-3 whitespace-nowrap">
+                      {rs[0]?.data.recordedAt ?? own[0]?.testedAt.slice(0, 10)}
+                    </td>
+                    <td class="px-4 py-3">
+                      {peak ? (
+                        <span class="bg-signal-soft text-signal rounded px-1.5 py-0.5 text-xs font-semibold">
+                          含晚高峰
+                        </span>
+                      ) : (
+                        <span class="text-muted-foreground text-xs">
+                          {windows[0] ?? "—"}
+                        </span>
+                      )}
+                    </td>
+                    <td class="px-4 py-3 text-center">
+                      <a
+                        href={`/test-records/${p.slug}/`}
+                        class="text-accent-strong font-semibold whitespace-nowrap hover:underline"
+                      >
+                        测试记录 →
+                      </a>
+                    </td>
+                  </tr>
+                );
+              })
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="app-layout pt-12" aria-labelledby="no-records">
+      <h2 id="no-records" class="section-title">
+        暂无测速记录的机场（{without.length}）
+      </h2>
+      <p class="text-muted-foreground mt-2 mb-4 text-sm">
+        这些机场目前既没有本站测试，也没有可核对的公开测速参考，只有套餐资料和资料测评。本站不会为它们填写估算的速度或解锁结果，取得原始结果后再补充。
+      </p>
+      <ul class="flex flex-wrap gap-2">
+        {
+          without.map(p => (
+            <li>
+              <a
+                href={p.hasProfile ? `/airports/${p.slug}/` : "/airports/"}
+                class="chip hover:text-accent-strong"
+              >
+                {p.name}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section
+      class="app-layout app-prose max-w-read pt-12"
+      aria-labelledby="how-read"
+    >
+      <h2 id="how-read">怎样读这些测速记录</h2>
+      <ul>
+        <li>
+          <strong>先看单位。</strong>Speedtest 记录使用
+          Mbps（兆比特每秒）；部分批量测速截图的单位是 MB（兆字节），1 MB/s
+          约等于 8 Mbps。单位不同的两组数字不能直接比。
+        </li>
+        <li>
+          <strong>再看时段。</strong>白天、凌晨的结果通常比 20:00–23:00
+          晚高峰好看。只有白天数据时，不能据此判断晚上是否够用，见<a
+            href="/methods/peak-hour-testing/">晚高峰测试怎样安排</a
+          >。
+        </li>
+        <li>
+          <strong>延迟口径不同。</strong>TLS RTT、HTTP/HTTPS 延迟和普通 Ping
+          测量的对象不同，数字不能互换，详见<a
+            href="/methods/metrics-speed-latency-loss/">速度、延迟与丢包</a
+          >。
+        </li>
+        <li>
+          <strong>测速快不等于 AI 和视频一定可用。</strong>能否访问
+          ChatGPT、Netflix 等取决于出口 IP，需要单独测试，见<a
+            href="/methods/ai-streaming-checks/">AI 与流媒体测试</a
+          >。
+        </li>
+        <li>
+          <strong>你的结果会不同。</strong
+          >所有记录都来自特定宽带和测试端，换成你的运营商和城市，结果可能明显不同；第一次购买建议先月付验证。
+        </li>
+      </ul>
+      <p>
+        测试流程与记录字段见<a href="/testing-methodology/">测试方法</a>和<a
+          href="/methods/record-node-speed-test/"
+          >怎样记录一次可复核的节点测速</a
+        >。
+      </p>
+    </section>
+  </main>
+</Layout>

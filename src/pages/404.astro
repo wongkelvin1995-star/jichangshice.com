@@ -1,0 +1,44 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { getPublishedPosts, postUrl } from "@/utils/posts";
+import config from "@/config";
+
+const latest = (await getPublishedPosts()).slice(0, 5);
+---
+
+<Layout
+  title={`页面不存在（404）｜${config.site.title}`}
+  description="你访问的页面不存在或已移动。可以搜索站内内容，或从机场目录、套餐比较和新手教程重新开始。"
+  noindex
+  canonicalPath=""
+>
+  <main id="main-content" class="app-layout max-w-read flex-1 py-12">
+    <p class="text-accent text-6xl font-extrabold">404</p>
+    <h1 class="mt-3 text-2xl font-bold">这个页面不存在或已经移动</h1>
+    <p class="text-muted-foreground mt-3 leading-relaxed">
+      链接可能输错了，或者文章换了地址。可以用页眉的搜索（Ctrl+K），或者从下面的入口重新开始。
+      如果你是从本站某个页面点进来的，欢迎通过<a
+        href="/contact/"
+        class="text-accent-strong underline underline-offset-4">联系页面</a
+      >告诉我们，方便修复失效链接。
+    </p>
+    <div class="mt-6 flex flex-wrap gap-3">
+      <a href="/" class="btn btn-primary">返回首页</a>
+      <a href="/airports/" class="btn btn-outline">机场目录</a>
+      <a href="/compare/" class="btn btn-outline">套餐比较</a>
+      <a href="/search/" class="btn btn-outline">站内搜索</a>
+    </div>
+    <h2 class="mt-10 mb-2 font-semibold">最新文章</h2>
+    <ul class="divide-y border-y">
+      {
+        latest.map(p => (
+          <li class="py-3">
+            <a href={postUrl(p)} class="hover:text-accent">
+              {p.data.title}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </main>
+</Layout>

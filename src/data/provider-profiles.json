@@ -1,0 +1,400 @@
+{
+  "_note": "机场资料表补充字段。founded/protocols/ownClient 来自 source 页面中的品牌资料；unlock 为品牌资料中的解锁说法（未经本站逐节点测试）。freeAccess（免翻墙访问入口）目前没有可靠资料，全部为 null。未列出的品牌这些字段为空，页面显示“—”。quanqiuyun 支付方式两份资料不一致（是否含微信），只保留两者共同的支付宝、USDT。 付款方式：站长 2026-10-15 确认全部显示“支付宝”（见 src/utils/brandProfile.ts 的 PAYMENTS_ALL），此处 payments 仅保留原始资料备查。",
+  "checkedAt": "2026-10-15",
+  "profiles": {
+    "lightspeed": {
+      "founded": "2020",
+      "freeAccess": null,
+      "protocols": [
+        "VLESS",
+        "Shadowsocks"
+      ],
+      "payments": [
+        "支付宝",
+        "微信",
+        "USDT"
+      ],
+      "ownClient": true,
+      "unlock": [
+        "ChatGPT",
+        "Claude",
+        "Gemini",
+        "Netflix",
+        "Disney+",
+        "YouTube",
+        "TikTok"
+      ],
+      "source": "https://jichangtj.co/reviews/guangsuyun"
+    },
+    "stardream": {
+      "founded": "2020",
+      "freeAccess": null,
+      "protocols": [],
+      "payments": [],
+      "ownClient": false,
+      "unlock": [
+        "ChatGPT",
+        "Claude",
+        "Gemini",
+        "Netflix",
+        "Disney+",
+        "YouTube",
+        "TikTok"
+      ],
+      "source": "https://jichangtj.co/reviews/xingdaomeng"
+    },
+    "breezenet": {
+      "founded": "2023",
+      "freeAccess": null,
+      "protocols": [
+        "VLESS"
+      ],
+      "payments": [
+        "支付宝",
+        "微信",
+        "USDT"
+      ],
+      "ownClient": true,
+      "unlock": [
+        "ChatGPT",
+        "Claude",
+        "Gemini",
+        "Netflix",
+        "Disney+",
+        "YouTube",
+        "TikTok"
+      ],
+      "source": "https://jichangtj.co/reviews/weifeng"
+    },
+    "feimaoyun": {
+      "founded": "2023",
+      "freeAccess": null,
+      "protocols": [
+        "Shadowsocks"
+      ],
+      "payments": [
+        "支付宝",
+        "微信",
+        "USDT"
+      ],
+      "ownClient": true,
+      "unlock": [
+        "ChatGPT",
+        "Claude",
+        "Gemini",
+        "Netflix",
+        "Disney+",
+        "YouTube",
+        "TikTok"
+      ],
+      "source": "https://jichangtj.co/reviews/feimaoyun"
+    },
+    "u1s1": {
+      "founded": "2023",
+      "freeAccess": null,
+      "protocols": [
+        "VLESS",
+        "Shadowsocks"
+      ],
+      "payments": [
+        "支付宝",
+        "微信",
+        "USDT"
+      ],
+      "ownClient": true,
+      "unlock": [
+        "ChatGPT",
+        "Claude",
+        "Gemini",
+        "Netflix",
+        "Disney+",
+        "YouTube",
+        "TikTok"
+      ],
+      "source": "https://jichangtj.co/reviews/u1s1"
+    },
+    "v2yun": {
+      "founded": "2023",
+      "freeAccess": null,
+      "protocols": [
+        "VLESS",
+        "Shadowsocks"
+      ],
+      "payments": [
+        "支付宝",
+        "微信",
+        "USDT"
+      ],
+      "ownClient": false,
+      "unlock": [
+        "ChatGPT",
+        "Claude",
+        "Gemini",
+        "Netflix",
+        "Disney+",
+        "YouTube",
+        "TikTok"
+      ],
+      "source": "https://jichangtj.co/reviews/weituyun"
+    },
+    "lingmao": {
+      "founded": "2024",
+      "freeAccess": null,
+      "protocols": [
+        "Shadowsocks"
+      ],
+      "payments": [
+        "支付宝",
+        "微信",
+        "USDT"
+      ],
+      "ownClient": false,
+      "unlock": [
+        "ChatGPT",
+        "Claude",
+        "Gemini",
+        "Netflix",
+        "Disney+",
+        "YouTube",
+        "TikTok"
+      ],
+      "source": "https://jichangtj.co/reviews/lingmao"
+    },
+    "jilianyun": {
+      "founded": "2024",
+      "freeAccess": null,
+      "protocols": [
+        "Shadowsocks"
+      ],
+      "payments": [
+        "支付宝",
+        "微信",
+        "USDT"
+      ],
+      "ownClient": true,
+      "unlock": [
+        "ChatGPT",
+        "Claude",
+        "Gemini",
+        "Netflix",
+        "Disney+",
+        "YouTube",
+        "TikTok"
+      ],
+      "source": "https://jichangtj.co/reviews/jilianyun"
+    },
+    "yuzhouyun": {
+      "founded": "2023",
+      "freeAccess": null,
+      "protocols": [
+        "VLESS"
+      ],
+      "payments": [
+        "支付宝",
+        "微信",
+        "USDT"
+      ],
+      "ownClient": true,
+      "unlock": [
+        "ChatGPT",
+        "Claude",
+        "Gemini",
+        "Netflix",
+        "Disney+",
+        "YouTube",
+        "TikTok"
+      ],
+      "source": "https://jichangtj.co/reviews/yuzhouyun"
+    },
+    "guangnianti": {
+      "founded": "2025",
+      "freeAccess": null,
+      "protocols": [
+        "VLESS",
+        "Shadowsocks"
+      ],
+      "payments": [
+        "支付宝",
+        "微信",
+        "USDT"
+      ],
+      "ownClient": true,
+      "unlock": [
+        "ChatGPT",
+        "Claude",
+        "Gemini",
+        "Netflix",
+        "Disney+",
+        "YouTube",
+        "TikTok"
+      ],
+      "source": "https://jichangtj.co/reviews/guangnianti"
+    },
+    "yifanyun": {
+      "founded": "2024",
+      "freeAccess": null,
+      "protocols": [
+        "VLESS",
+        "Shadowsocks"
+      ],
+      "payments": [
+        "支付宝",
+        "微信",
+        "USDT"
+      ],
+      "ownClient": false,
+      "unlock": [
+        "ChatGPT",
+        "Claude",
+        "Gemini",
+        "Netflix",
+        "Disney+",
+        "YouTube",
+        "TikTok"
+      ],
+      "source": "https://jichangtj.co/reviews/yifanyun"
+    },
+    "ermaoyun": {
+      "founded": "2023",
+      "freeAccess": null,
+      "protocols": [
+        "VLESS",
+        "Shadowsocks"
+      ],
+      "payments": [
+        "支付宝",
+        "微信",
+        "USDT"
+      ],
+      "ownClient": false,
+      "unlock": [
+        "ChatGPT",
+        "Claude",
+        "Gemini",
+        "Netflix",
+        "Disney+",
+        "YouTube",
+        "TikTok"
+      ],
+      "source": "https://jichangtj.co/reviews/ermaoyun"
+    },
+    "sogoyun": {
+      "founded": "2026",
+      "freeAccess": null,
+      "protocols": [
+        "VLESS",
+        "Shadowsocks"
+      ],
+      "payments": [
+        "支付宝",
+        "微信",
+        "USDT"
+      ],
+      "ownClient": true,
+      "unlock": [
+        "ChatGPT",
+        "Claude",
+        "Gemini",
+        "Netflix",
+        "Disney+",
+        "YouTube",
+        "TikTok"
+      ],
+      "source": "https://jichangtj.co/reviews/sogo"
+    },
+    "kexinyun": {
+      "founded": "2024",
+      "freeAccess": null,
+      "protocols": [
+        "VLESS",
+        "Shadowsocks"
+      ],
+      "payments": [
+        "支付宝",
+        "微信",
+        "USDT"
+      ],
+      "ownClient": false,
+      "unlock": [
+        "ChatGPT",
+        "Claude",
+        "Gemini",
+        "Netflix",
+        "Disney+",
+        "YouTube",
+        "TikTok"
+      ],
+      "source": "https://jichangtj.co/reviews/kexinyun"
+    },
+    "sujie": {
+      "founded": "2024",
+      "freeAccess": null,
+      "protocols": [
+        "VLESS",
+        "Shadowsocks"
+      ],
+      "payments": [
+        "支付宝",
+        "微信",
+        "USDT"
+      ],
+      "ownClient": true,
+      "unlock": [
+        "ChatGPT",
+        "Claude",
+        "Gemini",
+        "Netflix",
+        "Disney+",
+        "YouTube",
+        "TikTok"
+      ],
+      "source": "https://jichangtj.co/reviews/sujie"
+    },
+    "kuaili": {
+      "founded": "2023",
+      "freeAccess": null,
+      "protocols": [
+        "VLESS"
+      ],
+      "payments": [
+        "支付宝",
+        "微信",
+        "USDT"
+      ],
+      "ownClient": true,
+      "unlock": [
+        "ChatGPT",
+        "Claude",
+        "Gemini",
+        "Netflix",
+        "Disney+",
+        "YouTube",
+        "TikTok"
+      ],
+      "source": "https://jichangtj.co/reviews/kuaili"
+    },
+    "quanqiuyun": {
+      "founded": "2026",
+      "freeAccess": null,
+      "protocols": [
+        "VLESS",
+        "Shadowsocks"
+      ],
+      "payments": [
+        "支付宝",
+        "USDT"
+      ],
+      "ownClient": false,
+      "unlock": [
+        "ChatGPT",
+        "Claude",
+        "Gemini",
+        "Netflix",
+        "Disney+",
+        "YouTube",
+        "TikTok"
+      ],
+      "source": "https://jichangtj.co/reviews/quanqiuyun"
+    }
+  }
+}

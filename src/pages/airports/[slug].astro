@@ -1,0 +1,679 @@
+---
+import { FEATURED_COUNT } from "@/data/editorial-order";
+import { getCollection, render, type CollectionEntry } from "astro:content";
+import Layout from "@/layouts/Layout.astro";
+import Breadcrumbs from "@/components/Breadcrumbs.astro";
+import UserActions from "@/components/UserActions.astro";
+import VisitTracker from "@/components/VisitTracker.astro";
+import BrandAvatar from "@/components/BrandAvatar.astro";
+import EntryLink from "@/components/EntryLink.astro";
+import CouponBox from "@/components/CouponBox.astro";
+import PlanTable from "@/components/PlanTable.astro";
+import { getTestRecords, recordsOf, recordWindow } from "@/utils/testRecords";
+import { getVerifiedRuns, runsOf } from "@/utils/testRuns";
+import OwnRunsTable from "@/components/OwnRunsTable.astro";
+import {
+  getProviders,
+  getPlans,
+  sortPlans,
+  costPerGB,
+  priceLabel,
+  trafficLabel,
+  startingMonthly,
+  cycleList,
+  type Provider,
+  type Plan,
+  evidenceLabel,
+  trafficSuffix,
+} from "@/utils/plans";
+import { fmtMoney, fmtGB } from "@/utils/format";
+import { breadcrumbJsonLd, articleJsonLd } from "@/utils/jsonld";
+import config from "@/config";
+
+/** 只为有历史资料的品牌生成页面；新收录、无资料的品牌不建空壳页 */
+export async function getStaticPaths() {
+  const providers = await getProviders();
+  const plans = await getPlans();
+  const analyses = await getCollection("airports");
+  const withProfile = providers.filter(p => p.hasProfile);
+  return withProfile.map((p, i) => ({
+    params: { slug: p.slug },
+    props: {
+      provider: p,
+      plans: plans.filter(pl => pl.providerId === p.slug).sort(sortPlans),
+      allPlans: plans,
+      analysis: analyses.find(a => a.id === p.slug) ?? null,
+      rank: providers.indexOf(p) + 1,
+      prev: withProfile[i - 1] ?? null,
+      next: withProfile[i + 1] ?? null,
+      allProviders: providers,
+    },
+  }));
+}
+
+type Props = {
+  provider: Provider;
+  plans: Plan[];
+  allPlans: Plan[];
+  analysis: CollectionEntry<"airports"> | null;
+  rank: number;
+  prev: Provider | null;
+  next: Provider | null;
+  allProviders: Provider[];
+};
+const {
+  provider: p,
+  plans,
+  allPlans,
+  analysis,
+  rank,
+  prev,
+  next,
+  allProviders,
+} = Astro.props;
+const path = `/airports/${p.slug}/`;
+const crumbs = [{ name: "机场目录", href: "/airports/" }, { name: p.name }];
+const Analysis = analysis ? (await render(analysis)).Content : null;
+
+const clean = plans.filter(pl => !pl.conflicts.length);
+const conflicts = plans.filter(pl => pl.conflicts.length);
+const monthly = clean.filter(
+  pl => pl.paymentMonths === 1 && pl.paymentAmount !== null
+);
+const priceRange = monthly.length
+  ? [
+      Math.min(...monthly.map(x => x.paymentAmount!)),
+      Math.max(...monthly.map(x => x.paymentAmount!)),
+    ]
+  : null;
+const perGB = clean.map(costPerGB).filter((x): x is number => x !== null);
+const cycles = cycleList(plans, p.slug);
+const observed = plans
+  .map(pl => pl.observedAt)
+  .filter(Boolean)
+  .sort()
+  .at(-1);
+const oneTime = clean.filter(pl => pl.paymentMonths === 0);
+const annual = clean.filter(pl => pl.paymentMonths === 12);
+const claims = p.claims;
+const otherNames = p.aliases.filter(a => !a.includes(p.name));
+const start = startingMonthly(plans, p.slug);
+const featuredTop = rank <= FEATURED_COUNT;
+
+// 相近服务：月付起步价最接近的 3 家（排除自己）
+const similar = allProviders
+  .filter(x => x.hasProfile && x.slug !== p.slug)
+  .map(x => ({ x, s: startingMonthly(allPlans, x.slug) }))
+  .filter(o => o.s && start)
+  .sort(
+    (a, b) =>
+      Math.abs(a.s!.paymentAmount! - start!.paymentAmount!) -
+      Math.abs(b.s!.paymentAmount! - start!.paymentAmount!)
+  )
+  .slice(0, 3);
+
+const title =
+  analysis?.data.title ?? `${p.name}机场测评：套餐价格、线路资料与购买前须知`;
+const description =
+  analysis?.data.description ??
+  `${p.name}机场资料整理：共 ${plans.length} 档套餐${plans.every(x => x.currentVerified) ? `（${observed} 结算页核验）` : ""}，付款周期包括${cycles.join("、")}${priceRange ? `，月付 ¥${priceRange[0]}–¥${priceRange[1]}` : ""}。附流量口径说明${conflicts.length ? "、来源不一致的记录" : ""}与购买前核对清单。`;
+// 没有人工分析的品牌页不进入索引（与 astro.config.ts 的 Sitemap 规则一致）
+const noindex = !analysis;
+const records = recordsOf(await getTestRecords(), p.slug);
+const ownRuns = runsOf(getVerifiedRuns(), p.slug);
+const recordEvidence = records.reduce(
+  (n, r) => n + r.data.rows.filter(x => x.evidenceUrl).length,
+  0
+);
+---
+
+<Layout
+  title={`${title}｜${config.site.title}`}
+  description={description}
+  canonicalPath={path}
+  noindex={noindex}
+  ogType={analysis ? "article" : "website"}
+  jsonLd={[
+    breadcrumbJsonLd(crumbs, path),
+    ...(analysis
+      ? [
+          articleJsonLd({
+            title,
+            description,
+            path,
+            published: analysis.data.pubDatetime,
+            modified: analysis.data.modDatetime,
+            section: "机场资料",
+          }),
+        ]
+      : []),
+  ]}
+>
+  <main id="main-content" data-pagefind-body data-provider-detail={p.slug}>
+    <!-- 品牌头部 -->
+    <section class="hero-band relative border-b">
+      <div class="app-layout relative py-8 sm:py-10">
+        <Breadcrumbs items={crumbs} />
+        <div
+          class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start"
+        >
+          <div class="min-w-0">
+            <div class="flex flex-wrap items-center gap-2">
+              <span
+                class:list={[
+                  "rounded-full px-2.5 py-1 text-xs font-bold",
+                  featuredTop
+                    ? "bg-gold-soft text-gold"
+                    : "bg-muted text-muted-foreground",
+                ]}>编辑精选 No.{rank}</span
+              >
+              <span class="chip"
+                >{
+                  ownRuns.length
+                    ? `本站测试 ${ownRuns.length} 条`
+                    : records.length
+                      ? `公开测速参考 ${records.length} 批`
+                      : "资料测评 · 暂无测速记录"
+                }</span
+              >
+              <span class="chip num">最后核验 {observed ?? "—"}</span>
+            </div>
+            <div class="mt-4 flex items-start gap-4">
+              <BrandAvatar name={p.name} />
+              <div class="min-w-0">
+                <h1
+                  class="text-[1.6rem] leading-snug font-black tracking-tight text-balance sm:text-[2.1rem]"
+                >
+                  {title}
+                </h1>
+                {
+                  (p.englishName || otherNames.length > 0) && (
+                    <p class="text-muted-foreground mt-1.5 text-sm">
+                      {[p.englishName, ...otherNames]
+                        .filter(Boolean)
+                        .join(" · ")}
+                    </p>
+                  )
+                }
+              </div>
+            </div>
+            <UserActions slug={p.slug} name={p.name} class="mt-4" />
+            <VisitTracker type="airport" title={`${p.name} 机场资料`} />
+            <dl class="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              <div class="card p-3.5">
+                <dt class="text-muted-foreground text-xs">收录套餐</dt>
+                <dd class="num mt-1 text-lg font-extrabold">
+                  {plans.length} 档
+                </dd>
+              </div>
+              <div class="card p-3.5">
+                <dt class="text-muted-foreground text-xs">付款周期</dt>
+                <dd class="mt-1 text-sm font-bold">{cycles.join(" / ")}</dd>
+              </div>
+              <div class="card p-3.5">
+                <dt class="text-muted-foreground text-xs">月付范围</dt>
+                <dd class="num mt-1 text-lg font-extrabold">
+                  {priceRange ? `¥${priceRange[0]}–${priceRange[1]}` : "—"}
+                </dd>
+              </div>
+              <div class="card p-3.5">
+                <dt class="text-muted-foreground text-xs">来源不一致</dt>
+                <dd class="num mt-1 text-lg font-extrabold">
+                  {conflicts.length} 档
+                </dd>
+              </div>
+            </dl>
+          </div>
+
+          <aside class="card p-5" data-placement="provider-summary">
+            {
+              start ? (
+                <>
+                  <p class="text-muted-foreground text-xs">
+                    月付起步 · {evidenceLabel(start)}
+                  </p>
+                  <p class="num text-accent-strong mt-1 text-[2.2rem] leading-none font-black">
+                    {fmtMoney(start.paymentAmount!)}
+                    <span class="text-muted-foreground text-sm font-medium">
+                      /月
+                    </span>
+                  </p>
+                  <p class="text-muted-foreground mt-1.5 text-xs">
+                    基础流量{" "}
+                    <b class="num text-foreground">{fmtGB(start.trafficGB!)}</b>
+                    {trafficSuffix(start)}
+                  </p>
+                </>
+              ) : (
+                <p class="text-muted-foreground text-sm">
+                  暂无一致的月付记录，价格以当前结算页为准。
+                </p>
+              )
+            }
+            <div class="mt-4 grid gap-2.5">
+              {
+                p.coupon && (
+                  <CouponBox
+                    code={p.coupon}
+                    note={p.couponNote}
+                    brand={p.name}
+                    slug={p.slug}
+                  />
+                )
+              }
+              <EntryLink
+                href={p.entryUrl}
+                brand={p.name}
+                label={p.coupon ? "使用优惠码查看当前套餐" : "查看当前套餐"}
+                class="btn btn-primary w-full px-3 text-[0.9rem] whitespace-nowrap"
+              />
+            </div>
+            <p
+              class="text-muted-foreground mt-3 text-[0.72rem] leading-relaxed"
+            >
+              入口含邀请码，见<a
+                href="/disclosure/"
+                class="underline underline-offset-2">合作说明</a
+              >。价格、流量与优惠以当前结算页为准。
+            </p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <div
+      class="app-layout grid gap-10 pt-10 lg:grid-cols-[minmax(0,1fr)_300px]"
+    >
+      <div class="min-w-0">
+        {
+          Analysis && (
+            <section class="card app-prose mb-8 p-6 sm:p-8">
+              <Analysis />
+            </section>
+          )
+        }
+
+        <section class="card mb-8 p-5 sm:p-7" aria-labelledby="tests">
+          <div class="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 id="tests" class="section-title">{p.name}测速记录</h2>
+            {
+              (records.length > 0 || ownRuns.length > 0) && (
+                <a
+                  href={`/test-records/${p.slug}/`}
+                  class="text-accent-strong text-sm font-semibold hover:underline"
+                >
+                  查看完整测试数据 →
+                </a>
+              )
+            }
+          </div>
+          {
+            ownRuns.length > 0 && (
+              <div class="mt-4">
+                <h3 class="mb-2 text-sm font-bold">
+                  本站测试（{ownRuns.length} 条，已核验）
+                </h3>
+                <OwnRunsTable
+                  runs={ownRuns.slice(0, 6)}
+                  caption={`${p.name}本站测试记录`}
+                />
+              </div>
+            )
+          }
+          {
+            records.length > 0 ? (
+              <>
+                {ownRuns.length > 0 && (
+                  <h3 class="mt-6 text-sm font-bold">公开测速参考</h3>
+                )}
+                <p class="text-muted-foreground mt-2 text-sm leading-relaxed">
+                  {ownRuns.length === 0 && "暂无本站测试。"}公开测速参考共{" "}
+                  {records.length} 批，逐条注明来源
+                  {recordEvidence > 0 &&
+                    `，其中 ${recordEvidence} 条附 Speedtest 原始结果链接`}
+                  。不同批次的工具、测试端和单位不同，不能横向比较。
+                </p>
+                <ul class="mt-4 divide-y">
+                  {records.slice(0, 6).map(r => (
+                    <li class="py-3">
+                      <a
+                        href={`/test-records/${p.slug}/#${r.id}`}
+                        class="hover:text-accent-strong font-semibold"
+                      >
+                        {r.data.recordedAt}
+                        {r.data.time ? ` ${r.data.time}` : ""}
+                        {recordWindow(r) ? `（${recordWindow(r)}）` : ""}
+                      </a>
+                      <p class="text-muted-foreground mt-0.5 text-xs">
+                        {[
+                          r.data.carrier,
+                          r.data.bandwidthMbps &&
+                            (r.data.bandwidthMbps >= 1000
+                              ? `${r.data.bandwidthMbps / 1000}Gbps`
+                              : `${r.data.bandwidthMbps}M`),
+                          r.data.tool,
+                          `${r.data.rows.length} 组数据`,
+                          r.data.sourceName,
+                        ]
+                          .filter(Boolean)
+                          .join(" · ")}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+                {records.length > 6 && (
+                  <p class="text-muted-foreground text-xs">
+                    另有 {records.length - 6} 批，见完整测试数据页。
+                  </p>
+                )}
+              </>
+            ) : ownRuns.length > 0 ? null : (
+              <p class="text-muted-foreground mt-2 text-sm leading-relaxed">
+                目前没有可核对的{p.name}
+                测速记录，本页为资料测评：只根据套餐资料和购买前需要核对的项目分析，不填写估算的速度或解锁结果。想自己测试，可以按
+                <a
+                  href="/methods/record-node-speed-test/"
+                  class="text-accent-strong underline underline-offset-2"
+                >
+                  测速记录方法
+                </a>
+                先买月付验证。其他机场的记录见
+                <a
+                  href="/test-records/"
+                  class="text-accent-strong underline underline-offset-2"
+                >
+                  机场测试档案
+                </a>
+                。
+              </p>
+            )
+          }
+        </section>
+
+        <section aria-labelledby="plans">
+          <h2 id="plans" class="section-title">{p.name}套餐与价格</h2>
+          <p class="text-muted-foreground mt-2 mb-4 text-sm leading-relaxed">
+            {
+              plans.every(x => x.currentVerified) ? (
+                <>
+                  以下 {plans.length} 档摘自站长 {observed}
+                  截取的结算页，价格和活动可能随时调整，下单前仍以结算页为准。
+                </>
+              ) : (
+                <>
+                  以下 {plans.length} 档为历史参考（最后整理 {observed}
+                  ），尚未全部经结算页核验，不代表当前在售。
+                </>
+              )
+            }年付价格是全年总额，另列折算月均；一次性包按总量计，不折算成每月额度。
+          </p>
+          <div data-placement="provider-plans">
+            <PlanTable
+              plans={plans}
+              providers={allProviders}
+              showBrand={false}
+              linkMode="entry"
+              caption={`${p.name}套餐表`}
+              id={`plans-${p.slug}`}
+            />
+          </div>
+        </section>
+
+        <section
+          class="card app-prose mt-8 p-6 sm:p-8"
+          aria-labelledby="read-plans"
+        >
+          <h2 id="read-plans">怎么读{p.name}的套餐</h2>
+          <ul>
+            {
+              priceRange && (
+                <li>
+                  月付方案中，来源一致的记录价格从 {fmtMoney(priceRange[0])} 到{" "}
+                  {fmtMoney(priceRange[1])}。
+                  {perGB.length > 0 && (
+                    <>
+                      按每月流量折算，每 GB 约 {fmtMoney(Math.min(...perGB))}–
+                      {fmtMoney(Math.max(...perGB))}
+                      ，档位越高单价通常越低，但闲置的流量并不省钱。
+                    </>
+                  )}
+                </li>
+              )
+            }
+            {
+              annual.length > 0 && (
+                <li>
+                  年付方案：
+                  {annual
+                    .map(
+                      a =>
+                        `${priceLabel(a).main}（${trafficLabel(a).main}${trafficLabel(a).note ? "，" + trafficLabel(a).note : ""}）`
+                    )
+                    .join("；")}
+                  。年付需要一次付清全年费用，先看流量是每月重置还是全年总量。
+                </li>
+              )
+            }
+            {
+              oneTime.length > 0 && (
+                <li>
+                  一次性流量包 {oneTime.length}{" "}
+                  档，按总量计费，适合用量少、不想按月续费的情况；有效期以结算页说明为准。
+                </li>
+              )
+            }
+            <li>
+              估算自己需要多少流量，见<a href="/guides/how-to-choose-plan/"
+                >按流量、预算和付款周期选择套餐</a
+              >；年付与流量包的取舍见<a
+                href="/guides/annual-vs-monthly-vs-onetime/"
+                >年付、月付和不限时流量包怎样比较</a
+              >。
+            </li>
+          </ul>
+          <h3>购买前核对清单</h3>
+          <ul>
+            <li>结算页上的价格、流量和付款周期是否与上表一致；</li>
+            <li>流量按自然月还是按购买日重置，节点有没有倍率；</li>
+            <li>同时在线设备数、是否限速、退款条件；</li>
+            <li>你要用的客户端是否支持它提供的订阅格式。</li>
+          </ul>
+          <p>
+            完整清单见<a href="/guides/check-before-buying/"
+              >购买机场前核对重置、倍率、设备与退款条款</a
+            >。
+          </p>
+        </section>
+
+        {
+          conflicts.length > 0 && (
+            <section class="mt-8" aria-labelledby="conflicts">
+              <h2 id="conflicts" class="section-title">
+                来源不一致的记录
+              </h2>
+              <p class="text-muted-foreground mt-2 mb-3 text-sm">
+                不同记录对下面这些方案的价格或流量写法不同，本站两边都保留，不擅自取较新或较便宜的一条，也不计入最低价。
+              </p>
+              <ul class="card divide-y">
+                {conflicts.map(c => (
+                  <li class="px-4 py-3 text-sm">
+                    <span class="font-semibold">{c.name ?? "未命名方案"}</span>
+                    <span class="text-muted-foreground">
+                      {" "}
+                      · {priceLabel(c).main} · {c.billingCycle} ·{" "}
+                      {trafficLabel(c).main}
+                    </span>
+                    <span class="text-warn mt-0.5 block">
+                      {c.conflicts.join("；")}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )
+        }
+
+        {
+          similar.length > 0 && (
+            <section class="mt-8" aria-labelledby="similar">
+              <h2 id="similar" class="section-title">
+                价位相近的其他机场
+              </h2>
+              <div class="mt-4 grid gap-3 sm:grid-cols-3">
+                {similar.map(({ x, s }) => (
+                  <a
+                    href={`/airports/${x.slug}/`}
+                    class="card hover:border-accent/40 block p-4"
+                  >
+                    <span class="flex items-center gap-2 font-bold">
+                      <BrandAvatar name={x.name} size="sm" />
+                      {x.name}
+                    </span>
+                    <span class="num text-accent-strong mt-2 block font-extrabold">
+                      {fmtMoney(s!.paymentAmount!)}/月
+                    </span>
+                    <span class="text-muted-foreground text-xs">
+                      基础流量 {trafficLabel(s!).main}
+                    </span>
+                  </a>
+                ))}
+              </div>
+            </section>
+          )
+        }
+      </div>
+
+      <aside class="space-y-5">
+        {
+          claims && (
+            <section class="card p-5" aria-labelledby="claims">
+              <h2 id="claims" class="font-bold">
+                资料提及的线路与用途
+              </h2>
+              <p class="text-muted-foreground mt-1 text-xs">
+                来自服务商介绍与公开资料；有测速记录的项目以本页“测速记录”为准，其余尚未验证。
+              </p>
+              <dl class="mt-3 space-y-2.5 text-sm">
+                {claims.lineTypes.length > 0 && (
+                  <div>
+                    <dt class="text-muted-foreground text-xs">线路</dt>
+                    <dd class="mt-1 flex flex-wrap gap-1">
+                      {claims.lineTypes.map(c => (
+                        <span class="chip">{c}</span>
+                      ))}
+                    </dd>
+                  </div>
+                )}
+                {claims.protocols.length > 0 && (
+                  <div>
+                    <dt class="text-muted-foreground text-xs">协议</dt>
+                    <dd class="mt-1 flex flex-wrap gap-1">
+                      {claims.protocols.map(c => (
+                        <span class="chip">{c}</span>
+                      ))}
+                    </dd>
+                  </div>
+                )}
+                {claims.ai.length > 0 && (
+                  <div>
+                    <dt class="text-muted-foreground text-xs">
+                      提及的 AI 服务
+                    </dt>
+                    <dd>{claims.ai.join("、")}</dd>
+                  </div>
+                )}
+                {claims.streaming.length > 0 && (
+                  <div>
+                    <dt class="text-muted-foreground text-xs">提及的流媒体</dt>
+                    <dd>{claims.streaming.join("、")}</dd>
+                  </div>
+                )}
+              </dl>
+              <p class="text-muted-foreground mt-3 text-xs leading-relaxed">
+                “提及”不等于每个节点都能用，网络连通也不等于账号地区资格。概念见
+                <a
+                  href="/routes/iplc-iepl-bgp-vless/"
+                  class="text-accent-strong underline underline-offset-2"
+                >
+                  IPLC、IEPL、BGP 与 VLESS
+                </a>
+                。
+              </p>
+            </section>
+          )
+        }
+        <nav
+          class="card p-5 text-sm"
+          aria-label="相关链接"
+          data-pagefind-ignore
+        >
+          <h2 class="font-bold">购买后怎么用</h2>
+          <ul class="mt-2.5 space-y-2">
+            <li>
+              <a
+                href="/clients/clash-subscription-import/"
+                class="text-accent-strong hover:underline"
+                >Clash 类客户端导入订阅</a
+              >
+            </li>
+            <li>
+              <a
+                href="/clients/windows-setup/"
+                class="text-accent-strong hover:underline">Windows 首次配置</a
+              >
+            </li>
+            <li>
+              <a
+                href="/clients/android-ios-import/"
+                class="text-accent-strong hover:underline"
+                >Android 与 iOS 导入订阅</a
+              >
+            </li>
+            <li>
+              <a
+                href="/troubleshooting/subscription-update-failed/"
+                class="text-accent-strong hover:underline">订阅更新失败怎么办</a
+              >
+            </li>
+          </ul>
+        </nav>
+      </aside>
+    </div>
+
+    <nav
+      class="app-layout mt-12 flex flex-col justify-between gap-3 sm:flex-row"
+      aria-label="其他品牌"
+      data-pagefind-ignore
+    >
+      {
+        prev ? (
+          <a
+            href={`/airports/${prev.slug}/`}
+            class="card hover:border-accent/40 px-4 py-3 text-sm font-semibold"
+          >
+            ← {prev.name}
+          </a>
+        ) : (
+          <span />
+        )
+      }
+      <a
+        href="/airports/"
+        class="text-muted-foreground hover:text-accent-strong self-center text-sm"
+        >全部机场目录</a
+      >
+      {
+        next ? (
+          <a
+            href={`/airports/${next.slug}/`}
+            class="card hover:border-accent/40 px-4 py-3 text-sm font-semibold"
+          >
+            {next.name} →
+          </a>
+        ) : (
+          <span />
+        )
+      }
+    </nav>
+  </main>
+</Layout>

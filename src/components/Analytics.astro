@@ -1,0 +1,56 @@
+---
+/**
+ * 轻量事件：affiliate_click / coupon_copy / provider_detail_view。
+ * 只推送到 window.dataLayer（如未接入统计工具则无任何外发请求）。
+ * 不修改邀请链接，不记录任何个人信息。
+ */
+---
+
+<script>
+  type Ev = Record<string, string | number>;
+  const w = window as unknown as { dataLayer?: Ev[] };
+  function track(event: string, data: Ev) {
+    w.dataLayer = w.dataLayer || [];
+    w.dataLayer.push({ event, page_path: location.pathname, ...data });
+  }
+  document.addEventListener("click", e => {
+    const t = e.target as HTMLElement;
+    const entry = t.closest<HTMLElement>("[data-entry]");
+    if (entry) {
+      track("affiliate_click", {
+        provider: entry.dataset.entry ?? "",
+        placement:
+          entry.closest<HTMLElement>("[data-placement]")?.dataset.placement ??
+          "page",
+      });
+    }
+    const copy = t.closest<HTMLButtonElement>("[data-copy]");
+    if (copy) {
+      const code = copy.dataset.copy ?? "";
+      const done = () => {
+        const old = copy.textContent;
+        copy.textContent = "已复制";
+        setTimeout(() => (copy.textContent = old), 1500);
+      };
+      navigator.clipboard?.writeText(code).then(done, () => {
+        const sel = copy.parentElement?.querySelector("code");
+        if (sel) {
+          const r = document.createRange();
+          r.selectNodeContents(sel);
+          getSelection()?.removeAllRanges();
+          getSelection()?.addRange(r);
+        }
+        copy.textContent = "请手动复制";
+      });
+      track("coupon_copy", {
+        provider: copy.dataset.brand ?? "",
+        coupon: code,
+      });
+    }
+  });
+  const detail = document.querySelector<HTMLElement>("[data-provider-detail]");
+  if (detail)
+    track("provider_detail_view", {
+      provider: detail.dataset.providerDetail ?? "",
+    });
+</script>

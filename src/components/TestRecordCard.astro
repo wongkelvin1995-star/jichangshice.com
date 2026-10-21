@@ -1,0 +1,258 @@
+---
+/** 公开测速参考的一条记录。数值按来源原样展示，不换算、不补全；不是本站实测。 */
+import type { CollectionEntry } from "astro:content";
+import { recordWindow } from "@/utils/testRecords";
+
+type Props = {
+  record: CollectionEntry<"testRecords">;
+  /** 显示品牌名（档案总页用） */
+  brandName?: string;
+  headingLevel?: "h2" | "h3";
+};
+const { record, brandName, headingLevel = "h3" } = Astro.props;
+const r = record.data;
+const H = headingLevel;
+const TYPE_LABEL: Record<string, string> = {
+  first_party: "本站测试",
+  public_record: "公开测速记录",
+  vendor_claim: "服务商公布",
+  methodology: "测试方法",
+};
+const hasRegion = r.rows.some(x => x.region);
+const hasNode = r.rows.some(x => x.node);
+const hasTime = r.rows.some(x => x.time);
+const hasLatency = r.rows.some(x => x.latency);
+const hasDl = r.rows.some(x => x.download);
+const hasUl = r.rows.some(x => x.upload);
+const hasAi = r.rows.some(x => x.ai);
+const hasMedia = r.rows.some(x => x.media);
+const hasNote = r.rows.some(x => x.note);
+const hasEvidence = r.rows.some(x => x.evidenceUrl);
+const hasNumbers = hasLatency || hasDl || hasUl || hasAi || hasMedia;
+const env = [
+  r.testLocation && `地点：${r.testLocation}`,
+  r.carrier && `运营商：${r.carrier}`,
+  r.bandwidthMbps &&
+    `测试端带宽：${r.bandwidthMbps >= 1000 ? `${r.bandwidthMbps / 1000}Gbps` : `${r.bandwidthMbps}M`}`,
+  r.device && `设备/网络：${r.device}`,
+  r.client && `客户端：${r.client}`,
+  r.tool && `工具：${r.tool}`,
+  r.protocol && `协议：${r.protocol}`,
+  r.nodeCount && `节点数：${r.nodeCount}`,
+].filter(Boolean) as string[];
+---
+
+<article
+  id={record.id}
+  class="card scroll-mt-24 overflow-hidden"
+  data-record-type={r.sourceType}
+>
+  <header class="border-b px-5 py-4">
+    <div class="flex flex-wrap items-center gap-2 text-xs">
+      <span
+        class:list={[
+          "rounded-full px-2.5 py-0.5 font-bold",
+          r.sourceType === "vendor_claim"
+            ? "bg-warn-soft text-warn"
+            : "bg-accent-soft text-accent-strong",
+        ]}>{TYPE_LABEL[r.sourceType]}</span
+      >
+      <span class="chip">非本站实测</span>
+      <span class="chip num">{r.recordedAt}{r.time ? ` ${r.time}` : ""}</span>
+      {recordWindow(record) && <span class="chip">{recordWindow(record)}</span>}
+    </div>
+    <H class="mt-2 text-base leading-snug font-extrabold">
+      {brandName ? `${brandName} · ` : ""}{r.sourceName}
+    </H>
+    <p class="text-muted-foreground mt-1.5 text-xs leading-relaxed">
+      {env.join(" · ")}
+      {r.timezone && <> · 时间：{r.timezone}</>}
+    </p>
+  </header>
+
+  {
+    !hasNumbers && (
+      <ul class="space-y-1 border-b px-5 py-3 text-sm">
+        {r.rows.map(x => (
+          <li>
+            {x.region && <b>{x.region}：</b>}
+            {x.note}
+          </li>
+        ))}
+      </ul>
+    )
+  }
+  {
+    hasNumbers && (
+      <div class="table-scroll">
+        <table class="w-full min-w-[560px] text-sm">
+          <caption class="sr-only">
+            {r.sourceName}（{r.recordedAt}）测速数据，单位：{r.unit}
+          </caption>
+          <thead class="bg-muted/50 text-muted-foreground text-xs">
+            <tr>
+              {hasRegion && (
+                <th scope="col" class="px-3 py-2 text-start">
+                  地区
+                </th>
+              )}
+              {hasNode && (
+                <th scope="col" class="px-3 py-2 text-start">
+                  节点
+                </th>
+              )}
+              {hasTime && (
+                <th scope="col" class="px-3 py-2 text-start">
+                  时间
+                </th>
+              )}
+              {hasLatency && (
+                <th scope="col" class="px-3 py-2 text-start">
+                  延迟
+                </th>
+              )}
+              {hasDl && (
+                <th scope="col" class="px-3 py-2 text-start">
+                  下载
+                </th>
+              )}
+              {hasUl && (
+                <th scope="col" class="px-3 py-2 text-start">
+                  上传
+                </th>
+              )}
+              {hasAi && (
+                <th scope="col" class="px-3 py-2 text-start">
+                  AI
+                </th>
+              )}
+              {hasMedia && (
+                <th scope="col" class="px-3 py-2 text-start">
+                  视频
+                </th>
+              )}
+              {hasNote && (
+                <th scope="col" class="px-3 py-2 text-start">
+                  备注
+                </th>
+              )}
+              {hasEvidence && (
+                <th scope="col" class="px-3 py-2 text-start">
+                  原始结果
+                </th>
+              )}
+            </tr>
+          </thead>
+          <tbody>
+            {r.rows.map(x => (
+              <tr class="border-t align-top">
+                {hasRegion && (
+                  <td class="px-3 py-2 font-semibold whitespace-nowrap">
+                    {x.region ?? "—"}
+                  </td>
+                )}
+                {hasNode && (
+                  <td class="px-3 py-2 font-semibold whitespace-nowrap">
+                    {x.node ?? "—"}
+                  </td>
+                )}
+                {hasTime && (
+                  <td class="num px-3 py-2 whitespace-nowrap">
+                    {x.time ?? "—"}
+                    {x.window && (
+                      <span class="text-muted-foreground block text-xs">
+                        {x.window}
+                      </span>
+                    )}
+                  </td>
+                )}
+                {hasLatency && (
+                  <td class="num px-3 py-2">{x.latency ?? "—"}</td>
+                )}
+                {hasDl && <td class="num px-3 py-2">{x.download ?? "—"}</td>}
+                {hasUl && (
+                  <td class="num px-3 py-2 whitespace-nowrap">
+                    {x.upload ?? "—"}
+                  </td>
+                )}
+                {hasAi && <td class="px-3 py-2">{x.ai ?? "—"}</td>}
+                {hasMedia && <td class="px-3 py-2">{x.media ?? "—"}</td>}
+                {hasNote && (
+                  <td class="text-muted-foreground px-3 py-2">
+                    {x.note ?? ""}
+                  </td>
+                )}
+                {hasEvidence && (
+                  <td class="px-3 py-2 whitespace-nowrap">
+                    {x.evidenceUrl ? (
+                      <a
+                        href={x.evidenceUrl}
+                        target="_blank"
+                        rel="nofollow noopener noreferrer"
+                        class="text-accent-strong underline underline-offset-2"
+                      >
+                        Speedtest 结果
+                      </a>
+                    ) : (
+                      <span class="text-muted-foreground">未附链接</span>
+                    )}
+                  </td>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )
+  }
+
+  <div class="space-y-2 px-5 py-4 text-sm leading-relaxed">
+    <p class="text-muted-foreground text-xs">
+      速度单位：{r.unit}。{
+        r.latencyMethod && <>延迟口径：{r.latencyMethod}。</>
+      }
+    </p>
+    {
+      r.ai && (
+        <p>
+          <b>AI：</b>
+          {r.ai}
+        </p>
+      )
+    }
+    {
+      r.media && (
+        <p>
+          <b>流媒体：</b>
+          {r.media}
+        </p>
+      )
+    }
+    {r.notes && <p class="text-muted-foreground">{r.notes}</p>}
+    {
+      r.sharedData && (
+        <p class="bg-warn-soft text-warn rounded-lg px-3 py-2 text-xs leading-relaxed">
+          <b>数据重合说明：</b>
+          {r.sharedData}
+        </p>
+      )
+    }
+    <details class="text-muted-foreground">
+      <summary class="text-foreground cursor-pointer font-semibold"
+        >这组数据不能说明什么</summary
+      >
+      <ul class="mt-1.5 list-disc ps-5">
+        {r.limitations.map(l => <li>{l}</li>)}
+      </ul>
+    </details>
+    <p class="text-xs">
+      来源：<a
+        href={r.sourceUrl}
+        target="_blank"
+        rel="nofollow noopener noreferrer"
+        class="text-accent-strong underline underline-offset-2"
+        >{r.sourceName}</a
+      >（本站核对于 {r.sourceCheckedAt}）
+    </p>
+  </div>
+</article>

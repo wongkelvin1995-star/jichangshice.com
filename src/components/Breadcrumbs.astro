@@ -1,0 +1,32 @@
+---
+/** 面包屑：可见导航 + 由页面把同一组数据传给 breadcrumbJsonLd() 输出结构化数据 */
+export type Crumb = { name: string; href?: string };
+type Props = { items: Crumb[] };
+const { items } = Astro.props;
+---
+
+<nav
+  aria-label="面包屑"
+  class="text-muted-foreground mb-4 text-sm"
+  data-pagefind-ignore
+>
+  <ol class="flex flex-wrap items-center gap-x-1.5 gap-y-1">
+    <li><a href="/" class="hover:text-accent">首页</a></li>
+    {
+      items.map((c, i) => (
+        <li class="flex items-center gap-1.5">
+          <span aria-hidden="true">/</span>
+          {c.href && i < items.length - 1 ? (
+            <a href={c.href} class="hover:text-accent">
+              {c.name}
+            </a>
+          ) : (
+            <span aria-current="page" class="text-foreground line-clamp-1">
+              {c.name}
+            </span>
+          )}
+        </li>
+      ))
+    }
+  </ol>
+</nav>

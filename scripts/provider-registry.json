@@ -1,0 +1,628 @@
+{
+  "_note": "本站品牌注册表：slug、名称、别名、编辑排列(editorialOrder)、用户于2026-10-15提供的入口链接(entryUrl)。排列是编辑安排，不是实测排名。historyNames 用于匹配历史资料。 coupon 为站长 2026-10-15 提供的优惠码（34 家均有）；没有的填 null，不得自行编造。",
+  "providers": [
+    {
+      "slug": "lingdongyun",
+      "name": "灵动云",
+      "englishName": "Lingdong Cloud",
+      "aliases": [
+        "灵动"
+      ],
+      "pinyin": [
+        "lingdongyun",
+        "ldy"
+      ],
+      "historyNames": [
+        "灵动云"
+      ],
+      "entryUrl": "https://varnexa.lingdongaff.com/#/?code=HHoxxHGa",
+      "coupon": "ldy88",
+      "couponNote": "站长提供；折扣幅度与适用套餐以结算页显示为准",
+      "couponCheckedAt": "2026-10-15"
+    },
+    {
+      "slug": "muguang",
+      "name": "暮光加速",
+      "englishName": null,
+      "aliases": [
+        "暮光",
+        "暮光网络"
+      ],
+      "pinyin": [
+        "muguangjiasu",
+        "muguang",
+        "mg"
+      ],
+      "historyNames": [
+        "暮光加速",
+        "暮光网络"
+      ],
+      "entryUrl": "https://varnexa.twilightaff.com/#/?code=rkRvrsRc",
+      "coupon": "mm88",
+      "couponNote": "资料记录为 8 折；适用套餐和有效期以结算页为准",
+      "couponCheckedAt": "2026-10-15"
+    },
+    {
+      "slug": "feimaoyun",
+      "name": "飞猫云",
+      "englishName": null,
+      "aliases": [
+        "飞猫"
+      ],
+      "pinyin": [
+        "feimaoyun",
+        "feimao",
+        "fmy"
+      ],
+      "historyNames": [
+        "飞猫云"
+      ],
+      "entryUrl": "https://flycat1.flycatvipaff.cc/#/?code=AuJYgbpn",
+      "coupon": "flycat888",
+      "couponNote": "资料记录为新用户购买季付及以上 8 折；适用范围以结算页为准",
+      "couponCheckedAt": "2026-10-15"
+    },
+    {
+      "slug": "dalaoyun",
+      "name": "大佬云",
+      "englishName": null,
+      "aliases": [
+        "大老云",
+        "大佬"
+      ],
+      "pinyin": [
+        "dalaoyun",
+        "dly"
+      ],
+      "historyNames": [
+        "大佬云",
+        "大老云"
+      ],
+      "entryUrl": "https://a01vipaff.dalaoyunaff.com/#/?code=r0yLHfTq",
+      "coupon": "dly888",
+      "couponNote": "站长提供；折扣幅度与适用套餐以结算页显示为准",
+      "couponCheckedAt": "2026-10-15"
+    },
+    {
+      "slug": "breezenet",
+      "name": "微风网络",
+      "englishName": "Breezenet",
+      "aliases": [
+        "微风"
+      ],
+      "pinyin": [
+        "weifengwangluo",
+        "weifeng",
+        "wf"
+      ],
+      "historyNames": [
+        "微风网络"
+      ],
+      "entryUrl": "https://edp01.breezenetaff.com/#/?code=7zY9KCxp",
+      "coupon": "weifeng90",
+      "couponNote": "站长提供；折扣幅度与适用套餐以结算页显示为准",
+      "couponCheckedAt": "2026-10-15"
+    },
+    {
+      "slug": "flyv",
+      "name": "飞V",
+      "englishName": "FlyV",
+      "aliases": [
+        "飞v"
+      ],
+      "pinyin": [
+        "feiv",
+        "flyv"
+      ],
+      "historyNames": [
+        "飞V"
+      ],
+      "entryUrl": "https://varnexa.flyvaff.com/#/?code=1mq17Z8C",
+      "coupon": "fly20",
+      "couponNote": "站长提供；折扣幅度与适用套餐以结算页显示为准",
+      "couponCheckedAt": "2026-10-15"
+    },
+    {
+      "slug": "laddercloud",
+      "name": "梯子云",
+      "englishName": "LadderCloud",
+      "aliases": [
+        "梯子云 LadderCloud"
+      ],
+      "pinyin": [
+        "tiziyun",
+        "tzy"
+      ],
+      "historyNames": [
+        "梯子云"
+      ],
+      "entryUrl": "https://varnexa.ladderaff.com/#/?code=NSTRhs22",
+      "coupon": "tzy888",
+      "couponNote": "站长提供；折扣幅度与适用套餐以结算页显示为准",
+      "couponCheckedAt": "2026-10-15"
+    },
+    {
+      "slug": "wavenet",
+      "name": "浪网",
+      "englishName": "WaveNet",
+      "aliases": [
+        "浪网 WaveNet"
+      ],
+      "pinyin": [
+        "langwang",
+        "lw"
+      ],
+      "historyNames": [
+        "浪网"
+      ],
+      "entryUrl": "https://varnexa.wavenetaff.com/#/?code=Thua5OyI",
+      "coupon": "lw888",
+      "couponNote": "站长提供；折扣幅度与适用套餐以结算页显示为准",
+      "couponCheckedAt": "2026-10-15"
+    },
+    {
+      "slug": "yinxingren",
+      "name": "隐形人",
+      "englishName": null,
+      "aliases": [],
+      "pinyin": [
+        "yinxingren",
+        "yxr"
+      ],
+      "historyNames": [
+        "隐形人"
+      ],
+      "entryUrl": "https://varnexa.invisibleaff.com/#/?code=PoecAA0c",
+      "coupon": "yxr888",
+      "couponNote": "站长提供；折扣幅度与适用套餐以结算页显示为准",
+      "couponCheckedAt": "2026-10-15"
+    },
+    {
+      "slug": "stardream",
+      "name": "星岛梦",
+      "englishName": "StarDream",
+      "aliases": [
+        "星岛梦 StarDream"
+      ],
+      "pinyin": [
+        "xingdaomeng",
+        "xdm"
+      ],
+      "historyNames": [
+        "星岛梦"
+      ],
+      "entryUrl": "https://kfccbb.xingdaomeng.com/#/?code=8OfXD5OF",
+      "coupon": "nmw888",
+      "couponNote": "站长提供；折扣幅度与适用套餐以结算页显示为准",
+      "couponCheckedAt": "2026-10-15"
+    },
+    {
+      "slug": "lightspeed",
+      "name": "光速云",
+      "englishName": "LightSpeed",
+      "aliases": [
+        "光速云 LightSpeed"
+      ],
+      "pinyin": [
+        "guangsuyun",
+        "gsy"
+      ],
+      "historyNames": [
+        "光速云"
+      ],
+      "entryUrl": "https://mdlky.gsyaff.com/#/?code=F7n0RNQb",
+      "coupon": "GSY888",
+      "couponNote": "站长提供；折扣幅度与适用套餐以结算页显示为准",
+      "couponCheckedAt": "2026-10-15"
+    },
+    {
+      "slug": "v2yun",
+      "name": "唯兔云",
+      "englishName": "V2云",
+      "aliases": [
+        "V2云",
+        "唯兔"
+      ],
+      "pinyin": [
+        "weituyun",
+        "v2yun",
+        "wty"
+      ],
+      "historyNames": [
+        "唯兔云"
+      ],
+      "entryUrl": "https://fast.v2yunvipaff.com/#/?code=sZt4VRYd",
+      "coupon": "rabbit",
+      "couponNote": "站长提供；折扣幅度与适用套餐以结算页显示为准",
+      "couponCheckedAt": "2026-10-15"
+    },
+    {
+      "slug": "u1s1",
+      "name": "U1S1",
+      "englishName": "U1S1",
+      "aliases": [
+        "有一说一"
+      ],
+      "pinyin": [
+        "youyishuoyi",
+        "u1s1"
+      ],
+      "historyNames": [
+        "U1S1"
+      ],
+      "entryUrl": "https://pkdj7.vipaff.cc/#/?code=fRPgEjR9",
+      "coupon": "U1S1888",
+      "couponNote": "站长提供；折扣幅度与适用套餐以结算页显示为准",
+      "couponCheckedAt": "2026-10-15"
+    },
+    {
+      "slug": "jilianyun",
+      "name": "极连云",
+      "englishName": null,
+      "aliases": [],
+      "pinyin": [
+        "jilianyun",
+        "jly"
+      ],
+      "historyNames": [
+        "极连云"
+      ],
+      "entryUrl": "https://kdjhao.jlyvipaff.com/#/?code=CLXGwx9n",
+      "coupon": "ji8888",
+      "couponNote": "站长提供；折扣幅度与适用套餐以结算页显示为准",
+      "couponCheckedAt": "2026-10-15"
+    },
+    {
+      "slug": "quanqiuyun",
+      "name": "全球云",
+      "englishName": null,
+      "aliases": [],
+      "pinyin": [
+        "quanqiuyun",
+        "qqy"
+      ],
+      "historyNames": [
+        "全球云"
+      ],
+      "entryUrl": "https://sswdh.gcvipaff.com/#/?code=cFVyXgfb",
+      "coupon": "qq88",
+      "couponNote": "资料记录为 8 折；适用套餐、有效期及能否叠加以结算页为准",
+      "couponCheckedAt": "2026-10-15"
+    },
+    {
+      "slug": "guangnianti",
+      "name": "光年梯",
+      "englishName": null,
+      "aliases": [],
+      "pinyin": [
+        "guangnianti",
+        "gnt"
+      ],
+      "historyNames": [
+        "光年梯"
+      ],
+      "entryUrl": "https://ggmq.gntaff.com/#/?code=ntDL4Jt7",
+      "coupon": "GN888",
+      "couponNote": "站长提供；折扣幅度与适用套餐以结算页显示为准",
+      "couponCheckedAt": "2026-10-15"
+    },
+    {
+      "slug": "sogoyun",
+      "name": "Sogo云",
+      "englishName": null,
+      "aliases": [
+        "sogo"
+      ],
+      "pinyin": [
+        "sogoyun"
+      ],
+      "historyNames": [
+        "Sogo云"
+      ],
+      "entryUrl": "https://wzjc.sogoyunaff.cc/#/?code=EJx2Kerr",
+      "coupon": "SOGO888",
+      "couponNote": "站长提供；折扣幅度与适用套餐以结算页显示为准",
+      "couponCheckedAt": "2026-10-15"
+    },
+    {
+      "slug": "yuzhouyun",
+      "name": "宇宙云",
+      "englishName": "YuZhou",
+      "aliases": [
+        "宇宙云 YuZhou"
+      ],
+      "pinyin": [
+        "yuzhouyun",
+        "yzy"
+      ],
+      "historyNames": [
+        "宇宙云"
+      ],
+      "entryUrl": "https://wzjc.yuzoucloud.cc/#/?code=5LyV2wPs",
+      "coupon": "YUZHOU553",
+      "couponNote": "站长提供；折扣幅度与适用套餐以结算页显示为准",
+      "couponCheckedAt": "2026-10-15"
+    },
+    {
+      "slug": "ermaoyun",
+      "name": "二猫云",
+      "englishName": "2mao",
+      "aliases": [
+        "二猫云 2mao",
+        "2mao"
+      ],
+      "pinyin": [
+        "ermaoyun",
+        "emy"
+      ],
+      "historyNames": [
+        "二猫云"
+      ],
+      "entryUrl": "https://waaa.2maoyunaff.cc/#/?code=eWzdVBUV",
+      "coupon": "ermao888",
+      "couponNote": "站长提供；折扣幅度与适用套餐以结算页显示为准",
+      "couponCheckedAt": "2026-10-15"
+    },
+    {
+      "slug": "yifanyun",
+      "name": "一翻云",
+      "englishName": "1fly",
+      "aliases": [
+        "一翻云 1fly",
+        "1fly"
+      ],
+      "pinyin": [
+        "yifanyun",
+        "yfy"
+      ],
+      "historyNames": [
+        "一翻云"
+      ],
+      "entryUrl": "https://wzjc.1flyunaff.cc/#/?code=6kvuXWSh",
+      "coupon": "yfy6666",
+      "couponNote": "站长提供；折扣幅度与适用套餐以结算页显示为准",
+      "couponCheckedAt": "2026-10-15"
+    },
+    {
+      "slug": "edgenova",
+      "name": "边缘节点",
+      "englishName": "EdgeNova",
+      "aliases": [
+        "边缘节点 EdgeNova"
+      ],
+      "pinyin": [
+        "bianyuanjiedian",
+        "byjd"
+      ],
+      "historyNames": [
+        "边缘节点"
+      ],
+      "entryUrl": "https://work.edgenovaaff.cc/#/?code=nkZgzbw6",
+      "coupon": "EDGE888",
+      "couponNote": "站长提供；折扣幅度与适用套餐以结算页显示为准",
+      "couponCheckedAt": "2026-10-15"
+    },
+    {
+      "slug": "kexinyun",
+      "name": "可信云",
+      "englishName": null,
+      "aliases": [],
+      "pinyin": [
+        "kexinyun",
+        "kxy"
+      ],
+      "historyNames": [
+        "可信云"
+      ],
+      "entryUrl": "https://work.kosingaff.com/#/?code=Ho0l8Dcm",
+      "coupon": "KX888",
+      "couponNote": "站长提供；折扣幅度与适用套餐以结算页显示为准",
+      "couponCheckedAt": "2026-10-15"
+    },
+    {
+      "slug": "sujie",
+      "name": "速界",
+      "englishName": "SuJie",
+      "aliases": [
+        "速界 SuJie"
+      ],
+      "pinyin": [
+        "sujie",
+        "sj"
+      ],
+      "historyNames": [
+        "速界"
+      ],
+      "entryUrl": "https://work.speedworldaff.cc/#/?code=sRNgp64F",
+      "coupon": "SJ888",
+      "couponNote": "站长提供；折扣幅度与适用套餐以结算页显示为准",
+      "couponCheckedAt": "2026-10-15"
+    },
+    {
+      "slug": "kuaili",
+      "name": "快狸",
+      "englishName": "KuaiLi",
+      "aliases": [
+        "快狸 KuaiLi"
+      ],
+      "pinyin": [
+        "kuaili",
+        "kl"
+      ],
+      "historyNames": [
+        "快狸"
+      ],
+      "entryUrl": "https://work.kuailicloud.cc/#/?code=Tmt2KQBn",
+      "coupon": "KL888",
+      "couponNote": "站长提供；折扣幅度与适用套餐以结算页显示为准",
+      "couponCheckedAt": "2026-10-15"
+    },
+    {
+      "slug": "wuyou",
+      "name": "无忧",
+      "englishName": null,
+      "aliases": [],
+      "pinyin": [
+        "wuyou",
+        "wy"
+      ],
+      "historyNames": [
+        "无忧"
+      ],
+      "entryUrl": "https://wep01.worryfreeaff.com/#/?code=6KQS8Ked",
+      "coupon": "wuyou666",
+      "couponNote": "站长提供；折扣幅度与适用套餐以结算页显示为准",
+      "couponCheckedAt": "2026-10-15"
+    },
+    {
+      "slug": "lingmao",
+      "name": "灵猫",
+      "englishName": null,
+      "aliases": [],
+      "pinyin": [
+        "lingmao",
+        "lm"
+      ],
+      "historyNames": [
+        "灵猫"
+      ],
+      "entryUrl": "https://vip02.civetaff.com/#/?code=oL5LiBYi",
+      "coupon": "lmao888",
+      "couponNote": "站长提供；折扣幅度与适用套餐以结算页显示为准",
+      "couponCheckedAt": "2026-10-15"
+    },
+    {
+      "slug": "flashleap",
+      "name": "闪跃",
+      "englishName": "FlashLeap",
+      "aliases": [
+        "闪跃 FlashLeap"
+      ],
+      "pinyin": [
+        "shanyue",
+        "sy"
+      ],
+      "historyNames": [
+        "闪跃"
+      ],
+      "entryUrl": "https://vip02.flashleapaff.com/#/?code=mS7mSSyk",
+      "coupon": "shanyue",
+      "couponNote": "站长提供；折扣幅度与适用套餐以结算页显示为准",
+      "couponCheckedAt": "2026-10-15"
+    },
+    {
+      "slug": "firefly",
+      "name": "飞为",
+      "englishName": "Firefly",
+      "aliases": [
+        "飞为 Firefly"
+      ],
+      "pinyin": [
+        "feiwei",
+        "fw"
+      ],
+      "historyNames": [
+        "飞为"
+      ],
+      "entryUrl": "https://vip02.fireflyaff.com/#/?code=ChuJcdvd",
+      "coupon": "firefly",
+      "couponNote": "站长提供；折扣幅度与适用套餐以结算页显示为准",
+      "couponCheckedAt": "2026-10-15"
+    },
+    {
+      "slug": "kuajie",
+      "name": "跨界",
+      "englishName": null,
+      "aliases": [
+        "跨界云"
+      ],
+      "pinyin": [
+        "kuajie",
+        "kj"
+      ],
+      "historyNames": [
+        "跨界",
+        "跨界云"
+      ],
+      "entryUrl": "https://vip02.kuajieaff.com/#/?code=tpRqrYXx",
+      "coupon": "kuajie",
+      "couponNote": "站长提供；折扣幅度与适用套餐以结算页显示为准",
+      "couponCheckedAt": "2026-10-15"
+    },
+    {
+      "slug": "liulianyun",
+      "name": "榴莲云",
+      "englishName": null,
+      "aliases": [],
+      "pinyin": [
+        "liulianyun",
+        "lly"
+      ],
+      "historyNames": [],
+      "entryUrl": "https://a01vipaff.liulianyunaff.com/#/?code=DpwvSnYN",
+      "coupon": "LLY888",
+      "couponNote": "站长提供；折扣幅度与适用套餐以结算页显示为准",
+      "couponCheckedAt": "2026-10-15"
+    },
+    {
+      "slug": "shandianyun",
+      "name": "闪电云",
+      "englishName": null,
+      "aliases": [],
+      "pinyin": [
+        "shandianyun",
+        "sdy"
+      ],
+      "historyNames": [],
+      "entryUrl": "https://a01vipaff.shandianshuaff.com/#/?code=GgfmE3x9",
+      "coupon": "SDY888",
+      "couponNote": "站长提供；折扣幅度与适用套餐以结算页显示为准",
+      "couponCheckedAt": "2026-10-15"
+    },
+    {
+      "slug": "huanqiuyun",
+      "name": "环球云",
+      "englishName": null,
+      "aliases": [],
+      "pinyin": [
+        "huanqiuyun",
+        "hqy"
+      ],
+      "historyNames": [],
+      "entryUrl": "https://a01vipaff.huanqiutiaff.com/#/?code=KLJlZ16u",
+      "coupon": "HQY888",
+      "couponNote": "站长提供；折扣幅度与适用套餐以结算页显示为准",
+      "couponCheckedAt": "2026-10-15"
+    },
+    {
+      "slug": "shenxingyun",
+      "name": "神行云",
+      "englishName": null,
+      "aliases": [],
+      "pinyin": [
+        "shenxingyun",
+        "sxy"
+      ],
+      "historyNames": [],
+      "entryUrl": "https://a01vipaff.shenxingaff.com/#/?code=NjGWznDv",
+      "coupon": "SXY888",
+      "couponNote": "站长提供；折扣幅度与适用套餐以结算页显示为准",
+      "couponCheckedAt": "2026-10-15"
+    },
+    {
+      "slug": "yunjieyun",
+      "name": "云界云",
+      "englishName": null,
+      "aliases": [],
+      "pinyin": [
+        "yunjieyun",
+        "yjy"
+      ],
+      "historyNames": [],
+      "entryUrl": "https://a01vipaff.yunjiexianaff.com/#/?code=6F666lYO",
+      "coupon": "YJY888",
+      "couponNote": "站长提供；折扣幅度与适用套餐以结算页显示为准",
+      "couponCheckedAt": "2026-10-15"
+    }
+  ]
+}

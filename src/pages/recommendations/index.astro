@@ -1,0 +1,583 @@
+---
+import { FEATURED_COUNT } from "@/data/editorial-order";
+import Layout from "@/layouts/Layout.astro";
+import Breadcrumbs from "@/components/Breadcrumbs.astro";
+import BrandCard from "@/components/BrandCard.astro";
+import BrandAvatar from "@/components/BrandAvatar.astro";
+import CouponBox from "@/components/CouponBox.astro";
+import EntryLink from "@/components/EntryLink.astro";
+import Toc from "@/components/Toc.astro";
+import {
+  getProviders,
+  getPlans,
+  startingMonthly,
+  trafficLabel,
+  cycleList,
+  monthlyTraffic,
+  type Plan,
+} from "@/utils/plans";
+import { fmtGB, fmtMoney } from "@/utils/format";
+import {
+  breadcrumbJsonLd,
+  itemListJsonLd,
+  articleJsonLd,
+} from "@/utils/jsonld";
+import config from "@/config";
+
+const providers = await getProviders();
+const plans = await getPlans();
+const withProfile = providers.filter(p => p.hasProfile);
+const top = withProfile.slice(0, FEATURED_COUNT);
+const table = withProfile.slice(0, 15);
+const year = new Date().getFullYear();
+const observed = plans
+  .map(p => p.observedAt)
+  .filter(Boolean)
+  .sort()
+  .at(-1);
+const path = "/recommendations/";
+const crumbs = [{ name: "机场推荐" }];
+const nameOf = (slug: string) => providers.find(p => p.slug === slug)!.name;
+
+/** 场景选择全部由数据计算，避免手写数字出错 */
+const clean = plans.filter(
+  p => !p.conflicts.length && p.paymentAmount !== null
+);
+function bestPerBrand(list: Plan[], score: (p: Plan) => number, n = 4) {
+  const best = new Map<string, Plan>();
+  for (const p of list) {
+    const cur = best.get(p.providerId);
+    if (!cur || score(p) < score(cur)) best.set(p.providerId, p);
+  }
+  const order = new Map(providers.map(p => [p.slug, p.editorialOrder]));
+  return [...best.values()]
+    .sort((a, b) => order.get(a.providerId)! - order.get(b.providerId)!)
+    .slice(0, n);
+}
+const budget20 = bestPerBrand(
+  clean.filter(
+    p =>
+      p.paymentMonths === 1 &&
+      p.paymentAmount! <= 20 &&
+      p.trafficPeriod === "monthly"
+  ),
+  p => p.paymentAmount!
+);
+const mid300 = bestPerBrand(
+  clean.filter(
+    p =>
+      p.paymentMonths === 1 &&
+      (monthlyTraffic(p) ?? 0) >= 250 &&
+      (monthlyTraffic(p) ?? 0) <= 400
+  ),
+  p => p.paymentAmount!
+);
+const heavy = bestPerBrand(
+  clean.filter(p => p.paymentMonths === 1 && (monthlyTraffic(p) ?? 0) >= 1000),
+  p => p.paymentAmount!
+);
+const annual = bestPerBrand(
+  clean.filter(p => p.paymentMonths === 12 && p.trafficPeriod === "monthly"),
+  p => p.paymentAmount!
+);
+const onetime = bestPerBrand(
+  clean.filter(p => p.paymentMonths === 0),
+  p => p.paymentAmount!
+);
+const allCoupons = providers.filter(p => p.coupon);
+const coupons = allCoupons.slice(0, 6);
+
+const planLine = (p: Plan) =>
+  `${fmtMoney(p.paymentAmount!)}${p.paymentMonths === 1 ? "/月" : p.paymentMonths === 12 ? "/年" : ""} · ${p.trafficGB ? fmtGB(p.trafficGB) : "—"}${p.trafficPeriod === "monthly" ? "/月" : p.trafficPeriod === "total" ? " 总量" : ""}`;
+
+const reasons: Record<string, { fit: string; note: string }> = {
+  lingdongyun: {
+    fit: "想从小流量开始、以后逐步升级的新手。月付三档梯度清楚，用量变化时换档成本低；另有一次性流量包可作备用。",
+    note: "年付方案的 70GB 是全年总量，不适合每月用量较大的读者。",
+  },
+  muguang: {
+    fit: "入门就需要稍多流量、偶尔看视频的读者。¥20 档为每月 120GB，比精选里灵动云同价档多 20GB；大流量需求可看 1500GB 档。",
+    note: "¥40 档按站长资料记为每月 240GB（旧资料曾有 300GB 的写法），付款前以结算页为准。",
+  },
+  feimaoyun: {
+    fit: "用量不大、想长期低成本使用或需要一个备用服务的读者。年付方案折合约 ¥7/月、每月 50GB 额度。",
+    note: "优惠码资料记录为新用户季付及以上可用，月付是否适用请在结算页确认。",
+  },
+  dalaoyun: {
+    fit: "用量少且不规律、希望按总量买流量包的读者，资料中最小一档为 ¥99/78GB 总量。",
+    note: "月付各档按每 30 天重置流量；入门福利版卡片标 100GB、说明文字写 120GB，以付款后面板为准。",
+  },
+  breezenet: {
+    fit: "每月 200GB 左右的中度视频用户，入门档就提供 200GB；用量稳定后可比较年付清风的每月 100GB。",
+    note: "价格来自站长资料笔记，尚未经结算页截图核验，付款前以结算页为准。",
+  },
+};
+
+const faq = [
+  {
+    q: "这份机场推荐的顺序是怎么定的？",
+    a: "顺序是本站编辑安排，会考虑资料完整度和合作关系，不是测速或稳定性排名。本站目前没有发布实测记录，所以不打分。",
+  },
+  {
+    q: "第一次买机场应该选哪个档位？",
+    a: "先估算每月用量，选能覆盖用量、留出约 30% 余量的最低档，第一次购买优先月付，用一个月后再调整。",
+  },
+  {
+    q: "页面上的价格是现价吗？",
+    a: `不一定。价格为站内整理的套餐资料，最后整理 ${observed}，部分档位已按结算页截图核验。付款前请以服务商结算页显示的价格、流量和优惠为准。`,
+  },
+  {
+    q: "优惠码怎么用？",
+    a: "在服务商结算页的优惠码输入框填写后再付款。适用套餐、有效期和能否叠加以结算页显示为准，本站会标注最后核验日期。",
+  },
+];
+---
+
+<Layout
+  title={`${year} 机场推荐：稳定机场、便宜机场与梯子推荐，按预算和用途选择｜${config.site.title}`}
+  description={`${year} 机场推荐与梯子推荐：精选灵动云、暮光加速、飞猫云、大佬云、微风网络等机场，按预算、每月流量和付款周期比较，分别说明想要稳定、便宜、看视频或用 AI 时怎么选，附优惠码与购买前核对清单。`}
+  canonicalPath={path}
+  ogType="article"
+  jsonLd={[
+    breadcrumbJsonLd(crumbs, path),
+    itemListJsonLd(
+      "机场推荐",
+      top.map(p => ({ name: p.name, url: `/airports/${p.slug}/` }))
+    ),
+    articleJsonLd({
+      title: `${year} 机场推荐：编辑精选、价格比较与按需求选择`,
+      description: "机场推荐支柱页",
+      path,
+      published: new Date("2026-10-15T13:00:00+08:00"),
+      section: "机场推荐",
+    }),
+  ]}
+>
+  <main id="main-content" data-pagefind-body>
+    <section class="hero-band relative border-b">
+      <div class="app-layout relative py-8 sm:py-11">
+        <Breadcrumbs items={crumbs} />
+        <p class="chip border-accent/25 text-accent-strong">
+          {year} 机场推荐 · 最后核验 {observed}
+        </p>
+        <h1
+          class="mt-4 text-[1.85rem] leading-tight font-black tracking-tight text-balance sm:text-[2.6rem]"
+        >
+          {year} 机场推荐：稳定机场、便宜机场怎么选
+        </h1>
+        <div class="card mt-6 max-w-4xl p-5 sm:p-6">
+          <p class="text-sm font-bold">先说结论</p>
+          <ul class="mt-2.5 grid gap-2 text-[0.95rem] leading-relaxed">
+            <li>
+              · 想要清楚的升级梯度：<a
+                href="/airports/lingdongyun/"
+                class="text-accent-strong font-semibold hover:underline"
+                >灵动云</a
+              >，月付三档 ¥20/50/100。
+            </li>
+            <li>
+              · 入门就要多一点流量：<a
+                href="/airports/muguang/"
+                class="text-accent-strong font-semibold hover:underline"
+                >暮光加速</a
+              >，¥20 档每月 120GB。
+            </li>
+            <li>
+              · 低成本长期或备用：<a
+                href="/airports/feimaoyun/"
+                class="text-accent-strong font-semibold hover:underline"
+                >飞猫云</a
+              >，年付折合约 ¥7/月。
+            </li>
+            <li>
+              · 用量少、按总量买：<a
+                href="/airports/dalaoyun/"
+                class="text-accent-strong font-semibold hover:underline"
+                >大佬云</a
+              >的流量包；中度视频看 <a
+                href="/airports/breezenet/"
+                class="text-accent-strong font-semibold hover:underline"
+                >微风网络</a
+              > 200GB 起步档。
+            </li>
+          </ul>
+          <p class="text-muted-foreground mt-3 text-xs leading-relaxed">
+            顺序为编辑安排并考虑合作关系，不是测速排名；价格为历史资料，以当前结算页为准。入口含邀请码，见<a
+              href="/disclosure/"
+              class="underline underline-offset-2">合作说明</a
+            >。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <div
+      class="app-layout grid gap-10 pt-10 lg:grid-cols-[minmax(0,1fr)_240px]"
+    >
+      <div class="min-w-0">
+        <Toc
+          variant="mobile"
+          headings={[
+            { depth: 2, slug: "who", text: "这份推荐适合谁" },
+            { depth: 2, slug: "picks", text: "编辑精选 5 家" },
+            { depth: 2, slug: "table", text: "15 家机场快速对比" },
+            { depth: 2, slug: "by-need", text: "按需求选择" },
+            { depth: 2, slug: "coupons", text: "优惠码汇总" },
+            { depth: 2, slug: "method", text: "排序说明与评测方法" },
+            { depth: 2, slug: "checklist", text: "购买前核对清单" },
+            { depth: 2, slug: "faq", text: "常见问题" },
+          ]}
+        />
+
+        <section class="app-prose" aria-labelledby="who">
+          <h2 id="who">这份推荐适合谁</h2>
+          <p>
+            这页写给第一次挑选机场、或者想换一家的读者。机场推荐不是一句“哪家最好”能回答的：每月用多少流量、预算多少、愿不愿意一次付一年、需要几台设备同时在线，答案都不一样。所以下面先给出编辑精选，再按预算、流量和付款周期分别列出资料中符合条件的方案，最后附上购买前要核对的条款。
+          </p>
+          <p>
+            本站目前没有发布实测数据，以下内容基于整理过的公开套餐资料。价格、流量和优惠都标注了最后核验日期，资料之间不一致的地方会直接写出来。
+          </p>
+        </section>
+
+        <section class="mt-10" aria-labelledby="picks">
+          <h2 id="picks" class="section-title">编辑精选 5 家</h2>
+          <div class="mt-5 grid gap-5">
+            {
+              top.map((p, i) => (
+                <div>
+                  <BrandCard provider={p} plans={plans} rank={i + 1} />
+                  {reasons[p.slug] && (
+                    <div class="card -mt-2 rounded-t-none border-t-0 px-5 pt-5 pb-4 text-sm leading-relaxed sm:px-6">
+                      <p>
+                        <b>适合：</b>
+                        {reasons[p.slug].fit}
+                      </p>
+                      <p class="text-warn mt-1.5">
+                        <b>需要注意：</b>
+                        {reasons[p.slug].note}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ))
+            }
+          </div>
+        </section>
+
+        <section class="mt-12" aria-labelledby="table">
+          <h2 id="table" class="section-title">15 家机场快速对比</h2>
+          <p class="text-muted-foreground mt-2 mb-4 text-sm">
+            月付起步取来源一致的最低月付方案；完整套餐与筛选见<a
+              href="/compare/"
+              class="text-accent-strong underline underline-offset-2"
+              >套餐比较表</a
+            >。
+          </p>
+          <div
+            class="card table-scroll"
+            tabindex="0"
+            role="region"
+            aria-label="机场快速对比"
+          >
+            <table class="w-full min-w-[720px] text-[0.93rem]">
+              <thead class="bg-surface text-muted-foreground text-xs">
+                <tr>
+                  <th scope="col" class="px-4 py-3 text-start">编号</th>
+                  <th scope="col" class="px-4 py-3 text-start">机场</th>
+                  <th scope="col" class="px-4 py-3 text-center">月付起步</th>
+                  <th scope="col" class="px-4 py-3 text-center">基础流量</th>
+                  <th scope="col" class="px-4 py-3 text-start">付款周期</th>
+                  <th scope="col" class="px-4 py-3 text-center">优惠码</th>
+                  <th scope="col" class="px-4 py-3 text-center">查看</th>
+                </tr>
+              </thead>
+              <tbody>
+                {
+                  table.map((p, i) => {
+                    const s = startingMonthly(plans, p.slug);
+                    return (
+                      <tr
+                        class="border-t"
+                        data-placement={`rec-table-${i + 1}`}
+                      >
+                        <td class="px-4 py-3">
+                          <span
+                            class:list={[
+                              "num rounded-full px-2 py-0.5 text-xs font-bold",
+                              i < FEATURED_COUNT
+                                ? "bg-gold-soft text-gold"
+                                : "bg-muted text-muted-foreground",
+                            ]}
+                          >
+                            #{i + 1}
+                          </span>
+                        </td>
+                        <td class="px-4 py-3 font-semibold whitespace-nowrap">
+                          <a
+                            href={`/airports/${p.slug}/`}
+                            class="hover:text-accent-strong"
+                          >
+                            {p.name}
+                          </a>
+                        </td>
+                        <td class="num text-accent-strong px-4 py-3 text-center font-bold whitespace-nowrap">
+                          {s
+                            ? `${fmtMoney(s.paymentAmount!)}/月`
+                            : "以结算页为准"}
+                        </td>
+                        <td class="num px-4 py-3 text-center whitespace-nowrap">
+                          {s ? trafficLabel(s).main : "—"}
+                        </td>
+                        <td class="text-muted-foreground px-4 py-3 whitespace-nowrap">
+                          {cycleList(plans, p.slug).join(" / ")}
+                        </td>
+                        <td class="num px-4 py-3 text-center">
+                          {p.coupon ?? (
+                            <span class="text-muted-foreground text-xs">
+                              暂无
+                            </span>
+                          )}
+                        </td>
+                        <td class="px-4 py-3 text-center whitespace-nowrap">
+                          <a
+                            href={`/airports/${p.slug}/`}
+                            class="text-accent-strong text-xs font-semibold hover:underline"
+                          >
+                            测评
+                          </a>
+                          <span class="text-border mx-1.5">|</span>
+                          <EntryLink
+                            href={p.entryUrl}
+                            brand={p.name}
+                            label="套餐"
+                            class="text-accent-strong text-xs font-semibold hover:underline"
+                          />
+                        </td>
+                      </tr>
+                    );
+                  })
+                }
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="mt-12" aria-labelledby="by-need">
+          <h2 id="by-need" class="section-title">按需求选择</h2>
+          <p class="text-muted-foreground mt-2 text-sm">
+            下列方案由套餐数据按条件筛出，每家只列最符合条件的一档，排除来源不一致的记录。
+          </p>
+          <div class="mt-5 grid gap-4 md:grid-cols-2">
+            {
+              [
+                {
+                  title: "预算有限：月付 ¥20 及以下",
+                  list: budget20,
+                  tip: "适合每月 100GB 以内的文字、网页和轻度视频。",
+                  href: "/guides/how-to-choose-plan/",
+                },
+                {
+                  title: "中度视频：每月 250–400GB",
+                  list: mid300,
+                  tip: "每天看 1–2 小时 1080P 视频的常见档位。",
+                  href: "/methods/peak-hour-testing/",
+                },
+                {
+                  title: "大流量：每月 1000GB 以上",
+                  list: heavy,
+                  tip: "多设备、经常下载或 4K 视频；同时关注设备数与限速。",
+                  href: "/guides/check-before-buying/",
+                },
+                {
+                  title: "年付：流量每月重置",
+                  list: annual,
+                  tip: "用过一段时间、用量稳定后再考虑，注意不能按月退。",
+                  href: "/guides/annual-vs-monthly-vs-onetime/",
+                },
+                {
+                  title: "一次性流量包：按总量计",
+                  list: onetime,
+                  tip: "用量少且不规律，或作为主套餐之外的备用。",
+                  href: "/guides/annual-vs-monthly-vs-onetime/",
+                },
+              ].map(g => (
+                <div class="card p-5">
+                  <h3 class="font-bold">{g.title}</h3>
+                  <p class="text-muted-foreground mt-1 text-sm">{g.tip}</p>
+                  <ul class="mt-3 divide-y text-sm">
+                    {g.list.map(p => (
+                      <li class="flex items-center justify-between gap-3 py-2">
+                        <a
+                          href={`/airports/${p.providerId}/`}
+                          class="hover:text-accent-strong font-semibold"
+                        >
+                          {nameOf(p.providerId)}
+                        </a>
+                        <span class="num text-muted-foreground">
+                          {planLine(p)}
+                        </span>
+                      </li>
+                    ))}
+                    {g.list.length === 0 && (
+                      <li class="text-muted-foreground py-2">
+                        资料中暂无符合条件的方案
+                      </li>
+                    )}
+                  </ul>
+                  <a
+                    href={g.href}
+                    class="text-accent-strong mt-3 inline-block text-sm font-semibold hover:underline"
+                  >
+                    相关指南 →
+                  </a>
+                </div>
+              ))
+            }
+            <div class="card p-5">
+              <h3 class="font-bold">多设备与远程办公</h3>
+              <p class="text-muted-foreground mt-1 text-sm leading-relaxed">
+                多数资料没有写明同时在线设备数，本站不会猜测填写。手机、电脑、平板同时使用时，先在结算页或用户协议中确认设备上限；远程办公更看重白天时段的可用率和延迟，方法见
+                <a
+                  href="/methods/metrics-speed-latency-loss/"
+                  class="text-accent-strong underline underline-offset-2"
+                  >机场测试从哪些指标开始</a
+                >。
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="mt-12" aria-labelledby="coupons">
+          <h2 id="coupons" class="section-title">精选机场优惠码</h2>
+          <div class="mt-4 grid gap-3 sm:grid-cols-3">
+            {
+              coupons.map(p => (
+                <div class="card p-4" data-placement="rec-coupons">
+                  <p class="flex items-center gap-2 font-bold">
+                    <BrandAvatar name={p.name} size="sm" />
+                    {p.name}
+                  </p>
+                  <div class="mt-3">
+                    <CouponBox
+                      code={p.coupon!}
+                      note={p.couponNote}
+                      brand={p.name}
+                      slug={p.slug}
+                    />
+                  </div>
+                  <EntryLink
+                    href={p.entryUrl}
+                    brand={p.name}
+                    label="使用优惠码查看当前套餐"
+                    class="btn btn-primary mt-3 w-full px-3 text-sm whitespace-nowrap"
+                  />
+                </div>
+              ))
+            }
+          </div>
+          <p class="text-muted-foreground mt-2 text-xs">
+            优惠码最后更新 {coupons[0]?.couponCheckedAt}，折扣以结算页为准。全部 {
+              allCoupons.length
+            } 家的优惠码见<a
+              href="/coupons/"
+              class="underline underline-offset-2">优惠码速查表</a
+            >。
+          </p>
+        </section>
+
+        <section class="app-prose mt-12" aria-labelledby="method">
+          <h2 id="method">排序说明与评测方法</h2>
+          <p>
+            编辑精选的顺序由本站编辑确定，会参考资料完整度、套餐结构是否清楚，也考虑与服务商的合作关系。它不是测速排名，也不代表稳定性高低。本站公开了<a
+              href="/testing-methodology/">测试方法</a
+            >，发布可复核的测试记录后，会单独给出基于数据的比较。
+          </p>
+          <p>
+            价格与流量按统一口径整理：付款周期与流量周期分开；年付写全年总额并另算月均；一次性流量包不折算成每月额度；来源之间不一致的记录两边都保留，不计入最低价。
+          </p>
+          <h2 id="checklist">购买前核对清单</h2>
+          <ol>
+            <li>结算页上的价格、流量和付款周期是否与本站资料一致；</li>
+            <li>流量按自然月还是购买日重置，节点有没有倍率；</li>
+            <li>同时在线设备数、是否限速；</li>
+            <li>退款条件和服务期限；</li>
+            <li>
+              你的客户端是否支持它提供的订阅格式，见<a
+                href="/clients/clash-subscription-import/"
+                >Clash 订阅导入前核对</a
+              >。
+            </li>
+          </ol>
+        </section>
+
+        <section class="mt-12" aria-labelledby="faq">
+          <h2 id="faq" class="section-title">常见问题</h2>
+          <div class="mt-4 grid gap-3">
+            {
+              faq.map(f => (
+                <details class="card p-4" open>
+                  <summary class="cursor-pointer font-bold">{f.q}</summary>
+                  <p class="text-muted-foreground mt-2 text-sm leading-relaxed">
+                    {f.a}
+                  </p>
+                </details>
+              ))
+            }
+          </div>
+          <nav class="mt-8" aria-label="相关文章">
+            <h3 class="font-bold">相关阅读</h3>
+            <ul class="mt-3 grid gap-2 sm:grid-cols-2">
+              {
+                [
+                  [
+                    "/guides/how-to-choose-plan/",
+                    "根据流量、预算和付款周期选择机场套餐",
+                  ],
+                  [
+                    "/guides/annual-vs-monthly-vs-onetime/",
+                    "年付、月付和不限时流量包怎样比较",
+                  ],
+                  [
+                    "/guides/check-before-buying/",
+                    "购买机场前核对重置、倍率、设备与退款条款",
+                  ],
+                  [
+                    "/methods/metrics-speed-latency-loss/",
+                    "机场测试从哪些指标开始",
+                  ],
+                ].map(([href, t]) => (
+                  <li>
+                    <a
+                      href={href}
+                      class="card hover:border-accent/40 block px-4 py-3 text-sm font-semibold"
+                    >
+                      {t}
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+          </nav>
+        </section>
+      </div>
+
+      <aside class="hidden lg:block">
+        <div class="sticky top-[calc(var(--header-h)+24px)]">
+          <Toc
+            variant="desktop"
+            headings={[
+              { depth: 2, slug: "who", text: "这份推荐适合谁" },
+              { depth: 2, slug: "picks", text: "编辑精选 5 家" },
+              { depth: 2, slug: "table", text: "15 家机场快速对比" },
+              { depth: 2, slug: "by-need", text: "按需求选择" },
+              { depth: 2, slug: "coupons", text: "优惠码汇总" },
+              { depth: 2, slug: "method", text: "排序说明与评测方法" },
+              { depth: 2, slug: "checklist", text: "购买前核对清单" },
+              { depth: 2, slug: "faq", text: "常见问题" },
+            ]}
+          />
+        </div>
+      </aside>
+    </div>
+  </main>
+</Layout>

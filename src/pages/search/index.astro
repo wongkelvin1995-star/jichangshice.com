@@ -1,0 +1,17 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import SearchDialog from "@/components/SearchDialog.astro";
+import config from "@/config";
+---
+
+<Layout
+  title={`站内搜索｜${config.site.title}`}
+  description="搜索机场测试的文章、机场品牌、套餐与常见问题。"
+  canonicalPath="/search/"
+  noindex
+>
+  <main id="main-content" class="app-layout max-w-read pt-8">
+    <h1 class="mb-5 text-[1.75rem] font-bold">站内搜索</h1>
+    <SearchDialog inline />
+  </main>
+</Layout>

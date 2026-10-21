@@ -1,0 +1,122 @@
+---
+/** 本站实测记录表：只接收已核验（verified）的记录，数值按导入值原样展示 */
+import {
+  DATA_SOURCE_LABEL,
+  TOOL_LABEL,
+  fmtNum,
+  runTime,
+  type TestRun,
+} from "@/utils/testRuns";
+
+type Props = {
+  runs: TestRun[];
+  /** slug → 品牌名；传入时显示品牌列（档案总页用） */
+  brandNames?: Record<string, string>;
+  caption: string;
+};
+const { runs, brandNames, caption } = Astro.props;
+const hasJitter = runs.some(r => r.jitterMs !== null);
+---
+
+<div class="table-scroll card">
+  <table class="w-full min-w-[720px] text-sm" data-own-runs>
+    <caption class="sr-only">{caption}</caption>
+    <thead class="bg-muted/50 text-muted-foreground text-xs">
+      <tr>
+        {
+          brandNames && (
+            <th scope="col" class="px-3 py-2 text-start">
+              品牌
+            </th>
+          )
+        }
+        <th scope="col" class="px-3 py-2 text-start">节点地区</th>
+        <th scope="col" class="px-3 py-2 text-start">测试时间</th>
+        <th scope="col" class="px-3 py-2 text-end">下载 Mbps</th>
+        <th scope="col" class="px-3 py-2 text-end">上传 Mbps</th>
+        <th scope="col" class="px-3 py-2 text-end">延迟 ms</th>
+        {
+          hasJitter && (
+            <th scope="col" class="px-3 py-2 text-end">
+              抖动 ms
+            </th>
+          )
+        }
+        <th scope="col" class="px-3 py-2 text-start">工具 / 来源</th>
+        <th scope="col" class="px-3 py-2 text-start">原始证据</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        runs.map(r => (
+          <tr class="border-t align-top" id={`run-${r.id}`}>
+            {brandNames && (
+              <td class="px-3 py-2 font-semibold whitespace-nowrap">
+                <a
+                  href={`/test-records/${r.brandSlug}/#run-${r.id}`}
+                  class="hover:text-accent-strong"
+                >
+                  {brandNames[r.brandSlug] ?? r.brandSlug}
+                </a>
+              </td>
+            )}
+            <td class="px-3 py-2">
+              <span class="font-semibold">{r.nodeRegion}</span>
+              {r.nodeName && (
+                <span class="text-muted-foreground block text-xs">
+                  {r.nodeName}
+                </span>
+              )}
+            </td>
+            <td class="num px-3 py-2 whitespace-nowrap">{runTime(r)}</td>
+            <td class="num px-3 py-2 text-end font-semibold">
+              {fmtNum(r.downloadMbps)}
+            </td>
+            <td class="num px-3 py-2 text-end">{fmtNum(r.uploadMbps)}</td>
+            <td class="num px-3 py-2 text-end">{fmtNum(r.latencyMs)}</td>
+            {hasJitter && (
+              <td class="num px-3 py-2 text-end">
+                {r.jitterMs === null ? "—" : fmtNum(r.jitterMs)}
+              </td>
+            )}
+            <td class="px-3 py-2 text-xs">
+              {r.toolName ?? TOOL_LABEL[r.tool]}
+              <span class="text-muted-foreground block">
+                {DATA_SOURCE_LABEL[r.dataSource]}
+                {[r.isp, r.location, r.bandwidth].filter(Boolean).length > 0 &&
+                  ` · ${[r.isp, r.location, r.bandwidth].filter(Boolean).join(" ")}`}
+              </span>
+            </td>
+            <td class="px-3 py-2 text-xs whitespace-nowrap">
+              {r.evidenceUrl && (
+                <a
+                  href={r.evidenceUrl}
+                  target="_blank"
+                  rel="nofollow noopener noreferrer"
+                  class="text-accent-strong block underline underline-offset-2"
+                >
+                  结果链接
+                </a>
+              )}
+              {r.evidenceFiles
+                .filter(f => f.public)
+                .map(f => (
+                  <a
+                    href={f.path}
+                    target="_blank"
+                    rel="noopener"
+                    class="text-accent-strong block underline underline-offset-2"
+                  >
+                    {f.kind === "screenshot" ? "测速截图" : "导出文件"}
+                  </a>
+                ))}
+              {!r.evidenceUrl && !r.evidenceFiles.some(f => f.public) && (
+                <span class="text-muted-foreground">原件存档未公开</span>
+              )}
+            </td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>

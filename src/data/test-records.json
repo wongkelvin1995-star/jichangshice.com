@@ -1,0 +1,2418 @@
+[
+  {
+    "id": "siilas-quanqiuyun-2026-07-13",
+    "brandSlug": "quanqiuyun",
+    "sourceType": "public_record",
+    "sourceName": "siilas 公开测速数据库",
+    "sourceUrl": "https://github.com/haandiiong/siilas",
+    "recordedAt": "2026-07-13",
+    "timezone": "北京时间（来源标注）",
+    "testLocation": "中国大陆（城市未注明）",
+    "carrier": null,
+    "bandwidthMbps": 1000,
+    "device": "MacBook，Wi-Fi",
+    "client": "机场官方专属客户端",
+    "tool": "Speedtest（每条附结果链接）",
+    "protocol": "Shadowsocks（套餐标注）；VLESS（2026-07-17 节点记录）",
+    "latencyMethod": "Speedtest 结果页延迟（部分记录未保留）",
+    "unit": "Mbps",
+    "rows": [
+      {
+        "time": "10:30",
+        "window": "日间",
+        "node": "新加坡节点",
+        "latency": null,
+        "download": "277.74 Mbps",
+        "upload": "48.87 Mbps",
+        "ai": "ChatGPT：流畅",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/zh-Hans/result/19424026769"
+      },
+      {
+        "time": "约 10:40",
+        "window": "日间",
+        "node": "香港节点",
+        "latency": null,
+        "download": "654.96 Mbps",
+        "upload": "32.0 Mbps",
+        "ai": "ChatGPT：不可用",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/zh-Hans/result/19424048958"
+      },
+      {
+        "time": "10:57",
+        "window": "日间",
+        "node": "日本节点",
+        "latency": null,
+        "download": "457.1 Mbps",
+        "upload": "48.45 Mbps",
+        "ai": "ChatGPT：流畅",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/zh-Hans/result/19424075240"
+      },
+      {
+        "time": "11:00",
+        "window": "日间",
+        "node": "美国节点",
+        "latency": null,
+        "download": "9.79 Mbps",
+        "upload": "47.21 Mbps",
+        "ai": "ChatGPT：轻微延迟",
+        "media": "YouTube 4K：缓冲明显",
+        "evidenceUrl": "https://www.speedtest.net/result/d/19424081173"
+      }
+    ],
+    "ai": "ChatGPT 首字响应体验（来源按 ≤5 秒为流畅分级）",
+    "media": "YouTube 4K 拖动进度条 3 次的缓冲体验",
+    "notes": "每一行都可以点开 Speedtest 结果页核对下载、上传数值；AI 与视频体验为来源记录，Speedtest 链接本身不能证明这两项。",
+    "limitations": [
+      "单一网络环境（1000M 宽带 + Wi-Fi），换成你的宽带结果会不同",
+      "每个地区只测 1 个节点，不代表该地区所有节点",
+      "丢包、抖动未记录"
+    ],
+    "sourceCheckedAt": "2026-10-15"
+  },
+  {
+    "id": "siilas-quanqiuyun-2026-07-14",
+    "brandSlug": "quanqiuyun",
+    "sourceType": "public_record",
+    "sourceName": "siilas 公开测速数据库",
+    "sourceUrl": "https://github.com/haandiiong/siilas",
+    "recordedAt": "2026-07-14",
+    "timezone": "北京时间（来源标注）",
+    "testLocation": "中国大陆（城市未注明）",
+    "carrier": null,
+    "bandwidthMbps": 1000,
+    "device": "MacBook，Wi-Fi",
+    "client": "机场官方专属客户端",
+    "tool": "Speedtest（每条附结果链接）",
+    "protocol": "Shadowsocks（套餐标注）；VLESS（2026-07-17 节点记录）",
+    "latencyMethod": "Speedtest 结果页延迟（部分记录未保留）",
+    "unit": "Mbps",
+    "rows": [
+      {
+        "time": "10:06",
+        "window": "日间",
+        "node": "新加坡节点",
+        "latency": null,
+        "download": "315.5 Mbps",
+        "upload": "46.99 Mbps",
+        "ai": "ChatGPT：流畅",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/zh-Hans/result/19428122817"
+      },
+      {
+        "time": "10:26",
+        "window": "日间",
+        "node": "香港节点",
+        "latency": null,
+        "download": "215.28 Mbps",
+        "upload": "31.28 Mbps",
+        "ai": "ChatGPT：不可用",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/zh-Hans/result/19428163250"
+      },
+      {
+        "time": "13:45",
+        "window": "日间",
+        "node": "香港节点",
+        "latency": null,
+        "download": "724.94 Mbps",
+        "upload": "50.33 Mbps",
+        "ai": "ChatGPT：不可用",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/zh-Hans/result/19428580439"
+      },
+      {
+        "time": "13:50",
+        "window": "日间",
+        "node": "美国节点",
+        "latency": null,
+        "download": "160.06 Mbps",
+        "upload": "48.59 Mbps",
+        "ai": "ChatGPT：流畅",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/result/d/19428590204"
+      },
+      {
+        "time": "13:54",
+        "window": "日间",
+        "node": "日本节点",
+        "latency": null,
+        "download": "617.14 Mbps",
+        "upload": "50.41 Mbps",
+        "ai": "ChatGPT：流畅",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/zh-Hans/result/19428601665"
+      }
+    ],
+    "ai": "ChatGPT 首字响应体验（来源按 ≤5 秒为流畅分级）",
+    "media": "YouTube 4K 拖动进度条 3 次的缓冲体验",
+    "notes": "每一行都可以点开 Speedtest 结果页核对下载、上传数值；AI 与视频体验为来源记录，Speedtest 链接本身不能证明这两项。",
+    "limitations": [
+      "单一网络环境（1000M 宽带 + Wi-Fi），换成你的宽带结果会不同",
+      "每个地区只测 1 个节点，不代表该地区所有节点",
+      "丢包、抖动未记录"
+    ],
+    "sourceCheckedAt": "2026-10-15"
+  },
+  {
+    "id": "siilas-quanqiuyun-2026-07-15",
+    "brandSlug": "quanqiuyun",
+    "sourceType": "public_record",
+    "sourceName": "siilas 公开测速数据库",
+    "sourceUrl": "https://github.com/haandiiong/siilas",
+    "recordedAt": "2026-07-15",
+    "timezone": "北京时间（来源标注）",
+    "testLocation": "中国大陆（城市未注明）",
+    "carrier": null,
+    "bandwidthMbps": 1000,
+    "device": "MacBook，Wi-Fi",
+    "client": "机场官方专属客户端",
+    "tool": "Speedtest（每条附结果链接）",
+    "protocol": "Shadowsocks（套餐标注）；VLESS（2026-07-17 节点记录）",
+    "latencyMethod": "Speedtest 结果页延迟（部分记录未保留）",
+    "unit": "Mbps",
+    "rows": [
+      {
+        "time": "16:18",
+        "window": "日间",
+        "node": "新加坡节点",
+        "latency": null,
+        "download": "234.09 Mbps",
+        "upload": "45.85 Mbps",
+        "ai": "ChatGPT：流畅",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/zh-Hans/result/19433413790"
+      },
+      {
+        "time": "17:48",
+        "window": "日间",
+        "node": "香港节点",
+        "latency": null,
+        "download": "812.65 Mbps",
+        "upload": "48.9 Mbps",
+        "ai": "ChatGPT：不可用",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/zh-Hans/result/19433694719"
+      },
+      {
+        "time": "18:00",
+        "window": "晚间",
+        "node": "日本节点",
+        "latency": null,
+        "download": "469.35 Mbps",
+        "upload": "53.7 Mbps",
+        "ai": "ChatGPT：流畅",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/zh-Hans/result/19433733619"
+      },
+      {
+        "time": "18:19",
+        "window": "晚间",
+        "node": "美国节点",
+        "latency": null,
+        "download": "5.33 Mbps",
+        "upload": "19.91 Mbps",
+        "ai": "ChatGPT：响应较慢",
+        "media": "YouTube 4K：缓冲严重",
+        "evidenceUrl": "https://www.speedtest.net/result/d/19433792994"
+      }
+    ],
+    "ai": "ChatGPT 首字响应体验（来源按 ≤5 秒为流畅分级）",
+    "media": "YouTube 4K 拖动进度条 3 次的缓冲体验",
+    "notes": "每一行都可以点开 Speedtest 结果页核对下载、上传数值；AI 与视频体验为来源记录，Speedtest 链接本身不能证明这两项。",
+    "limitations": [
+      "单一网络环境（1000M 宽带 + Wi-Fi），换成你的宽带结果会不同",
+      "每个地区只测 1 个节点，不代表该地区所有节点",
+      "丢包、抖动未记录"
+    ],
+    "sourceCheckedAt": "2026-10-15"
+  },
+  {
+    "id": "siilas-quanqiuyun-2026-07-16",
+    "brandSlug": "quanqiuyun",
+    "sourceType": "public_record",
+    "sourceName": "siilas 公开测速数据库",
+    "sourceUrl": "https://github.com/haandiiong/siilas",
+    "recordedAt": "2026-07-16",
+    "timezone": "北京时间（来源标注）",
+    "testLocation": "中国大陆（城市未注明）",
+    "carrier": null,
+    "bandwidthMbps": 1000,
+    "device": "MacBook，Wi-Fi",
+    "client": "机场官方专属客户端",
+    "tool": "Speedtest（每条附结果链接）",
+    "protocol": "Shadowsocks（套餐标注）；VLESS（2026-07-17 节点记录）",
+    "latencyMethod": "Speedtest 结果页延迟（部分记录未保留）",
+    "unit": "Mbps",
+    "rows": [
+      {
+        "time": "15:47",
+        "window": "日间",
+        "node": "新加坡节点",
+        "latency": null,
+        "download": "275.71 Mbps",
+        "upload": "56.28 Mbps",
+        "ai": "ChatGPT：流畅",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/result/d/19437708610"
+      }
+    ],
+    "ai": "ChatGPT 首字响应体验（来源按 ≤5 秒为流畅分级）",
+    "media": "YouTube 4K 拖动进度条 3 次的缓冲体验",
+    "notes": "每一行都可以点开 Speedtest 结果页核对下载、上传数值；AI 与视频体验为来源记录，Speedtest 链接本身不能证明这两项。",
+    "limitations": [
+      "单一网络环境（1000M 宽带 + Wi-Fi），换成你的宽带结果会不同",
+      "每个地区只测 1 个节点，不代表该地区所有节点",
+      "丢包、抖动未记录"
+    ],
+    "sourceCheckedAt": "2026-10-15"
+  },
+  {
+    "id": "siilas-quanqiuyun-2026-07-17",
+    "brandSlug": "quanqiuyun",
+    "sourceType": "public_record",
+    "sourceName": "siilas 公开测速数据库",
+    "sourceUrl": "https://github.com/haandiiong/siilas",
+    "recordedAt": "2026-07-17",
+    "timezone": "北京时间（来源标注）",
+    "testLocation": "中国大陆（城市未注明）",
+    "carrier": null,
+    "bandwidthMbps": 1000,
+    "device": "MacBook，Wi-Fi",
+    "client": "机场官方专属客户端",
+    "tool": "Speedtest（每条附结果链接）",
+    "protocol": "Shadowsocks（套餐标注）；VLESS（2026-07-17 节点记录）",
+    "latencyMethod": "Speedtest 结果页延迟（部分记录未保留）",
+    "unit": "Mbps",
+    "rows": [
+      {
+        "time": "17:41",
+        "window": "日间",
+        "node": "新加坡节点",
+        "latency": null,
+        "download": "756.09 Mbps",
+        "upload": "39.64 Mbps",
+        "ai": "ChatGPT：流畅",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/result/d/19442291714"
+      }
+    ],
+    "ai": "ChatGPT 首字响应体验（来源按 ≤5 秒为流畅分级）",
+    "media": "YouTube 4K 拖动进度条 3 次的缓冲体验",
+    "notes": "每一行都可以点开 Speedtest 结果页核对下载、上传数值；AI 与视频体验为来源记录，Speedtest 链接本身不能证明这两项。",
+    "limitations": [
+      "单一网络环境（1000M 宽带 + Wi-Fi），换成你的宽带结果会不同",
+      "每个地区只测 1 个节点，不代表该地区所有节点",
+      "丢包、抖动未记录"
+    ],
+    "sourceCheckedAt": "2026-10-15"
+  },
+  {
+    "id": "siilas-quanqiuyun-2026-07-18",
+    "brandSlug": "quanqiuyun",
+    "sourceType": "public_record",
+    "sourceName": "siilas 公开测速数据库",
+    "sourceUrl": "https://github.com/haandiiong/siilas",
+    "recordedAt": "2026-07-18",
+    "timezone": "北京时间（来源标注）",
+    "testLocation": "中国大陆（城市未注明）",
+    "carrier": null,
+    "bandwidthMbps": 1000,
+    "device": "MacBook，Wi-Fi",
+    "client": "全球云官方专属客户端",
+    "tool": "Speedtest（每条附结果链接）",
+    "protocol": "Shadowsocks（套餐标注）；VLESS（2026-07-17 节点记录）",
+    "latencyMethod": "Speedtest 结果页延迟（部分记录未保留）",
+    "unit": "Mbps",
+    "rows": [
+      {
+        "time": "16:29",
+        "window": "日间",
+        "node": "新加坡节点",
+        "latency": "84 ms",
+        "download": "637.6 Mbps",
+        "upload": "50.96 Mbps",
+        "ai": "ChatGPT：流畅",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/zh-Hans/result/19446018458"
+      },
+      {
+        "time": "16:36",
+        "window": "日间",
+        "node": "香港节点",
+        "latency": "112 ms",
+        "download": "757.27 Mbps",
+        "upload": "42.09 Mbps",
+        "ai": "ChatGPT：不可用",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/result/19446033844"
+      },
+      {
+        "time": "16:45",
+        "window": "日间",
+        "node": "美国节点",
+        "latency": "286 ms",
+        "download": "19.19 Mbps",
+        "upload": "28.01 Mbps",
+        "ai": "ChatGPT：响应较慢",
+        "media": "YouTube 4K：缓冲明显",
+        "evidenceUrl": "https://www.speedtest.net/result/19446056876"
+      },
+      {
+        "time": "17:08",
+        "window": "日间",
+        "node": "日本节点",
+        "latency": "146 ms",
+        "download": "841.12 Mbps",
+        "upload": "40.09 Mbps",
+        "ai": "ChatGPT：流畅",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/zh-Hans/result/19446113484"
+      },
+      {
+        "time": "21:06",
+        "window": "晚高峰",
+        "node": "美国节点",
+        "latency": "280 ms",
+        "download": "142.7 Mbps",
+        "upload": "7.51 Mbps",
+        "ai": "ChatGPT：流畅",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/zh-Hans/result/19446767571"
+      }
+    ],
+    "ai": "ChatGPT 首字响应体验（来源按 ≤5 秒为流畅分级）",
+    "media": "YouTube 4K 拖动进度条 3 次的缓冲体验",
+    "notes": "每一行都可以点开 Speedtest 结果页核对下载、上传数值；AI 与视频体验为来源记录，Speedtest 链接本身不能证明这两项。",
+    "limitations": [
+      "单一网络环境（1000M 宽带 + Wi-Fi），换成你的宽带结果会不同",
+      "每个地区只测 1 个节点，不代表该地区所有节点",
+      "丢包、抖动未记录"
+    ],
+    "sourceCheckedAt": "2026-10-15"
+  },
+  {
+    "id": "siilas-quanqiuyun-2026-07-28",
+    "brandSlug": "quanqiuyun",
+    "sourceType": "public_record",
+    "sourceName": "siilas 公开测速数据库",
+    "sourceUrl": "https://github.com/haandiiong/siilas",
+    "recordedAt": "2026-07-28",
+    "timezone": "北京时间（来源标注）",
+    "testLocation": "中国大陆（城市未注明）",
+    "carrier": null,
+    "bandwidthMbps": 1000,
+    "device": "MacBook，Wi-Fi",
+    "client": "全球云官方专属客户端",
+    "tool": "Speedtest（每条附结果链接）",
+    "protocol": "Shadowsocks（套餐标注）；VLESS（2026-07-17 节点记录）",
+    "latencyMethod": "Speedtest 结果页延迟（部分记录未保留）",
+    "unit": "Mbps",
+    "rows": [
+      {
+        "time": "21:07",
+        "window": "晚高峰",
+        "node": "新加坡节点",
+        "latency": "129 ms",
+        "download": "390.36 Mbps",
+        "upload": "26.2 Mbps",
+        "ai": "ChatGPT：轻微延迟",
+        "media": "YouTube 4K：轻微缓冲",
+        "evidenceUrl": "https://www.speedtest.net/zh-Hans/result/19486832407"
+      },
+      {
+        "time": "22:16",
+        "window": "晚高峰",
+        "node": "美国节点",
+        "latency": "294 ms",
+        "download": "158.63 Mbps",
+        "upload": "44.5 Mbps",
+        "ai": "ChatGPT：响应较慢",
+        "media": "YouTube 4K：缓冲明显",
+        "evidenceUrl": "https://www.speedtest.net/result/19487121958"
+      },
+      {
+        "time": "22:22",
+        "window": "晚高峰",
+        "node": "日本节点",
+        "latency": "149 ms",
+        "download": "17.48 Mbps",
+        "upload": "31.59 Mbps",
+        "ai": "ChatGPT：响应较慢",
+        "media": "YouTube 4K：缓冲明显",
+        "evidenceUrl": "https://www.speedtest.net/result/19487148444"
+      },
+      {
+        "time": "22:27",
+        "window": "晚高峰",
+        "node": "香港节点",
+        "latency": "116 ms",
+        "download": "882.38 Mbps",
+        "upload": "49.94 Mbps",
+        "ai": "ChatGPT：不可用",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/result/19487169986"
+      }
+    ],
+    "ai": "ChatGPT 首字响应体验（来源按 ≤5 秒为流畅分级）",
+    "media": "YouTube 4K 拖动进度条 3 次的缓冲体验",
+    "notes": "每一行都可以点开 Speedtest 结果页核对下载、上传数值；AI 与视频体验为来源记录，Speedtest 链接本身不能证明这两项。",
+    "limitations": [
+      "单一网络环境（1000M 宽带 + Wi-Fi），换成你的宽带结果会不同",
+      "每个地区只测 1 个节点，不代表该地区所有节点",
+      "丢包、抖动未记录"
+    ],
+    "sourceCheckedAt": "2026-10-15"
+  },
+  {
+    "id": "siilas-quanqiuyun-2026-10-08",
+    "brandSlug": "quanqiuyun",
+    "sourceType": "public_record",
+    "sourceName": "siilas 公开测速数据库",
+    "sourceUrl": "https://github.com/haandiiong/siilas",
+    "recordedAt": "2026-10-08",
+    "timezone": "北京时间（来源标注）",
+    "testLocation": "中国大陆（城市未注明）",
+    "carrier": null,
+    "bandwidthMbps": 1000,
+    "device": "MacBook，Wi-Fi",
+    "client": "全球云客户端",
+    "tool": "Speedtest（每条附结果链接）",
+    "protocol": "Shadowsocks（套餐标注）；VLESS（2026-07-17 节点记录）",
+    "latencyMethod": "Speedtest 结果页延迟（部分记录未保留）",
+    "unit": "Mbps",
+    "rows": [
+      {
+        "time": "20:47",
+        "window": "晚高峰",
+        "node": "新加坡节点",
+        "latency": "143 ms",
+        "download": "416.9 Mbps",
+        "upload": "92.81 Mbps",
+        "ai": "ChatGPT：流畅",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/zh-Hans/result/19765395401"
+      },
+      {
+        "time": "20:51",
+        "window": "晚高峰",
+        "node": "日本节点",
+        "latency": "171 ms",
+        "download": "132.71 Mbps",
+        "upload": "37.0 Mbps",
+        "ai": "ChatGPT：流畅",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/zh-Hans/result/19765413045"
+      },
+      {
+        "time": "20:57",
+        "window": "晚高峰",
+        "node": "美国节点",
+        "latency": "303 ms",
+        "download": "405.33 Mbps",
+        "upload": "90.74 Mbps",
+        "ai": "ChatGPT：流畅",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/zh-Hans/result/19765434254"
+      },
+      {
+        "time": "21:05",
+        "window": "晚高峰",
+        "node": "香港节点",
+        "latency": "326 ms",
+        "download": "424.58 Mbps",
+        "upload": "91.34 Mbps",
+        "ai": "ChatGPT：不可用",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/zh-Hans/result/19765465408"
+      }
+    ],
+    "ai": "ChatGPT 首字响应体验（来源按 ≤5 秒为流畅分级）",
+    "media": "YouTube 4K 拖动进度条 3 次的缓冲体验",
+    "notes": "每一行都可以点开 Speedtest 结果页核对下载、上传数值；AI 与视频体验为来源记录，Speedtest 链接本身不能证明这两项。",
+    "limitations": [
+      "单一网络环境（1000M 宽带 + Wi-Fi），换成你的宽带结果会不同",
+      "每个地区只测 1 个节点，不代表该地区所有节点",
+      "丢包、抖动未记录"
+    ],
+    "sourceCheckedAt": "2026-10-15"
+  },
+  {
+    "id": "siilas-guangnianti-2026-07-13",
+    "brandSlug": "guangnianti",
+    "sourceType": "public_record",
+    "sourceName": "siilas 公开测速数据库",
+    "sourceUrl": "https://github.com/haandiiong/siilas",
+    "recordedAt": "2026-07-13",
+    "timezone": "北京时间（来源标注）",
+    "testLocation": "中国大陆（城市未注明）",
+    "carrier": null,
+    "bandwidthMbps": 1000,
+    "device": "MacBook，Wi-Fi",
+    "client": "光年梯官方专属客户端（macOS）",
+    "tool": "Speedtest（每条附结果链接）",
+    "protocol": "VLESS",
+    "latencyMethod": "Speedtest 结果页延迟（部分记录未保留）",
+    "unit": "Mbps",
+    "rows": [
+      {
+        "time": "11:57",
+        "window": "日间",
+        "node": "新加坡节点",
+        "latency": null,
+        "download": "337.0 Mbps",
+        "upload": "36.41 Mbps",
+        "ai": "ChatGPT：流畅",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/zh-Hans/result/19424186787"
+      },
+      {
+        "time": "12:01",
+        "window": "日间",
+        "node": "香港节点",
+        "latency": null,
+        "download": "205.75 Mbps",
+        "upload": "49.49 Mbps",
+        "ai": "ChatGPT：不可用",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/zh-Hans/result/19424197533"
+      },
+      {
+        "time": "12:06",
+        "window": "日间",
+        "node": "日本节点",
+        "latency": null,
+        "download": "501.05 Mbps",
+        "upload": "40.63 Mbps",
+        "ai": "ChatGPT：流畅",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/zh-Hans/result/19424206275"
+      },
+      {
+        "time": "12:09",
+        "window": "日间",
+        "node": "美国节点",
+        "latency": null,
+        "download": "424.21 Mbps",
+        "upload": "47.86 Mbps",
+        "ai": "ChatGPT：流畅",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/result/d/19424211266"
+      }
+    ],
+    "ai": "ChatGPT 首字响应体验（来源按 ≤5 秒为流畅分级）",
+    "media": "YouTube 4K 拖动进度条 3 次的缓冲体验",
+    "notes": "每一行都可以点开 Speedtest 结果页核对下载、上传数值；AI 与视频体验为来源记录，Speedtest 链接本身不能证明这两项。",
+    "limitations": [
+      "单一网络环境（1000M 宽带 + Wi-Fi），换成你的宽带结果会不同",
+      "每个地区只测 1 个节点，不代表该地区所有节点",
+      "丢包、抖动未记录"
+    ],
+    "sourceCheckedAt": "2026-10-15"
+  },
+  {
+    "id": "siilas-guangnianti-2026-07-15",
+    "brandSlug": "guangnianti",
+    "sourceType": "public_record",
+    "sourceName": "siilas 公开测速数据库",
+    "sourceUrl": "https://github.com/haandiiong/siilas",
+    "recordedAt": "2026-07-15",
+    "timezone": "北京时间（来源标注）",
+    "testLocation": "中国大陆（城市未注明）",
+    "carrier": null,
+    "bandwidthMbps": 1000,
+    "device": "MacBook，Wi-Fi",
+    "client": "光年梯官方专属客户端（macOS）",
+    "tool": "Speedtest（每条附结果链接）",
+    "protocol": "VLESS",
+    "latencyMethod": "Speedtest 结果页延迟（部分记录未保留）",
+    "unit": "Mbps",
+    "rows": [
+      {
+        "time": "18:30",
+        "window": "晚间",
+        "node": "新加坡节点",
+        "latency": null,
+        "download": "752.09 Mbps",
+        "upload": "40.37 Mbps",
+        "ai": "ChatGPT：流畅",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/zh-Hans/result/19433818645"
+      },
+      {
+        "time": "18:50",
+        "window": "晚间",
+        "node": "香港节点",
+        "latency": null,
+        "download": "548.86 Mbps",
+        "upload": "46.82 Mbps",
+        "ai": "ChatGPT：不可用",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/zh-Hans/result/19433905389"
+      },
+      {
+        "time": "19:14",
+        "window": "晚间",
+        "node": "日本节点",
+        "latency": null,
+        "download": "818.59 Mbps",
+        "upload": "47.34 Mbps",
+        "ai": "ChatGPT：流畅",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/zh-Hans/result/19433971479"
+      },
+      {
+        "time": "19:20",
+        "window": "晚间",
+        "node": "美国节点",
+        "latency": null,
+        "download": "56.01 Mbps",
+        "upload": "41.36 Mbps",
+        "ai": "ChatGPT：流畅",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/result/d/19433995770"
+      }
+    ],
+    "ai": "ChatGPT 首字响应体验（来源按 ≤5 秒为流畅分级）",
+    "media": "YouTube 4K 拖动进度条 3 次的缓冲体验",
+    "notes": "每一行都可以点开 Speedtest 结果页核对下载、上传数值；AI 与视频体验为来源记录，Speedtest 链接本身不能证明这两项。",
+    "limitations": [
+      "单一网络环境（1000M 宽带 + Wi-Fi），换成你的宽带结果会不同",
+      "每个地区只测 1 个节点，不代表该地区所有节点",
+      "丢包、抖动未记录"
+    ],
+    "sourceCheckedAt": "2026-10-15"
+  },
+  {
+    "id": "siilas-guangnianti-2026-07-18",
+    "brandSlug": "guangnianti",
+    "sourceType": "public_record",
+    "sourceName": "siilas 公开测速数据库",
+    "sourceUrl": "https://github.com/haandiiong/siilas",
+    "recordedAt": "2026-07-18",
+    "timezone": "北京时间（来源标注）",
+    "testLocation": "中国大陆（城市未注明）",
+    "carrier": null,
+    "bandwidthMbps": 1000,
+    "device": "MacBook，Wi-Fi",
+    "client": "光年梯官方专属客户端",
+    "tool": "Speedtest（每条附结果链接）",
+    "protocol": "VLESS",
+    "latencyMethod": "Speedtest 结果页延迟（部分记录未保留）",
+    "unit": "Mbps",
+    "rows": [
+      {
+        "time": "17:11",
+        "window": "日间",
+        "node": "新加坡节点",
+        "latency": "81 ms",
+        "download": "868.43 Mbps",
+        "upload": "36.45 Mbps",
+        "ai": "ChatGPT：流畅",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/zh-Hans/result/19446121913"
+      },
+      {
+        "time": "17:20",
+        "window": "日间",
+        "node": "美国节点",
+        "latency": "281 ms",
+        "download": "164.47 Mbps",
+        "upload": "50.43 Mbps",
+        "ai": "ChatGPT：流畅",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/zh-Hans/result/19446143276"
+      },
+      {
+        "time": "17:23",
+        "window": "日间",
+        "node": "日本节点",
+        "latency": "169 ms",
+        "download": "211.08 Mbps",
+        "upload": "39.03 Mbps",
+        "ai": "ChatGPT：流畅",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/zh-Hans/result/19446150508"
+      },
+      {
+        "time": "17:48",
+        "window": "日间",
+        "node": "香港节点",
+        "latency": "119 ms",
+        "download": "413.92 Mbps",
+        "upload": "33.95 Mbps",
+        "ai": "ChatGPT：不可用",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/zh-Hans/result/19446214139"
+      }
+    ],
+    "ai": "ChatGPT 首字响应体验（来源按 ≤5 秒为流畅分级）",
+    "media": "YouTube 4K 拖动进度条 3 次的缓冲体验",
+    "notes": "每一行都可以点开 Speedtest 结果页核对下载、上传数值；AI 与视频体验为来源记录，Speedtest 链接本身不能证明这两项。",
+    "limitations": [
+      "单一网络环境（1000M 宽带 + Wi-Fi），换成你的宽带结果会不同",
+      "每个地区只测 1 个节点，不代表该地区所有节点",
+      "丢包、抖动未记录"
+    ],
+    "sourceCheckedAt": "2026-10-15"
+  },
+  {
+    "id": "siilas-guangnianti-2026-10-08",
+    "brandSlug": "guangnianti",
+    "sourceType": "public_record",
+    "sourceName": "siilas 公开测速数据库",
+    "sourceUrl": "https://github.com/haandiiong/siilas",
+    "recordedAt": "2026-10-08",
+    "timezone": "北京时间（来源标注）",
+    "testLocation": "中国大陆（城市未注明）",
+    "carrier": null,
+    "bandwidthMbps": 1000,
+    "device": "MacBook，Wi-Fi",
+    "client": "光年梯客户端",
+    "tool": "Speedtest（每条附结果链接）",
+    "protocol": "VLESS",
+    "latencyMethod": "Speedtest 结果页延迟（部分记录未保留）",
+    "unit": "Mbps",
+    "rows": [
+      {
+        "time": "20:17",
+        "window": "晚高峰",
+        "node": "新加坡节点",
+        "latency": "208 ms",
+        "download": "107.26 Mbps",
+        "upload": "13.89 Mbps",
+        "ai": "ChatGPT：流畅",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/zh-Hans/result/19765286002"
+      },
+      {
+        "time": "20:30",
+        "window": "晚高峰",
+        "node": "美国节点",
+        "latency": "204 ms",
+        "download": "8.22 Mbps",
+        "upload": "46.29 Mbps",
+        "ai": "ChatGPT：轻微延迟",
+        "media": "YouTube 4K：缓冲严重",
+        "evidenceUrl": "https://www.speedtest.net/zh-Hans/result/19765333047"
+      },
+      {
+        "time": "20:39",
+        "window": "晚高峰",
+        "node": "日本节点",
+        "latency": "373 ms",
+        "download": "67.53 Mbps",
+        "upload": "48.92 Mbps",
+        "ai": "ChatGPT：轻微延迟",
+        "media": "YouTube 4K：缓冲严重",
+        "evidenceUrl": "https://www.speedtest.net/zh-Hans/result/19765366735"
+      },
+      {
+        "time": "20:43",
+        "window": "晚高峰",
+        "node": "香港节点",
+        "latency": "179 ms",
+        "download": "121.46 Mbps",
+        "upload": "7.83 Mbps",
+        "ai": "ChatGPT：不可用",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/zh-Hans/result/19765381537"
+      }
+    ],
+    "ai": "ChatGPT 首字响应体验（来源按 ≤5 秒为流畅分级）",
+    "media": "YouTube 4K 拖动进度条 3 次的缓冲体验",
+    "notes": "每一行都可以点开 Speedtest 结果页核对下载、上传数值；AI 与视频体验为来源记录，Speedtest 链接本身不能证明这两项。",
+    "limitations": [
+      "单一网络环境（1000M 宽带 + Wi-Fi），换成你的宽带结果会不同",
+      "每个地区只测 1 个节点，不代表该地区所有节点",
+      "丢包、抖动未记录"
+    ],
+    "sourceCheckedAt": "2026-10-15"
+  },
+  {
+    "id": "siilas-edgenova-2026-07-13",
+    "brandSlug": "edgenova",
+    "sourceType": "public_record",
+    "sourceName": "siilas 公开测速数据库",
+    "sourceUrl": "https://github.com/haandiiong/siilas",
+    "recordedAt": "2026-07-13",
+    "timezone": "北京时间（来源标注）",
+    "testLocation": "中国大陆（城市未注明）",
+    "carrier": null,
+    "bandwidthMbps": 1000,
+    "device": "MacBook，Wi-Fi",
+    "client": "官网指定 Android、Windows、macOS 专属客户端及 iOS Nextin；本站测速使用机场官方专属客户端",
+    "tool": "Speedtest（每条附结果链接）",
+    "protocol": "专属客户端",
+    "latencyMethod": "Speedtest 结果页延迟（部分记录未保留）",
+    "unit": "Mbps",
+    "rows": [
+      {
+        "time": "20:43",
+        "window": "晚高峰",
+        "node": "日本节点",
+        "latency": null,
+        "download": "437.82 Mbps",
+        "upload": "21.43 Mbps",
+        "ai": "ChatGPT：流畅",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/zh-Hans/result/19425660275"
+      },
+      {
+        "time": "20:50",
+        "window": "晚高峰",
+        "node": "美国节点",
+        "latency": null,
+        "download": "317.34 Mbps",
+        "upload": "8.37 Mbps",
+        "ai": "ChatGPT：流畅",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/result/d/19425685752"
+      },
+      {
+        "time": "21:10",
+        "window": "晚高峰",
+        "node": "香港节点",
+        "latency": null,
+        "download": "367.82 Mbps",
+        "upload": "4.22 Mbps",
+        "ai": "ChatGPT：不可用",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/zh-Hans/result/19425763804"
+      }
+    ],
+    "ai": "ChatGPT 首字响应体验（来源按 ≤5 秒为流畅分级）",
+    "media": "YouTube 4K 拖动进度条 3 次的缓冲体验",
+    "notes": "每一行都可以点开 Speedtest 结果页核对下载、上传数值；AI 与视频体验为来源记录，Speedtest 链接本身不能证明这两项。",
+    "limitations": [
+      "单一网络环境（1000M 宽带 + Wi-Fi），换成你的宽带结果会不同",
+      "每个地区只测 1 个节点，不代表该地区所有节点",
+      "丢包、抖动未记录"
+    ],
+    "sourceCheckedAt": "2026-10-15"
+  },
+  {
+    "id": "siilas-edgenova-2026-07-17",
+    "brandSlug": "edgenova",
+    "sourceType": "public_record",
+    "sourceName": "siilas 公开测速数据库",
+    "sourceUrl": "https://github.com/haandiiong/siilas",
+    "recordedAt": "2026-07-17",
+    "timezone": "北京时间（来源标注）",
+    "testLocation": "中国大陆（城市未注明）",
+    "carrier": null,
+    "bandwidthMbps": 1000,
+    "device": "MacBook，Wi-Fi",
+    "client": "机场官方专属客户端",
+    "tool": "Speedtest（每条附结果链接）",
+    "protocol": "专属客户端",
+    "latencyMethod": "Speedtest 结果页延迟（部分记录未保留）",
+    "unit": "Mbps",
+    "rows": [
+      {
+        "time": "20:31",
+        "window": "晚高峰",
+        "node": "新加坡节点",
+        "latency": "129 ms",
+        "download": "818.8 Mbps",
+        "upload": "49.74 Mbps",
+        "ai": "ChatGPT：流畅",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": null
+      }
+    ],
+    "ai": "ChatGPT 首字响应体验（来源按 ≤5 秒为流畅分级）",
+    "media": "YouTube 4K 拖动进度条 3 次的缓冲体验",
+    "notes": "每一行都可以点开 Speedtest 结果页核对下载、上传数值；AI 与视频体验为来源记录，Speedtest 链接本身不能证明这两项。",
+    "limitations": [
+      "单一网络环境（1000M 宽带 + Wi-Fi），换成你的宽带结果会不同",
+      "每个地区只测 1 个节点，不代表该地区所有节点",
+      "丢包、抖动未记录"
+    ],
+    "sourceCheckedAt": "2026-10-15"
+  },
+  {
+    "id": "siilas-edgenova-2026-08-13",
+    "brandSlug": "edgenova",
+    "sourceType": "public_record",
+    "sourceName": "siilas 公开测速数据库",
+    "sourceUrl": "https://github.com/haandiiong/siilas",
+    "recordedAt": "2026-08-13",
+    "timezone": "北京时间（来源标注）",
+    "testLocation": "中国大陆（城市未注明）",
+    "carrier": null,
+    "bandwidthMbps": 1000,
+    "device": "MacBook，Wi-Fi",
+    "client": "边缘客户端",
+    "tool": "Speedtest（每条附结果链接）",
+    "protocol": "专属客户端",
+    "latencyMethod": "Speedtest 结果页延迟（部分记录未保留）",
+    "unit": "Mbps",
+    "rows": [
+      {
+        "time": "20:03",
+        "window": "晚高峰",
+        "node": "香港节点",
+        "latency": "162 ms",
+        "download": "16.71 Mbps",
+        "upload": "1.9 Mbps",
+        "ai": "ChatGPT：不可用",
+        "media": "YouTube 4K：缓冲严重",
+        "evidenceUrl": "https://www.speedtest.net/result/19551023189"
+      },
+      {
+        "time": "20:09",
+        "window": "晚高峰",
+        "node": "美国节点",
+        "latency": "347 ms",
+        "download": "19.93 Mbps",
+        "upload": "5.19 Mbps",
+        "ai": "ChatGPT：轻微延迟",
+        "media": "YouTube 4K：轻微缓冲",
+        "evidenceUrl": "https://www.speedtest.net/result/19551044456"
+      },
+      {
+        "time": "20:18",
+        "window": "晚高峰",
+        "node": "新加坡节点",
+        "latency": "213 ms",
+        "download": "23.18 Mbps",
+        "upload": "1.89 Mbps",
+        "ai": "ChatGPT：轻微延迟",
+        "media": "YouTube 4K：轻微缓冲",
+        "evidenceUrl": "https://www.speedtest.net/result/19551074198"
+      },
+      {
+        "time": "20:24",
+        "window": "晚高峰",
+        "node": "日本节点",
+        "latency": "327 ms",
+        "download": "12.22 Mbps",
+        "upload": "0.58 Mbps",
+        "ai": "ChatGPT：轻微延迟",
+        "media": "YouTube 4K：轻微缓冲",
+        "evidenceUrl": "https://www.speedtest.net/result/19551098819"
+      }
+    ],
+    "ai": "ChatGPT 首字响应体验（来源按 ≤5 秒为流畅分级）",
+    "media": "YouTube 4K 拖动进度条 3 次的缓冲体验",
+    "notes": "每一行都可以点开 Speedtest 结果页核对下载、上传数值；AI 与视频体验为来源记录，Speedtest 链接本身不能证明这两项。",
+    "limitations": [
+      "单一网络环境（1000M 宽带 + Wi-Fi），换成你的宽带结果会不同",
+      "每个地区只测 1 个节点，不代表该地区所有节点",
+      "丢包、抖动未记录"
+    ],
+    "sourceCheckedAt": "2026-10-15"
+  },
+  {
+    "id": "siilas-edgenova-2026-10-08",
+    "brandSlug": "edgenova",
+    "sourceType": "public_record",
+    "sourceName": "siilas 公开测速数据库",
+    "sourceUrl": "https://github.com/haandiiong/siilas",
+    "recordedAt": "2026-10-08",
+    "timezone": "北京时间（来源标注）",
+    "testLocation": "中国大陆（城市未注明）",
+    "carrier": null,
+    "bandwidthMbps": 1000,
+    "device": "MacBook，Wi-Fi",
+    "client": "边缘节点客户端（EdgeNova）",
+    "tool": "Speedtest（每条附结果链接）",
+    "protocol": "专属客户端",
+    "latencyMethod": "Speedtest 结果页延迟（部分记录未保留）",
+    "unit": "Mbps",
+    "rows": [
+      {
+        "time": "19:42",
+        "window": "晚间",
+        "node": "新加坡节点",
+        "latency": "88 ms",
+        "download": "551.47 Mbps",
+        "upload": "94.93 Mbps",
+        "ai": "ChatGPT：流畅",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/zh-Hans/result/19765167377"
+      },
+      {
+        "time": "19:53",
+        "window": "晚间",
+        "node": "日本节点",
+        "latency": "163 ms",
+        "download": "78.75 Mbps",
+        "upload": "59.59 Mbps",
+        "ai": "ChatGPT：流畅",
+        "media": "YouTube 4K：轻微缓冲",
+        "evidenceUrl": "https://www.speedtest.net/zh-Hans/result/19765202122"
+      },
+      {
+        "time": "19:59",
+        "window": "晚间",
+        "node": "香港节点",
+        "latency": "152 ms",
+        "download": "541.78 Mbps",
+        "upload": "95.4 Mbps",
+        "ai": "ChatGPT：不可用",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/zh-Hans/result/19765222685"
+      },
+      {
+        "time": "20:01",
+        "window": "晚高峰",
+        "node": "美国节点",
+        "latency": "235 ms",
+        "download": "601.7 Mbps",
+        "upload": "95.33 Mbps",
+        "ai": "ChatGPT：流畅",
+        "media": "YouTube 4K：流畅",
+        "evidenceUrl": "https://www.speedtest.net/zh-Hans/result/19765231897"
+      }
+    ],
+    "ai": "ChatGPT 首字响应体验（来源按 ≤5 秒为流畅分级）",
+    "media": "YouTube 4K 拖动进度条 3 次的缓冲体验",
+    "notes": "每一行都可以点开 Speedtest 结果页核对下载、上传数值；AI 与视频体验为来源记录，Speedtest 链接本身不能证明这两项。",
+    "limitations": [
+      "单一网络环境（1000M 宽带 + Wi-Fi），换成你的宽带结果会不同",
+      "每个地区只测 1 个节点，不代表该地区所有节点",
+      "丢包、抖动未记录"
+    ],
+    "sourceCheckedAt": "2026-10-15"
+  },
+  {
+    "id": "jichangtj-lightspeed-2026-08-11",
+    "brandSlug": "lightspeed",
+    "sourceType": "public_record",
+    "sourceName": "机场推荐 jichangtj.co 首轮评测快照",
+    "sourceUrl": "https://jichangtj.co/reviews/guangsuyun",
+    "recordedAt": "2026-08-11",
+    "time": "14:32",
+    "window": "白天，非高峰",
+    "timezone": "未注明（按来源页面原样记录）",
+    "testLocation": "广东珠海",
+    "carrier": "中国联通",
+    "bandwidthMbps": 5000,
+    "device": null,
+    "client": null,
+    "tool": "MAI-TEST-BOT 2.0.0-dev，32 线程",
+    "protocol": "Shadowsocks",
+    "latencyMethod": "RTT / HTTP 延迟（来源快照）",
+    "unit": "MB（来源截图原单位，未换算，不能与 Mbps 直接比较）",
+    "nodeCount": 54,
+    "rows": [
+      {
+        "region": "香港（19）",
+        "latency": "RTT 多在 14–33 ms",
+        "download": "平均约 54–75",
+        "note": null
+      },
+      {
+        "region": "新加坡、日本（各 10）",
+        "latency": null,
+        "download": "平均约 55–73",
+        "note": null
+      },
+      {
+        "region": "美国（10）",
+        "latency": null,
+        "download": "平均约 54–72，最高 85–127",
+        "note": null
+      },
+      {
+        "region": "台湾 04",
+        "latency": null,
+        "download": "平均 8.40",
+        "note": null
+      },
+      {
+        "region": "香港 02",
+        "latency": null,
+        "download": "0B",
+        "note": "维护中/无数据"
+      },
+      {
+        "region": "香港 20",
+        "latency": "RTT 201 ms，HTTP 408 ms",
+        "download": null,
+        "note": null
+      }
+    ],
+    "notes": null,
+    "limitations": [
+      "白天测试，未覆盖 20:00–23:00 晚高峰",
+      "单次快照，不代表长期稳定性",
+      "只测速度和延迟，未测丢包与连通率",
+      "AI 与流媒体未在快照中测试"
+    ],
+    "sourceCheckedAt": "2026-10-15"
+  },
+  {
+    "id": "jichangtj-stardream-2026-08-11",
+    "brandSlug": "stardream",
+    "sourceType": "public_record",
+    "sourceName": "机场推荐 jichangtj.co 首轮评测快照",
+    "sourceUrl": "https://jichangtj.co/reviews/xingdaomeng",
+    "recordedAt": "2026-08-11",
+    "time": "01:48",
+    "window": "凌晨，非高峰",
+    "timezone": "未注明（按来源页面原样记录）",
+    "testLocation": "广东珠海",
+    "carrier": "中国联通",
+    "bandwidthMbps": 5000,
+    "device": null,
+    "client": null,
+    "tool": "MAI-TEST-BOT 2.0.0-dev，32 线程",
+    "protocol": "Shadowsocks",
+    "latencyMethod": "RTT / HTTP 延迟（来源快照）",
+    "unit": "MB（来源截图原单位，未换算，不能与 Mbps 直接比较）",
+    "nodeCount": 55,
+    "rows": [
+      {
+        "region": "香港（20）",
+        "latency": "RTT 多在 25–30 ms；06/09/11/19 约 105 ms",
+        "download": "平均约 55–70",
+        "note": null
+      },
+      {
+        "region": "新加坡（11）",
+        "latency": null,
+        "download": "平均约 45–66；新加坡 08 为 8.22",
+        "note": null
+      },
+      {
+        "region": "日本（10）",
+        "latency": null,
+        "download": "平均约 26–54",
+        "note": null
+      },
+      {
+        "region": "美国（10）",
+        "latency": null,
+        "download": "平均约 14–34",
+        "note": null
+      },
+      {
+        "region": "台湾（4）",
+        "latency": null,
+        "download": "台湾 02 为 13.40，台湾 03 为 5.89",
+        "note": null
+      },
+      {
+        "region": "香港 01",
+        "latency": null,
+        "download": "0B",
+        "note": null
+      }
+    ],
+    "notes": "测试耗时 496 秒，消耗 15.1GB；本地 ping 5 ms。",
+    "limitations": [
+      "凌晨测试，未覆盖晚高峰",
+      "单次快照，不代表长期稳定性",
+      "只测速度和延迟，未测丢包与连通率",
+      "AI 与流媒体未在快照中测试"
+    ],
+    "sourceCheckedAt": "2026-10-15"
+  },
+  {
+    "id": "jichangtj-breezenet-2026-07-19",
+    "brandSlug": "breezenet",
+    "sourceType": "public_record",
+    "sourceName": "机场推荐 jichangtj.co 首轮评测快照",
+    "sourceUrl": "https://jichangtj.co/reviews/weifeng",
+    "recordedAt": "2026-07-19",
+    "time": "18:38",
+    "window": "傍晚",
+    "timezone": "未注明（按来源页面原样记录）",
+    "testLocation": "广东珠海",
+    "carrier": "中国联通",
+    "bandwidthMbps": 9000,
+    "device": null,
+    "client": null,
+    "tool": "MiaoKo 自定义测试，32 线程",
+    "protocol": "VLESS",
+    "latencyMethod": "RTT / HTTP 延迟（来源快照）",
+    "unit": "MB（来源截图原单位，未换算，不能与 Mbps 直接比较）",
+    "nodeCount": 50,
+    "rows": [
+      {
+        "region": "香港（15）",
+        "latency": "TLS RTT 97–115 ms（香港 09 为 211 ms）",
+        "download": "平均约 469–546",
+        "note": null
+      },
+      {
+        "region": "新加坡（10）",
+        "latency": null,
+        "download": "135–401",
+        "note": null
+      },
+      {
+        "region": "日本（10）",
+        "latency": null,
+        "download": "80–258；日本 05 平均 8.00KB",
+        "note": null
+      },
+      {
+        "region": "台湾（5）",
+        "latency": null,
+        "download": "73–103；台湾 02 为 0.00B",
+        "note": null
+      },
+      {
+        "region": "美国（10）",
+        "latency": null,
+        "download": "约 10–21",
+        "note": null
+      }
+    ],
+    "notes": null,
+    "limitations": [
+      "来源自述为“试验性结果，仅供参考”",
+      "工具与 9Gbps 测试端和其他快照不同，不能横向比较",
+      "TLS RTT 与普通 RTT 不可比",
+      "单次快照，不代表长期稳定性",
+      "只测速度和延迟，未测丢包与连通率",
+      "AI 与流媒体未在快照中测试"
+    ],
+    "sourceCheckedAt": "2026-10-15"
+  },
+  {
+    "id": "jichangtj-feimaoyun-2026-08-11",
+    "brandSlug": "feimaoyun",
+    "sourceType": "public_record",
+    "sourceName": "机场推荐 jichangtj.co 首轮评测快照",
+    "sourceUrl": "https://jichangtj.co/reviews/feimaoyun",
+    "recordedAt": "2026-08-11",
+    "time": "08:52",
+    "window": "上午，非高峰",
+    "timezone": "未注明（按来源页面原样记录）",
+    "testLocation": "广东珠海",
+    "carrier": "中国联通",
+    "bandwidthMbps": 5000,
+    "device": null,
+    "client": null,
+    "tool": "MAI-TEST-BOT 2.0.0-dev，32 线程",
+    "protocol": "Shadowsocks",
+    "latencyMethod": "RTT / HTTP 延迟（来源快照）",
+    "unit": "MB（来源截图原单位，未换算，不能与 Mbps 直接比较）",
+    "nodeCount": 62,
+    "rows": [
+      {
+        "region": "香港（19）",
+        "latency": "RTT 16–26 ms",
+        "download": "平均 560–735",
+        "note": null
+      },
+      {
+        "region": "新加坡、日本",
+        "latency": null,
+        "download": "约 500–730",
+        "note": null
+      },
+      {
+        "region": "台湾（5）",
+        "latency": "HTTP 约 270–570 ms",
+        "download": null,
+        "note": null
+      },
+      {
+        "region": "美国（10）",
+        "latency": null,
+        "download": "美国 01 约 470；其余 9 个多在 32–46",
+        "note": null
+      },
+      {
+        "region": "泰国 01",
+        "latency": "HTTP 2544 ms",
+        "download": "平均 1.91",
+        "note": null
+      },
+      {
+        "region": "德国 01",
+        "latency": null,
+        "download": "平均 1.88",
+        "note": null
+      }
+    ],
+    "notes": "共 12 个地区；测试消耗 9.0GB。",
+    "limitations": [
+      "上午测试，未覆盖晚高峰",
+      "单次快照，不代表长期稳定性",
+      "只测速度和延迟，未测丢包与连通率",
+      "AI 与流媒体未在快照中测试"
+    ],
+    "sourceCheckedAt": "2026-10-15"
+  },
+  {
+    "id": "jichangtj-u1s1-2026-08-11",
+    "brandSlug": "u1s1",
+    "sourceType": "public_record",
+    "sourceName": "机场推荐 jichangtj.co 首轮评测快照",
+    "sourceUrl": "https://jichangtj.co/reviews/u1s1",
+    "recordedAt": "2026-08-11",
+    "time": "22:33",
+    "window": "晚高峰",
+    "timezone": "未注明（按来源页面原样记录）",
+    "testLocation": "广东珠海",
+    "carrier": "中国联通",
+    "bandwidthMbps": 5000,
+    "device": null,
+    "client": null,
+    "tool": "MAI-TEST-BOT 2.0.0-dev，32 线程",
+    "protocol": "Shadowsocks",
+    "latencyMethod": "RTT / HTTP 延迟（来源快照）",
+    "unit": "MB（来源截图原单位，未换算，不能与 Mbps 直接比较）",
+    "nodeCount": 61,
+    "rows": [
+      {
+        "region": "香港（19，“香港专线”）",
+        "latency": "RTT 15–20 ms",
+        "download": "平均 96–107",
+        "note": null
+      },
+      {
+        "region": "香港 20",
+        "latency": "HTTP 3561 ms",
+        "download": null,
+        "note": null
+      },
+      {
+        "region": "新加坡（10）",
+        "latency": null,
+        "download": "平均 99–105；新加坡 01 为 17",
+        "note": null
+      },
+      {
+        "region": "日本（10）",
+        "latency": "RTT 194–200 ms",
+        "download": "平均 80–110",
+        "note": null
+      },
+      {
+        "region": "美国（10）",
+        "latency": null,
+        "download": "02/07/10 为 30–67，其余 7 个约 5–10",
+        "note": null
+      },
+      {
+        "region": "泰国 01",
+        "latency": "HTTP 1450 ms",
+        "download": "平均 7.28",
+        "note": null
+      },
+      {
+        "region": "土耳其 01",
+        "latency": null,
+        "download": "平均 4.96",
+        "note": null
+      }
+    ],
+    "notes": "共 11 个地区；耗时 468 秒，消耗 27.7GB。",
+    "limitations": [
+      "只有晚高峰一个时点，没有白天对照",
+      "快照账号可能是测试账号，条件可能与零售套餐不同",
+      "单次快照，不代表长期稳定性",
+      "只测速度和延迟，未测丢包与连通率",
+      "AI 与流媒体未在快照中测试"
+    ],
+    "sourceCheckedAt": "2026-10-15"
+  },
+  {
+    "id": "jichangtj-v2yun-2026-08-11",
+    "brandSlug": "v2yun",
+    "sourceType": "public_record",
+    "sourceName": "机场推荐 jichangtj.co 首轮评测快照",
+    "sourceUrl": "https://jichangtj.co/reviews/weituyun",
+    "recordedAt": "2026-08-11",
+    "time": "13:55",
+    "window": "白天，非高峰",
+    "timezone": "未注明（按来源页面原样记录）",
+    "testLocation": "广东珠海",
+    "carrier": "中国联通",
+    "bandwidthMbps": 5000,
+    "device": null,
+    "client": null,
+    "tool": "MAI-TEST-BOT 2.0.0-dev，32 线程",
+    "protocol": "Shadowsocks",
+    "latencyMethod": "RTT / HTTP 延迟（来源快照）",
+    "unit": "MB（来源截图原单位，未换算，不能与 Mbps 直接比较）",
+    "nodeCount": 53,
+    "rows": [
+      {
+        "region": "香港（20）",
+        "latency": "RTT 约 19–30 ms",
+        "download": "平均约 41–65",
+        "note": null
+      },
+      {
+        "region": "日本（9）",
+        "latency": null,
+        "download": "约 45–62",
+        "note": null
+      },
+      {
+        "region": "美国（9）",
+        "latency": "美国 10 RTT 336 ms",
+        "download": "平均约 48–61，峰值 80–93",
+        "note": null
+      },
+      {
+        "region": "新加坡（8）",
+        "latency": "新加坡 03 RTT 282 ms",
+        "download": "部分 50–63，部分 26–37",
+        "note": null
+      },
+      {
+        "region": "台湾（5）",
+        "latency": null,
+        "download": "约 40–53",
+        "note": null
+      },
+      {
+        "region": "新加坡 07、马来西亚 01/02",
+        "latency": null,
+        "download": "0B",
+        "note": null
+      }
+    ],
+    "notes": "耗时 391 秒，消耗 15.6GB。",
+    "limitations": [
+      "白天测试，未覆盖晚高峰",
+      "节点数 53，少于品牌宣称的 60+",
+      "单次快照，不代表长期稳定性",
+      "只测速度和延迟，未测丢包与连通率",
+      "AI 与流媒体未在快照中测试"
+    ],
+    "sourceCheckedAt": "2026-10-15"
+  },
+  {
+    "id": "jichangtj-lingmao-2026-08-11",
+    "brandSlug": "lingmao",
+    "sourceType": "public_record",
+    "sourceName": "机场推荐 jichangtj.co 首轮评测快照",
+    "sourceUrl": "https://jichangtj.co/reviews/lingmao",
+    "recordedAt": "2026-08-11",
+    "time": "18:45",
+    "window": "傍晚，接近高峰",
+    "timezone": "未注明（按来源页面原样记录）",
+    "testLocation": "广东珠海",
+    "carrier": "中国联通",
+    "bandwidthMbps": 5000,
+    "device": null,
+    "client": null,
+    "tool": "MAI-TEST-BOT 2.0.0-dev，32 线程",
+    "protocol": "Shadowsocks",
+    "latencyMethod": "RTT / HTTP 延迟（来源快照）",
+    "unit": "MB（来源截图原单位，未换算，不能与 Mbps 直接比较）",
+    "nodeCount": 54,
+    "rows": [
+      {
+        "region": "香港（20）",
+        "latency": "RTT 多在 13–18 ms；11/12/13/15 为 80–203 ms",
+        "download": "平均约 18–33",
+        "note": null
+      },
+      {
+        "region": "新加坡（10）",
+        "latency": null,
+        "download": "03–10 平均约 65–71；01 为 1.74，02 为 9.32",
+        "note": null
+      },
+      {
+        "region": "日本（9）",
+        "latency": "日本 03 HTTP 2146 ms",
+        "download": "约 19–24",
+        "note": null
+      },
+      {
+        "region": "美国（10）",
+        "latency": null,
+        "download": "约 16–24",
+        "note": null
+      },
+      {
+        "region": "台湾（5）",
+        "latency": null,
+        "download": "11–63，分化明显",
+        "note": null
+      },
+      {
+        "region": "香港 01",
+        "latency": null,
+        "download": "0B",
+        "note": null
+      }
+    ],
+    "notes": "耗时 411 秒，消耗 10.4GB。",
+    "limitations": [
+      "没有白天对照",
+      "单次快照，不代表长期稳定性",
+      "只测速度和延迟，未测丢包与连通率",
+      "AI 与流媒体未在快照中测试"
+    ],
+    "sourceCheckedAt": "2026-10-15"
+  },
+  {
+    "id": "jichangtj-jilianyun-2026-08-11",
+    "brandSlug": "jilianyun",
+    "sourceType": "public_record",
+    "sourceName": "机场推荐 jichangtj.co 首轮评测快照",
+    "sourceUrl": "https://jichangtj.co/reviews/jilianyun",
+    "recordedAt": "2026-08-11",
+    "time": "22:46",
+    "window": "晚高峰",
+    "timezone": "未注明（按来源页面原样记录）",
+    "testLocation": "广东珠海",
+    "carrier": "中国联通",
+    "bandwidthMbps": 5000,
+    "device": null,
+    "client": null,
+    "tool": "MAI-TEST-BOT 2.0.0-dev，32 线程",
+    "protocol": "Shadowsocks",
+    "latencyMethod": "RTT / HTTP 延迟（来源快照）",
+    "unit": "MB（来源截图原单位，未换算，不能与 Mbps 直接比较）",
+    "nodeCount": 61,
+    "rows": [
+      {
+        "region": "香港（20）",
+        "latency": "RTT 分两组：约 24–33 ms 与 107–291 ms",
+        "download": "平均约 60–99",
+        "note": null
+      },
+      {
+        "region": "新加坡（9）",
+        "latency": null,
+        "download": "约 44–84",
+        "note": null
+      },
+      {
+        "region": "日本（10）",
+        "latency": null,
+        "download": "1.4–67",
+        "note": null
+      },
+      {
+        "region": "美国（10）",
+        "latency": "美国 01 RTT 1787 ms",
+        "download": "5–73",
+        "note": null
+      },
+      {
+        "region": "德国 01 / 越南 01",
+        "latency": null,
+        "download": "42.50KB / 1.45",
+        "note": null
+      },
+      {
+        "region": "香港 01",
+        "latency": null,
+        "download": "各项为 0",
+        "note": null
+      }
+    ],
+    "notes": "共 11 个地区；耗时 678 秒，消耗 18.8GB。",
+    "limitations": [
+      "只有晚高峰一个时点，没有白天对照",
+      "快照前三行为订阅信息，可能是测试账号",
+      "单次快照，不代表长期稳定性",
+      "只测速度和延迟，未测丢包与连通率",
+      "AI 与流媒体未在快照中测试"
+    ],
+    "sourceCheckedAt": "2026-10-15"
+  },
+  {
+    "id": "jichangtj-yuzhouyun-2026-08-11",
+    "brandSlug": "yuzhouyun",
+    "sourceType": "public_record",
+    "sourceName": "机场推荐 jichangtj.co 首轮评测快照",
+    "sourceUrl": "https://jichangtj.co/reviews/yuzhouyun",
+    "recordedAt": "2026-08-11",
+    "time": "21:04",
+    "window": "晚高峰",
+    "timezone": "未注明（按来源页面原样记录）",
+    "testLocation": "广东珠海",
+    "carrier": "中国联通",
+    "bandwidthMbps": 9000,
+    "device": null,
+    "client": null,
+    "tool": "主端 4.3.3 / 喵速 4.7.0，32 线程",
+    "protocol": "VLESS",
+    "latencyMethod": "RTT / HTTP 延迟（来源快照）",
+    "unit": "MB（来源截图原单位，未换算，不能与 Mbps 直接比较）",
+    "nodeCount": 50,
+    "rows": [
+      {
+        "region": "香港（15）",
+        "latency": "TLS RTT 91–121 ms",
+        "download": "平均 470–550",
+        "note": null
+      },
+      {
+        "region": "新加坡（10）",
+        "latency": null,
+        "download": "330–400；新加坡 07 为 9.60KB",
+        "note": null
+      },
+      {
+        "region": "日本（10）",
+        "latency": "日本 07 HTTPS 2091 ms",
+        "download": "22–170",
+        "note": null
+      },
+      {
+        "region": "台湾（5）",
+        "latency": null,
+        "download": "29–77",
+        "note": null
+      },
+      {
+        "region": "美国（10）",
+        "latency": null,
+        "download": "8–12",
+        "note": null
+      },
+      {
+        "region": "香港 01",
+        "latency": null,
+        "download": "0.00B",
+        "note": null
+      }
+    ],
+    "notes": null,
+    "limitations": [
+      "工具与测试端和主批次不同，不宜与其他快照直接比较",
+      "TLS RTT 与普通 RTT 不可比",
+      "单次快照，不代表长期稳定性",
+      "只测速度和延迟，未测丢包与连通率",
+      "AI 与流媒体未在快照中测试"
+    ],
+    "sourceCheckedAt": "2026-10-15"
+  },
+  {
+    "id": "jichangtj-guangnianti-2026-08-11",
+    "brandSlug": "guangnianti",
+    "sourceType": "public_record",
+    "sourceName": "机场推荐 jichangtj.co 首轮评测快照",
+    "sourceUrl": "https://jichangtj.co/reviews/guangnianti",
+    "recordedAt": "2026-08-11",
+    "time": "14:38",
+    "window": "白天，非高峰",
+    "timezone": "未注明（按来源页面原样记录）",
+    "testLocation": "广东珠海",
+    "carrier": "中国联通",
+    "bandwidthMbps": 5000,
+    "device": null,
+    "client": null,
+    "tool": "MAI-TEST-BOT 2.0.0-dev，32 线程",
+    "protocol": "Shadowsocks",
+    "latencyMethod": "RTT / HTTP 延迟（来源快照）",
+    "unit": "MB（来源截图原单位，未换算，不能与 Mbps 直接比较）",
+    "nodeCount": 63,
+    "rows": [
+      {
+        "region": "香港（20）",
+        "latency": "RTT 约 25–30 ms；香港 05 为 151 ms",
+        "download": "平均 73–96",
+        "note": null
+      },
+      {
+        "region": "新加坡（10）",
+        "latency": "新加坡 01/08 HTTP 约 1800 ms",
+        "download": "平均 87–95",
+        "note": null
+      },
+      {
+        "region": "日本（10）",
+        "latency": "日本 05 HTTP 约 1800 ms",
+        "download": "平均 76–90",
+        "note": null
+      },
+      {
+        "region": "美国（10）",
+        "latency": null,
+        "download": "平均 11–38",
+        "note": null
+      },
+      {
+        "region": "马来西亚 / 德国 / 巴西",
+        "latency": null,
+        "download": "马来西亚 01、德国 01 为 0B；马来西亚 02 为 52.65KB；巴西 01 无数据",
+        "note": null
+      }
+    ],
+    "notes": "共 12 个地区；耗时 457 秒，消耗 23.1GB。",
+    "limitations": [
+      "白天测试，未覆盖晚高峰",
+      "单次快照，不代表长期稳定性",
+      "只测速度和延迟，未测丢包与连通率",
+      "AI 与流媒体未在快照中测试"
+    ],
+    "sourceCheckedAt": "2026-10-15"
+  },
+  {
+    "id": "jichangtj-yifanyun-2026-08-11",
+    "brandSlug": "yifanyun",
+    "sourceType": "public_record",
+    "sourceName": "机场推荐 jichangtj.co 首轮评测快照",
+    "sourceUrl": "https://jichangtj.co/reviews/yifanyun",
+    "recordedAt": "2026-08-11",
+    "time": "00:21",
+    "window": "凌晨，非高峰",
+    "timezone": "未注明（按来源页面原样记录）",
+    "testLocation": "广东珠海",
+    "carrier": "中国联通",
+    "bandwidthMbps": 5000,
+    "device": null,
+    "client": null,
+    "tool": "MAI-TEST-BOT 2.0.0-dev，32 线程",
+    "protocol": "Shadowsocks",
+    "latencyMethod": "RTT / HTTP 延迟（来源快照）",
+    "unit": "MB（来源截图原单位，未换算，不能与 Mbps 直接比较）",
+    "nodeCount": 55,
+    "rows": [
+      {
+        "region": "香港（20）",
+        "latency": "RTT 多在 16–24 ms；香港 09 为 101 ms",
+        "download": "约 80–92；香港 11 为 42.70",
+        "note": null
+      },
+      {
+        "region": "美国（10）",
+        "latency": null,
+        "download": "约 61–82，最高 100–149",
+        "note": null
+      },
+      {
+        "region": "新加坡、日本、台湾",
+        "latency": "日本 04/05 HTTP 550–611 ms",
+        "download": "约 25–89，节点差异大",
+        "note": null
+      },
+      {
+        "region": "香港 01",
+        "latency": null,
+        "download": "0B",
+        "note": null
+      }
+    ],
+    "notes": "消耗 23.3GB。",
+    "limitations": [
+      "凌晨测试，未覆盖晚高峰",
+      "单次快照，不代表长期稳定性",
+      "只测速度和延迟，未测丢包与连通率",
+      "AI 与流媒体未在快照中测试"
+    ],
+    "sourceCheckedAt": "2026-10-15"
+  },
+  {
+    "id": "jichangtj-ermaoyun-2026-08-11",
+    "brandSlug": "ermaoyun",
+    "sourceType": "public_record",
+    "sourceName": "机场推荐 jichangtj.co 首轮评测快照",
+    "sourceUrl": "https://jichangtj.co/reviews/ermaoyun",
+    "recordedAt": "2026-08-11",
+    "time": "10:45",
+    "window": "上午，非高峰",
+    "timezone": "未注明（按来源页面原样记录）",
+    "testLocation": "广东珠海",
+    "carrier": "中国联通",
+    "bandwidthMbps": 5000,
+    "device": null,
+    "client": null,
+    "tool": "MAI-TEST-BOT 2.0.0-dev，32 线程",
+    "protocol": "Shadowsocks",
+    "latencyMethod": "RTT / HTTP 延迟（来源快照）",
+    "unit": "MB（来源截图原单位，未换算，不能与 Mbps 直接比较）",
+    "nodeCount": 63,
+    "rows": [
+      {
+        "region": "香港（20）",
+        "latency": "RTT 约 25–31 ms",
+        "download": "约 82–91",
+        "note": null
+      },
+      {
+        "region": "新加坡（10）",
+        "latency": null,
+        "download": "约 72–88",
+        "note": null
+      },
+      {
+        "region": "日本（10）",
+        "latency": null,
+        "download": "约 54–87",
+        "note": null
+      },
+      {
+        "region": "台湾（5）",
+        "latency": null,
+        "download": "约 60–80",
+        "note": null
+      },
+      {
+        "region": "美国（10）",
+        "latency": null,
+        "download": "约 20–74",
+        "note": null
+      },
+      {
+        "region": "冷门地区",
+        "latency": null,
+        "download": "土耳其 01 为 0B；英国 01 为 483B；泰国 01 为 45.31KB（HTTP 2038 ms）；巴西 01 为 6.88",
+        "note": null
+      }
+    ],
+    "notes": "共 12 个地区；耗时 439 秒，消耗 26.0GB。",
+    "limitations": [
+      "上午测试，未覆盖晚高峰",
+      "单次快照，不代表长期稳定性",
+      "只测速度和延迟，未测丢包与连通率",
+      "AI 与流媒体未在快照中测试"
+    ],
+    "sourceCheckedAt": "2026-10-15"
+  },
+  {
+    "id": "jichangtj-sogoyun-2026-08-11",
+    "brandSlug": "sogoyun",
+    "sourceType": "public_record",
+    "sourceName": "机场推荐 jichangtj.co 首轮评测快照",
+    "sourceUrl": "https://jichangtj.co/reviews/sogo",
+    "recordedAt": "2026-08-11",
+    "time": "18:57",
+    "window": "傍晚",
+    "timezone": "未注明（按来源页面原样记录）",
+    "testLocation": "广东珠海",
+    "carrier": "中国联通",
+    "bandwidthMbps": 5000,
+    "device": null,
+    "client": null,
+    "tool": "MAI-TEST-BOT 2.0.0-dev，32 线程",
+    "protocol": "Shadowsocks",
+    "latencyMethod": "RTT / HTTP 延迟（来源快照）",
+    "unit": "MB（来源截图原单位，未换算，不能与 Mbps 直接比较）",
+    "nodeCount": 62,
+    "rows": [
+      {
+        "region": "香港（20）",
+        "latency": "RTT 约 14–23 ms",
+        "download": "平均约 44–61；香港 11 全部为 0",
+        "note": null
+      },
+      {
+        "region": "日本（10）",
+        "latency": "日本 01 HTTP 约 1800–2000 ms",
+        "download": "平均约 71–106",
+        "note": null
+      },
+      {
+        "region": "新加坡（10）",
+        "latency": "新加坡 10 HTTP 约 1800–2000 ms",
+        "download": "约 47–98",
+        "note": null
+      },
+      {
+        "region": "美国（9）",
+        "latency": null,
+        "download": "平均约 50–86，最高 116–161",
+        "note": null
+      },
+      {
+        "region": "英/德/法/泰/韩",
+        "latency": null,
+        "download": "各 1–2 个，平均约 2–8",
+        "note": null
+      },
+      {
+        "region": "马来西亚 01/02",
+        "latency": null,
+        "download": "0B",
+        "note": null
+      }
+    ],
+    "notes": "香港 03 在节点列表中出现两次（来源按原样记录，未合并）。耗时 557 秒，消耗 22.6GB。",
+    "limitations": [
+      "18:57 尚未进入晚高峰",
+      "单次快照，不代表长期稳定性",
+      "只测速度和延迟，未测丢包与连通率",
+      "AI 与流媒体未在快照中测试"
+    ],
+    "sourceCheckedAt": "2026-10-15"
+  },
+  {
+    "id": "jichangtj-kexinyun-2026-08-11",
+    "brandSlug": "kexinyun",
+    "sourceType": "public_record",
+    "sourceName": "机场推荐 jichangtj.co 首轮评测快照",
+    "sourceUrl": "https://jichangtj.co/reviews/kexinyun",
+    "recordedAt": "2026-08-11",
+    "time": "15:32",
+    "window": "白天",
+    "timezone": "未注明（按来源页面原样记录）",
+    "testLocation": "广东珠海",
+    "carrier": "中国联通",
+    "bandwidthMbps": 5000,
+    "device": null,
+    "client": null,
+    "tool": "MAI-TEST-BOT 2.0.0-dev，32 线程",
+    "protocol": "Shadowsocks",
+    "latencyMethod": "RTT / HTTP 延迟（来源快照）",
+    "unit": "MB（来源截图原单位，未换算，不能与 Mbps 直接比较）",
+    "nodeCount": 55,
+    "rows": [
+      {
+        "region": "香港（20）",
+        "latency": "RTT 多为 24–34 ms；香港 01 为 104 ms",
+        "download": "均速 28–53",
+        "note": null
+      },
+      {
+        "region": "新加坡（10）",
+        "latency": "新加坡 03 HTTP 1829 ms",
+        "download": "37–48",
+        "note": null
+      },
+      {
+        "region": "日本（10）",
+        "latency": "日本 08 HTTP 2231 ms",
+        "download": "27–43；日本 07 为 12.61KB",
+        "note": null
+      },
+      {
+        "region": "美国（10）",
+        "latency": null,
+        "download": "11–20；美国 05 为 688.93KB",
+        "note": null
+      }
+    ],
+    "notes": "耗时 889 秒，消耗 10.5GB。",
+    "limitations": [
+      "截图未显示年月日，来源按批次记为 2026-08-11",
+      "白天测试，未覆盖晚高峰",
+      "单次快照，不代表长期稳定性",
+      "只测速度和延迟，未测丢包与连通率",
+      "AI 与流媒体未在快照中测试"
+    ],
+    "sourceCheckedAt": "2026-10-15"
+  },
+  {
+    "id": "jichangtj-sujie-2026-08-11",
+    "brandSlug": "sujie",
+    "sourceType": "public_record",
+    "sourceName": "机场推荐 jichangtj.co 首轮评测快照",
+    "sourceUrl": "https://jichangtj.co/reviews/sujie",
+    "recordedAt": "2026-08-11",
+    "time": "15:39",
+    "window": "白天，非高峰",
+    "timezone": "未注明（按来源页面原样记录）",
+    "testLocation": "广东珠海",
+    "carrier": "中国联通",
+    "bandwidthMbps": 5000,
+    "device": null,
+    "client": null,
+    "tool": "MAI-TEST-BOT 2.0.0-dev，32 线程",
+    "protocol": "Shadowsocks",
+    "latencyMethod": "RTT / HTTP 延迟（来源快照）",
+    "unit": "MB（来源截图原单位，未换算，不能与 Mbps 直接比较）",
+    "nodeCount": 63,
+    "rows": [
+      {
+        "region": "香港",
+        "latency": "RTT 约 13–29 ms",
+        "download": "41–69；香港 20 为 0B",
+        "note": null
+      },
+      {
+        "region": "美国",
+        "latency": null,
+        "download": "35–52",
+        "note": null
+      },
+      {
+        "region": "日本",
+        "latency": null,
+        "download": "31–49",
+        "note": null
+      },
+      {
+        "region": "新加坡",
+        "latency": null,
+        "download": "40–48；新加坡 01 约 7.44",
+        "note": null
+      },
+      {
+        "region": "台湾",
+        "latency": null,
+        "download": "28–37",
+        "note": null
+      },
+      {
+        "region": "土耳其 01",
+        "latency": "RTT 590 ms",
+        "download": null,
+        "note": null
+      },
+      {
+        "region": "英国 01 / 泰国 01 / 巴西 01",
+        "latency": null,
+        "download": "0B / 约 5–6 / 约 5–6",
+        "note": null
+      }
+    ],
+    "notes": "共 12 个地区；耗时 466 秒，消耗 15.0GB。",
+    "limitations": [
+      "白天测试，未覆盖晚高峰",
+      "单次快照，不代表长期稳定性",
+      "只测速度和延迟，未测丢包与连通率",
+      "AI 与流媒体未在快照中测试"
+    ],
+    "sourceCheckedAt": "2026-10-15"
+  },
+  {
+    "id": "jichangtj-kuaili-2026-08-11",
+    "brandSlug": "kuaili",
+    "sourceType": "public_record",
+    "sourceName": "机场推荐 jichangtj.co 首轮评测快照",
+    "sourceUrl": "https://jichangtj.co/reviews/kuaili",
+    "recordedAt": "2026-08-11",
+    "time": "19:52",
+    "window": "傍晚，接近高峰",
+    "timezone": "未注明（按来源页面原样记录）",
+    "testLocation": "广东珠海",
+    "carrier": "中国联通",
+    "bandwidthMbps": 9000,
+    "device": null,
+    "client": null,
+    "tool": "主端 4.3.3 / 喵速 4.7.0，32 线程",
+    "protocol": "VLESS",
+    "latencyMethod": "RTT / HTTP 延迟（来源快照）",
+    "unit": "MB（来源截图原单位，未换算，不能与 Mbps 直接比较）",
+    "nodeCount": 50,
+    "rows": [
+      {
+        "region": "香港",
+        "latency": "TLS RTT 98–202 ms",
+        "download": "505–551",
+        "note": null
+      },
+      {
+        "region": "新加坡",
+        "latency": null,
+        "download": "205–420；新加坡 08 为 9.60KB",
+        "note": null
+      },
+      {
+        "region": "日本",
+        "latency": null,
+        "download": "106–190",
+        "note": null
+      },
+      {
+        "region": "台湾",
+        "latency": null,
+        "download": "47–90",
+        "note": null
+      },
+      {
+        "region": "美国",
+        "latency": null,
+        "download": "8.6–13.9",
+        "note": null
+      }
+    ],
+    "notes": "UDP 类型：多数节点为 FullCone，新加坡 05/06、台湾 01/05 显示 Unknown。",
+    "limitations": [
+      "工具与测试端和主批次不同，不宜与其他快照直接比较",
+      "TLS RTT 与普通 RTT 不可比",
+      "单次快照，不代表长期稳定性",
+      "只测速度和延迟，未测丢包与连通率",
+      "AI 与流媒体未在快照中测试"
+    ],
+    "sourceCheckedAt": "2026-10-15"
+  },
+  {
+    "id": "jichangtj-quanqiuyun-2026-08-11",
+    "brandSlug": "quanqiuyun",
+    "sourceType": "public_record",
+    "sourceName": "机场推荐 jichangtj.co 首轮评测快照",
+    "sourceUrl": "https://jichangtj.co/reviews/quanqiuyun",
+    "recordedAt": "2026-08-11",
+    "time": "15:50",
+    "window": "白天，非高峰",
+    "timezone": "未注明（按来源页面原样记录）",
+    "testLocation": "广东珠海",
+    "carrier": "中国联通",
+    "bandwidthMbps": 5000,
+    "device": null,
+    "client": null,
+    "tool": "MAI-TEST-BOT 2.0.0-dev，32 线程",
+    "protocol": "Shadowsocks",
+    "latencyMethod": "RTT / HTTP 延迟（来源快照）",
+    "unit": "MB（来源截图原单位，未换算，不能与 Mbps 直接比较）",
+    "nodeCount": 62,
+    "rows": [
+      {
+        "region": "香港（20）",
+        "latency": "RTT 14–22 ms",
+        "download": "平均 73–91",
+        "note": null
+      },
+      {
+        "region": "日本（10）",
+        "latency": "RTT 约 200 ms",
+        "download": "平均 64–84；日本 08 为 80.52KB",
+        "note": null
+      },
+      {
+        "region": "新加坡（9）",
+        "latency": null,
+        "download": "58–83；新加坡 05 为 13.81",
+        "note": null
+      },
+      {
+        "region": "台湾（5）",
+        "latency": null,
+        "download": "73–80",
+        "note": null
+      },
+      {
+        "region": "美国（10）",
+        "latency": null,
+        "download": "平均 45–68，最高 98–120",
+        "note": null
+      },
+      {
+        "region": "其他地区",
+        "latency": null,
+        "download": "泰国 01 为 3.41KB；韩国 01 为 2.25；英/法/德约 3–5",
+        "note": null
+      }
+    ],
+    "notes": "共 12 个地区；耗时 466 秒，消耗 25.5GB。",
+    "limitations": [
+      "白天测试，未覆盖晚高峰",
+      "单次快照，不代表长期稳定性",
+      "只测速度和延迟，未测丢包与连通率",
+      "AI 与流媒体未在快照中测试"
+    ],
+    "sourceCheckedAt": "2026-10-15"
+  },
+  {
+    "id": "towernav-lingdongyun-2026-07-20",
+    "brandSlug": "lingdongyun",
+    "sourceType": "public_record",
+    "sourceName": "TowerNav 灵动云节点测试",
+    "sourceUrl": "https://towernav.com/airports/lingdong/",
+    "recordedAt": "2026-07-20",
+    "time": "20:54（流媒体/AI 面板为 2026-07-21 19:12）",
+    "window": "晚高峰",
+    "timezone": "北京时间",
+    "testLocation": "广东珠海",
+    "carrier": "中国联通",
+    "bandwidthMbps": 9000,
+    "device": null,
+    "client": null,
+    "tool": "MiaoKo 工具，32 线程",
+    "protocol": null,
+    "latencyMethod": "TLS RTT（单次握手）+ HTTPS 单次请求延迟",
+    "unit": "MB/s（来源单位）",
+    "nodeCount": 60,
+    "rows": [
+      {
+        "region": "香港（20）",
+        "latency": "TLS RTT 136–279 ms；HTTPS 1121–2312 ms",
+        "download": "平均约 21–75，峰值 65–102",
+        "note": null
+      },
+      {
+        "region": "日本（10）",
+        "latency": "TLS RTT 228–530 ms；HTTPS 999–2373 ms",
+        "download": "平均 46–76，峰值 92–111",
+        "note": null
+      },
+      {
+        "region": "新加坡（10）",
+        "latency": "TLS RTT 157–492 ms；HTTPS 757–2758 ms",
+        "download": "平均 17–47，峰值 58–120",
+        "note": null
+      },
+      {
+        "region": "台湾（10）",
+        "latency": "TLS RTT 157–189 ms；HTTPS 757–1459 ms",
+        "download": "平均 33–46，峰值 60–113",
+        "note": null
+      },
+      {
+        "region": "美国（10）",
+        "latency": "TLS RTT 186–456 ms；HTTPS 1126–2373 ms",
+        "download": "平均 43–83，峰值 101–125；美国 01 整个节点测试失败",
+        "note": null
+      }
+    ],
+    "ai": "OpenAI：除美国 01 外均可访问",
+    "media": "YouTube：香港、日本、美国 02–10 正常，新加坡与台湾节点被识别为中国大陆；Netflix / Disney+ 多数节点可用；TikTok 多数节点不可用",
+    "notes": "UDP：多数节点为 FullCone，新加坡 04/05/08 为 Unknown。台湾节点在 Netflix/Disney+ 被识别为西班牙、Steam 显示英镑，说明出口 IP 归属可能在欧洲。",
+    "limitations": [
+      "单一测试环境，结果只供参考",
+      "速度受测试端宽带限制",
+      "HTTPS 延迟为单次读数，随时段变化",
+      "未测上传、丢包；未做线路拓扑分析",
+      "来源汇总表的台湾 RTT 写作 157–298 ms，与逐节点表最高 189 ms 不一致",
+      "与梯子云、暮光加速公开资料中的测速数据相同，不能视为独立测试"
+    ],
+    "sourceCheckedAt": "2026-10-15",
+    "sharedData": "这组数据与梯子云官方 GitHub 测速报告的五个地区峰值（101.56 / 111.34 / 119.52 / 125.17 / 96.25 MB/s）完全一致；纳云发布的暮光加速测速截图也标注同一时间（2026-07-20 20:54:55 CST）和同样 60 个 VLESS 节点。几处资料很可能出自同一次测试，本站不把它们算作独立测试，也无法确认数据实际属于哪个品牌。"
+  },
+  {
+    "id": "jichangwiki-stardream-2026-10-09",
+    "brandSlug": "stardream",
+    "sourceType": "public_record",
+    "sourceName": "机场百科 jichangwiki.blog 星岛梦测评",
+    "sourceUrl": "https://jichangwiki.blog/posts/airports/xingdaomeng/",
+    "recordedAt": "2026-10-09",
+    "time": "20:00–23:00",
+    "window": "晚高峰",
+    "timezone": "北京时间",
+    "testLocation": "未注明",
+    "carrier": "中国电信",
+    "bandwidthMbps": 500,
+    "device": "Windows 11",
+    "client": "Clash Verge Rev",
+    "tool": "未注明",
+    "protocol": "VLESS",
+    "latencyMethod": "来源未说明",
+    "unit": "Mbps",
+    "nodeCount": null,
+    "rows": [
+      {
+        "region": "香港",
+        "latency": "55 ms",
+        "download": null,
+        "note": null
+      },
+      {
+        "region": "日本",
+        "latency": "71 ms",
+        "download": null,
+        "note": null
+      },
+      {
+        "region": "土耳其",
+        "latency": "210 ms",
+        "download": null,
+        "note": null
+      },
+      {
+        "region": "巴西",
+        "latency": "265 ms",
+        "download": null,
+        "note": null
+      },
+      {
+        "region": "汇总",
+        "latency": null,
+        "download": "晚高峰下载 165 Mbps；非高峰 280 Mbps",
+        "note": "丢包 0.6%"
+      }
+    ],
+    "notes": "同页的第二批“电信千兆环境”数据中，多个地区的平均速度超过 1000 Mbps（如香港 1850 Mbps），与其标称的千兆环境矛盾，本站未收录该批数据。",
+    "limitations": [
+      "只有汇总数字，没有逐次原始结果",
+      "测试工具未注明",
+      "常用地区稳定、冷门地区高峰波动为来源描述"
+    ],
+    "sourceCheckedAt": "2026-10-15"
+  },
+  {
+    "id": "laddercloud-github-2026-08-11",
+    "brandSlug": "laddercloud",
+    "sourceType": "vendor_claim",
+    "sourceName": "梯子云官方 GitHub 测速报告（LadderCloudOfficial/Speed-Test）",
+    "sourceUrl": "https://github.com/LadderCloudOfficial/Speed-Test",
+    "recordedAt": "2026-08-11",
+    "time": null,
+    "window": null,
+    "timezone": null,
+    "testLocation": "广东珠海",
+    "carrier": "中国联通",
+    "bandwidthMbps": 9000,
+    "device": null,
+    "client": null,
+    "tool": "MiaoKo 工具，32 线程",
+    "protocol": null,
+    "latencyMethod": null,
+    "unit": "MB/s（来源单位）",
+    "nodeCount": null,
+    "rows": [
+      {
+        "region": "香港",
+        "download": "平均 45–65，峰值 101.56"
+      },
+      {
+        "region": "日本",
+        "download": "平均 55–76，峰值 111.34"
+      },
+      {
+        "region": "新加坡",
+        "download": "平均 35–68，峰值 119.52"
+      },
+      {
+        "region": "美国",
+        "download": "平均 50–83，峰值 125.17"
+      },
+      {
+        "region": "台湾",
+        "download": "平均 35–45，峰值 96.25"
+      }
+    ],
+    "ai": null,
+    "media": null,
+    "notes": "服务商在自己的 GitHub 仓库发布的测速报告。日期为报告更新时间，报告没有写明实际测试日期和时段，也没有延迟和上传数据。报告称节点数 60+，并宣称全线 20Gbps 带宽升级、BBRv3 调优、95% 以上节点支持 FullCone UDP，这些说法本站未核实。报告中的测速图本站未转载，请到原仓库查看。",
+    "limitations": [
+      "服务商自行发布，不是本站测试",
+      "没有实际测试日期、时段，也没有延迟和上传数据",
+      "速度受测试端 9Gbps 宽带和 32 线程设置影响，普通家庭宽带达不到",
+      "峰值与 TowerNav 灵动云记录完全相同，数据归属存疑，不能视为梯子云的独立测速",
+      "20Gbps、BBRv3、FullCone 等宣传未经核实"
+    ],
+    "sourceCheckedAt": "2026-10-15",
+    "sharedData": "五个地区峰值与 TowerNav 灵动云测试页（2026-07-20 20:54 CST）逐节点表中的数值完全一致，测试端描述（珠海联通 9Gbps、MiaoKo 32 线程）也相同；纳云发布的暮光加速测速截图标注的也是这一时间。几处资料很可能出自同一次测试，本站不把它们算作独立测试，也无法确认数据实际属于哪个品牌。"
+  },
+  {
+    "id": "nayun-muguang-2026-07-20",
+    "brandSlug": "muguang",
+    "sourceType": "vendor_claim",
+    "sourceName": "纳云 · 暮光加速介绍页（截图由服务方提供）",
+    "sourceUrl": "https://nayun.net/articles/twilight/index.html",
+    "recordedAt": "2026-07-20",
+    "time": "20:54:55",
+    "window": "晚高峰",
+    "timezone": "CST（北京时间）",
+    "testLocation": null,
+    "carrier": null,
+    "bandwidthMbps": null,
+    "device": null,
+    "client": null,
+    "tool": null,
+    "protocol": "VLESS",
+    "latencyMethod": null,
+    "unit": "来源页面没有给出文字数值",
+    "nodeCount": 60,
+    "rows": [
+      {
+        "region": "新加坡、日本、美国、香港、台湾",
+        "note": "截图显示 60 个节点全部测试成功；各节点速度和延迟只在截图中，页面正文没有数值，本站不转录、不转载截图"
+      }
+    ],
+    "ai": null,
+    "media": null,
+    "notes": "截图由暮光加速服务页面提供，纳云在介绍页中转载，并注明不等同于其独立实测。截图未写明测试地区、运营商、带宽、设备和客户端。",
+    "limitations": [
+      "服务方提供的单次截图，不是本站测试",
+      "页面没有文字数值，本站无法逐项核对速度和延迟",
+      "未说明测试地区、运营商、带宽、设备、客户端和重复次数",
+      "与 TowerNav 灵动云、梯子云报告的测试时间和节点数相同，数据归属存疑"
+    ],
+    "sourceCheckedAt": "2026-10-15",
+    "sharedData": "同一时间（2026-07-20 20:54 CST）、同样 60 个 VLESS 节点的测速数据还出现在 TowerNav 灵动云测试页和梯子云官方 GitHub 测速报告中，后两者的地区峰值完全一致。几处资料很可能出自同一次测试，本站不把它们算作独立测试，也无法确认数据实际属于哪个品牌。"
+  }
+]

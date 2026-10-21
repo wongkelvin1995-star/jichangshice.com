@@ -1,0 +1,68 @@
+---
+/** 套餐比较页：选择机场加入“我的比较清单”（保存在本地浏览器），点「开始比较」只看清单内机场的套餐。 */
+import type { Provider } from "@/utils/plans";
+import { COMPARE_MAX } from "@/utils/userStore";
+
+type Props = { providers: Provider[] };
+const { providers } = Astro.props;
+---
+
+<section
+  class="card mb-6 px-5 py-4"
+  aria-labelledby="my-compare"
+  data-user-actions
+  data-pagefind-ignore
+>
+  <div class="flex flex-wrap items-baseline justify-between gap-2">
+    <h2 id="my-compare" class="text-base font-extrabold">我的比较清单</h2>
+    <a
+      href="/compare/#plans-compare"
+      class="text-accent-strong hidden text-sm font-semibold hover:underline"
+      data-start-compare>开始比较 →</a
+    >
+  </div>
+  <p class="text-muted-foreground mt-1 text-sm">
+    点选机场加入或移出清单（最多 {COMPARE_MAX} 家），再点「开始比较」，下表只显示清单中机场的套餐。清单也可以在<a
+      href="/user/#compare"
+      class="text-accent-strong underline underline-offset-2">个人中心</a
+    >管理，只保存在当前浏览器。
+  </p>
+  <ul class="mt-3 flex flex-wrap gap-2">
+    {
+      providers.map(p => (
+        <li>
+          <button
+            type="button"
+            class="bg-card hover:border-accent/50 aria-pressed:border-accent aria-pressed:bg-accent-soft aria-pressed:text-accent-strong inline-flex h-9 items-center rounded-full border px-3 text-sm transition-colors aria-pressed:font-semibold"
+            data-cmp={p.slug}
+            data-name={p.name}
+            data-chip
+            aria-pressed="false"
+            disabled
+          >
+            <span data-label>{p.name}</span>
+          </button>
+        </li>
+      ))
+    }
+  </ul>
+  <span class="sr-only" aria-live="polite" data-ua-status></span>
+</section>
+
+<script>
+  import "@/scripts/userActions";
+  import { CHANGE_EVENT, getCompare } from "@/utils/userStore";
+
+  const link = document.querySelector<HTMLAnchorElement>(
+    "[data-start-compare]"
+  );
+  function update() {
+    if (!link) return;
+    const list = getCompare();
+    link.classList.toggle("hidden", list.length === 0);
+    link.href = `/compare/?brands=${list.join(",")}#plans-compare`;
+  }
+  window.addEventListener(CHANGE_EVENT, update);
+  window.addEventListener("storage", update);
+  update();
+</script>

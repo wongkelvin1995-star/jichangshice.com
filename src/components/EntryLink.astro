@@ -1,0 +1,29 @@
+---
+/**
+ * 品牌入口链接（含邀请码）。统一输出 rel="sponsored nofollow noopener"，新窗口打开。
+ * 只接受 providers.json 中登记的入口，避免链接串品牌。
+ */
+type Props = {
+  href: string | null;
+  label?: string;
+  class?: string;
+  brand: string;
+};
+const { href, label = "访问入口", class: className, brand } = Astro.props;
+---
+
+{
+  href && (
+    <a
+      href={href}
+      target="_blank"
+      rel="sponsored nofollow noopener noreferrer"
+      class={className}
+      aria-label={`${label}：${brand}（新窗口，含邀请码）`}
+      data-entry={brand}
+    >
+      {label}
+      <span aria-hidden="true">↗</span>
+    </a>
+  )
+}

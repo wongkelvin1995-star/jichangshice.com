@@ -1,0 +1,121 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Breadcrumbs from "@/components/Breadcrumbs.astro";
+import PlanTable from "@/components/PlanTable.astro";
+import CompareChips from "@/components/CompareChips.astro";
+import { getProviders, getPlans, sortPlans } from "@/utils/plans";
+import { breadcrumbJsonLd } from "@/utils/jsonld";
+import config from "@/config";
+
+const providers = await getProviders();
+const order = new Map(providers.map(p => [p.slug, p.editorialOrder]));
+const plans = (await getPlans()).sort(
+  (a, b) =>
+    order.get(a.providerId)! - order.get(b.providerId)! || sortPlans(a, b)
+);
+const brands = new Set(plans.map(p => p.providerId)).size;
+const conflicts = plans.filter(p => p.conflicts.length).length;
+const observed = plans
+  .map(p => p.observedAt)
+  .filter(Boolean)
+  .sort();
+const crumbs = [{ name: "套餐比较" }];
+const path = "/compare/";
+---
+
+<Layout
+  title={`机场套餐价格比较：月付、年付与流量包对照表｜${config.site.title}`}
+  description={`${brands} 个机场共 ${plans.length} 档套餐的价格比较表，按品牌、预算、付款周期和每月流量筛选。年付总额与折算月均分开列出，一次性流量包单独标注。`}
+  canonicalPath={path}
+  jsonLd={[breadcrumbJsonLd(crumbs, path)]}
+>
+  <main id="main-content" data-pagefind-body>
+    <section class="hero-band relative border-b">
+      <div class="app-layout relative py-8 sm:py-10">
+        <Breadcrumbs items={crumbs} />
+        <div class="max-w-3xl">
+          <h1 class="text-[1.8rem] font-black tracking-tight sm:text-[2.4rem]">
+            机场套餐价格比较
+          </h1>
+          <p class="text-muted-foreground mt-3 leading-relaxed">
+            表中整理了 {brands} 个机场的 {plans.length} 档套餐，一档一行。资料整理于
+            {observed[0]} 至 {
+              observed.at(-1)
+            }，部分档位已按结算页截图核验，<strong class="text-foreground"
+              >付款前请以服务商结算页为准</strong
+            >。
+          </p>
+        </div>
+      </div>
+    </section>
+    <div class="app-layout pt-8">
+      <details class="card mb-6 max-w-3xl px-5 py-4" open>
+        <summary class="cursor-pointer font-semibold">比较口径说明</summary>
+        <ul
+          class="text-muted-foreground mt-2 list-disc space-y-1.5 ps-5 text-sm leading-relaxed"
+        >
+          <li>
+            <b class="text-foreground">价格</b
+            >是实际付款金额。年付写“¥119/年”，下方另算折合月均，不会写成“¥119/月”。
+          </li>
+          <li>
+            <b class="text-foreground">流量</b
+            >保留原口径：“/月”为每月重置；“/年”为全年总量；只写数字并注明“总量”的是一次性额度，不按月折算。
+          </li>
+          <li>
+            <b class="text-foreground">预算筛选</b
+            >按折合每月金额分档；一次性流量包单独归为一类。
+          </li>
+          <li>
+            <b class="text-foreground">来源不一致</b>：{conflicts} 档记录在不同来源之间价格或流量写法不同，两边都保留并标注，不参与“最低价”判断。可勾选隐藏。
+          </li>
+          <li>
+            表格顺序按目录编辑顺序和价格排列，<b class="text-foreground"
+              >不是推荐排名</b
+            >。怎么挑见<a
+              href="/guides/how-to-choose-plan/"
+              class="text-accent-strong underline underline-offset-2"
+              >选择套餐指南</a
+            >。
+          </li>
+        </ul>
+      </details>
+
+      <CompareChips providers={providers} />
+
+      <PlanTable
+        plans={plans}
+        providers={providers}
+        filters
+        caption="机场套餐比较表"
+        id="compare"
+      />
+
+      <section class="app-prose max-w-read mt-10" aria-labelledby="how">
+        <h2 id="how">用这张表挑套餐的三个步骤</h2>
+        <ol>
+          <li>
+            <strong>先定每月流量。</strong>只是网页、文字类 AI
+            工具和即时通讯，每月几十 GB
+            通常够用；经常看高清视频或传大文件，就要按几百 GB 估算。估算方法见<a
+              href="/guides/how-to-choose-plan/">选择套餐指南</a
+            >。
+          </li>
+          <li>
+            <strong>再定付款周期。</strong
+            >第一次用某家机场，先选月付观察一两个月；确认稳定、用量也稳定后，再考虑年付或一次性包。<a
+              href="/guides/annual-vs-monthly-vs-onetime/"
+              >年付、月付和流量包的比较方法</a
+            >里有具体算法。
+          </li>
+          <li>
+            <strong>最后核对条款。</strong
+            >表里没有的设备数、限速、倍率、退款规则，需要在付款前到服务商页面确认，清单见<a
+              href="/guides/check-before-buying/">购买前核对的条款</a
+            >。
+          </li>
+        </ol>
+      </section>
+    </div>
+  </main>
+</Layout>

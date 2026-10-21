@@ -1,0 +1,366 @@
+---
+/**
+ * 套餐表：一档套餐一行，全部从 src/data/plan-snapshots.json 读取。
+ * - 付款周期与流量周期分列
+ * - 年付显示总额 + 折算月均；一次性包、全年总量单独标注
+ * - 价格为 null 的方案不显示为 0
+ * - filters=true 时输出筛选器（品牌、预算、付款周期、流量），无 JS 时表格照常完整显示
+ */
+import EntryLink from "./EntryLink.astro";
+import {
+  priceLabel,
+  trafficLabel,
+  budgetBucket,
+  trafficBucket,
+  cycleBucket,
+  type Plan,
+  type Provider,
+} from "@/utils/plans";
+
+type Props = {
+  plans: Plan[];
+  providers: Provider[];
+  showBrand?: boolean;
+  filters?: boolean;
+  /** 品牌页可放推广入口；首页/比较页链接到品牌资料页 */
+  linkMode?: "profile" | "entry";
+  caption?: string;
+  id?: string;
+};
+
+const {
+  plans,
+  providers,
+  showBrand = true,
+  filters = false,
+  linkMode = "profile",
+  caption,
+  id = "plan-table",
+} = Astro.props;
+
+const byId = new Map(providers.map(p => [p.slug, p]));
+const brandOptions = providers.filter(p =>
+  plans.some(pl => pl.providerId === p.slug)
+);
+---
+
+<div data-plan-table={id} id={`plans-${id}`} class="scroll-mt-24">
+  {
+    filters && (
+      <form
+        class="card mb-4 grid grid-cols-2 gap-3 rounded-lg border p-3 sm:grid-cols-4 sm:p-4"
+        data-filters
+        aria-label="套餐筛选"
+      >
+        <label class="flex flex-col gap-1 text-sm">
+          <span class="font-medium">品牌</span>
+          <select name="brand" class="bg-background h-11 rounded border px-2">
+            <option value="">全部品牌</option>
+            {brandOptions.map(b => (
+              <option value={b.slug}>{b.name}</option>
+            ))}
+          </select>
+        </label>
+        <label class="flex flex-col gap-1 text-sm">
+          <span class="font-medium">预算（折合每月）</span>
+          <select name="budget" class="bg-background h-11 rounded border px-2">
+            <option value="">不限</option>
+            <option value="le20">¥20 及以下</option>
+            <option value="le50">¥20–50</option>
+            <option value="le100">¥50–100</option>
+            <option value="gt100">¥100 以上</option>
+            <option value="onetime">一次性流量包</option>
+          </select>
+        </label>
+        <label class="flex flex-col gap-1 text-sm">
+          <span class="font-medium">付款周期</span>
+          <select name="cycle" class="bg-background h-11 rounded border px-2">
+            <option value="">全部</option>
+            <option value="monthly">月付</option>
+            <option value="quarter">季付 / 半年付</option>
+            <option value="annual">年付</option>
+            <option value="multiyear">两年及以上</option>
+            <option value="onetime">一次性</option>
+          </select>
+        </label>
+        <label class="flex flex-col gap-1 text-sm">
+          <span class="font-medium">每月流量</span>
+          <select name="traffic" class="bg-background h-11 rounded border px-2">
+            <option value="">不限</option>
+            <option value="lt100">100GB 以下</option>
+            <option value="le300">100–300GB</option>
+            <option value="le700">300–700GB</option>
+            <option value="gt700">700GB 以上</option>
+            <option value="other">非按月重置 / 口径不明</option>
+          </select>
+        </label>
+        <div class="col-span-2 flex flex-wrap items-center gap-3 sm:col-span-4">
+          <label class="flex items-center gap-2 text-sm">
+            <input type="checkbox" name="hideConflicts" class="size-4" />
+            隐藏来源不一致的记录
+          </label>
+          <button
+            type="reset"
+            class="btn-outline ms-auto min-h-9 rounded px-3 text-sm"
+          >
+            重置筛选
+          </button>
+          <p
+            class="bg-accent-soft text-accent-strong hidden w-full rounded-lg px-3 py-2 text-sm"
+            data-brands-note
+          >
+            只显示我的比较清单：
+            <b data-brands-names />
+            <button
+              type="button"
+              class="ms-2 underline underline-offset-2"
+              data-brands-clear
+            >
+              显示全部品牌
+            </button>
+          </p>
+          <span
+            class="text-muted-foreground w-full text-sm sm:w-auto"
+            data-count
+            aria-live="polite"
+          >
+            共 {plans.length} 档
+          </span>
+        </div>
+      </form>
+    )
+  }
+
+  <p class="text-muted-foreground mb-2 text-xs sm:hidden">← 表格可左右滑动 →</p>
+  <div
+    class="card table-scroll"
+    tabindex="0"
+    role="region"
+    aria-label={caption ?? "套餐表"}
+  >
+    <table class="w-full min-w-[640px] border-collapse text-[0.95rem]">
+      {caption && <caption class="sr-only">{caption}</caption>}
+      <thead class="bg-surface text-muted-foreground text-sm">
+        <tr>
+          {
+            showBrand && (
+              <th
+                scope="col"
+                class="px-4 py-3 text-start font-medium whitespace-nowrap"
+              >
+                机场
+              </th>
+            )
+          }
+          <th
+            scope="col"
+            class="px-4 py-3 text-start font-medium whitespace-nowrap">套餐</th
+          >
+          <th
+            scope="col"
+            class="px-4 py-3 text-center font-medium whitespace-nowrap">价格</th
+          >
+          <th
+            scope="col"
+            class="px-4 py-3 text-center font-medium whitespace-nowrap"
+            >付款周期</th
+          >
+          <th
+            scope="col"
+            class="px-4 py-3 text-center font-medium whitespace-nowrap">流量</th
+          >
+          <th
+            scope="col"
+            class="px-4 py-3 text-center font-medium whitespace-nowrap">查看</th
+          >
+        </tr>
+      </thead>
+      <tbody>
+        {
+          plans.map(p => {
+            const prov = byId.get(p.providerId)!;
+            const price = priceLabel(p);
+            const traffic = trafficLabel(p);
+            return (
+              <tr
+                class="border-t align-middle"
+                data-brand={p.providerId}
+                data-budget={budgetBucket(p)}
+                data-cycle={cycleBucket(p)}
+                data-traffic={trafficBucket(p)}
+                data-conflict={p.conflicts.length ? "1" : "0"}
+              >
+                {showBrand && (
+                  <td class="px-4 py-3 font-medium whitespace-nowrap">
+                    {prov.hasProfile ? (
+                      <a
+                        href={`/airports/${prov.slug}/`}
+                        class="hover:text-accent"
+                      >
+                        {prov.name}
+                      </a>
+                    ) : (
+                      prov.name
+                    )}
+                  </td>
+                )}
+                <td class="px-4 py-3">
+                  <span class="block min-w-24">{p.name ?? "—"}</span>
+                  {p.conflicts.length > 0 && (
+                    <span
+                      class="bg-warn-soft text-warn mt-1 inline-block rounded px-1.5 py-0.5 text-xs"
+                      title={p.conflicts.join("；")}
+                    >
+                      来源不一致
+                    </span>
+                  )}
+                  {p.currentVerified && (
+                    <span class="bg-signal-soft text-signal me-1 mt-1 inline-block rounded px-1.5 py-0.5 text-xs">
+                      结算页 {p.observedAt}
+                    </span>
+                  )}
+                  {p.notes.map(n => (
+                    <span class="text-muted-foreground mt-1 block max-w-56 text-xs leading-snug">
+                      {n}
+                    </span>
+                  ))}
+                </td>
+                <td class="px-4 py-3 text-center whitespace-nowrap">
+                  <span class="font-semibold">{price.main}</span>
+                  {price.note && (
+                    <span class="text-muted-foreground block text-xs">
+                      {price.note}
+                    </span>
+                  )}
+                </td>
+                <td class="px-4 py-3 text-center whitespace-nowrap">
+                  {p.billingCycle}
+                </td>
+                <td class="px-4 py-3 text-center whitespace-nowrap">
+                  {traffic.main}
+                  {traffic.note && (
+                    <span class="text-muted-foreground block text-xs">
+                      {traffic.note}
+                    </span>
+                  )}
+                </td>
+                <td class="px-4 py-3 text-center whitespace-nowrap">
+                  {linkMode === "entry" || !prov.hasProfile ? (
+                    <EntryLink
+                      href={prov.entryUrl}
+                      brand={prov.name}
+                      class="text-accent-strong hover:underline"
+                    />
+                  ) : (
+                    <a
+                      href={`/airports/${prov.slug}/`}
+                      class="text-accent-strong hover:underline"
+                    >
+                      查看资料 →
+                    </a>
+                  )}
+                </td>
+              </tr>
+            );
+          })
+        }
+        {
+          filters && (
+            <tr data-empty class="hidden">
+              <td
+                colspan={showBrand ? 6 : 5}
+                class="text-muted-foreground px-4 py-10 text-center"
+              >
+                没有符合条件的套餐。可以放宽预算或流量条件，或点“重置筛选”。
+              </td>
+            </tr>
+          )
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  import { getPrefs } from "@/utils/userStore";
+
+  document.querySelectorAll<HTMLElement>("[data-plan-table]").forEach(root => {
+    const form = root.querySelector<HTMLFormElement>("[data-filters]");
+    if (!form) return;
+    const rows = Array.from(
+      root.querySelectorAll<HTMLTableRowElement>("tbody tr[data-brand]")
+    );
+    const empty = root.querySelector<HTMLTableRowElement>("tr[data-empty]");
+    const count = root.querySelector<HTMLElement>("[data-count]");
+    const params = new URLSearchParams(location.search);
+    for (const key of ["brand", "budget", "cycle", "traffic"]) {
+      const el = form.elements.namedItem(key) as HTMLSelectElement | null;
+      const v = params.get(key);
+      if (el && v && Array.from(el.options).some(o => o.value === v))
+        el.value = v;
+    }
+    // ?brands=a,b,c：只看个人中心“我的比较”清单中的机场
+    const brandSel = form.elements.namedItem("brand") as HTMLSelectElement;
+    const known = new Map(
+      Array.from(brandSel.options).map(o => [o.value, o.textContent ?? ""])
+    );
+    let brands = (params.get("brands") ?? "")
+      .split(",")
+      .filter(s => s && known.has(s));
+    const note = root.querySelector<HTMLElement>("[data-brands-note]");
+    root.querySelector("[data-brands-clear]")?.addEventListener("click", () => {
+      brands = [];
+      apply();
+    });
+    // 网址没有指定预算时，套用个人中心里的“默认预算”偏好
+    if (!params.has("budget")) {
+      const pref = getPrefs().defaultBudget;
+      const el = form.elements.namedItem("budget") as HTMLSelectElement | null;
+      if (el && pref && Array.from(el.options).some(o => o.value === pref))
+        el.value = pref;
+    }
+    function apply() {
+      const fd = new FormData(form!);
+      const f = {
+        brand: String(fd.get("brand") ?? ""),
+        budget: String(fd.get("budget") ?? ""),
+        cycle: String(fd.get("cycle") ?? ""),
+        traffic: String(fd.get("traffic") ?? ""),
+      };
+      const hide = fd.get("hideConflicts") === "on";
+      let shown = 0;
+      for (const r of rows) {
+        const d = r.dataset;
+        const ok =
+          (!f.brand || d.brand === f.brand) &&
+          (f.brand || !brands.length || brands.includes(d.brand ?? "")) &&
+          (!f.budget || d.budget === f.budget) &&
+          (!f.cycle || d.cycle === f.cycle) &&
+          (!f.traffic || d.traffic === f.traffic) &&
+          !(hide && d.conflict === "1");
+        r.hidden = !ok;
+        if (ok) shown++;
+      }
+      const multi = !f.brand && brands.length > 0;
+      note?.classList.toggle("hidden", !multi);
+      const names = root.querySelector("[data-brands-names]");
+      if (names) names.textContent = brands.map(b => known.get(b)).join("、");
+      empty?.classList.toggle("hidden", shown > 0);
+      if (count) count.textContent = `显示 ${shown} / ${rows.length} 档`;
+      const q = new URLSearchParams();
+      Object.entries(f).forEach(([k, v]) => v && q.set(k, v));
+      if (multi) q.set("brands", brands.join(","));
+      history.replaceState(
+        null,
+        "",
+        (q.toString() ? `?${q}` : location.pathname) + location.hash
+      );
+    }
+    form.addEventListener("change", apply);
+    form.addEventListener("reset", () => {
+      brands = [];
+      setTimeout(apply, 0);
+    });
+    apply();
+  });
+</script>

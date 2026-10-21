@@ -1,0 +1,65 @@
+/*
+ * 设计变量 v2：深海军蓝 + 信号蓝，冷灰底 + 白色卡片。
+ * 版式：两层页眉 / 深色精选区 / 卡片式品牌榜 / 文章三栏。
+ */
+@theme inline {
+  --color-background: var(--background);
+  --color-card: var(--card);
+  --color-surface: var(--surface);
+  --color-foreground: var(--foreground);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-signal: var(--signal);
+  --color-signal-soft: var(--signal-soft);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --font-app: var(--font-sans);
+  --font-num: var(--font-mono);
+}
+
+:root,
+[data-theme="light"] {
+  --background: #f3f7fd;
+  --card: #ffffff;
+  --surface: #f1f6fe;
+  --foreground: #111c33;
+  --muted-foreground: #5b6780;
+  --ink: #0b1a33;
+  --ink-soft: #14284a;
+  --accent: #1a6dff;
+  --accent-strong: #0f55d8;
+  --accent-soft: #e8f1ff;
+  --accent-foreground: #ffffff;
+  --signal: #0f9f8f;
+  --signal-soft: #e2f6f3;
+  --gold: #c27a05;
+  --gold-soft: #fff3dc;
+  --muted: #e9eef5;
+  --border: #e1e9f5;
+  --warn: #9a5b00;
+  --warn-soft: #fff4e0;
+  --radius: 16px;
+  --header-h: 68px;
+  --shadow-card:
+    0 1px 2px rgb(20 60 140 / 0.04), 0 10px 30px -12px rgb(20 60 140 / 0.16);
+  --font-sans:
+    "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC",
+    "Source Han Sans SC", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono:
+    "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+}
+
+@media (max-width: 767px) {
+  :root {
+    --header-h: 60px;
+  }
+}

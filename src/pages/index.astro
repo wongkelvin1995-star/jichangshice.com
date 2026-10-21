@@ -1,0 +1,478 @@
+---
+/**
+ * 首页结构：首屏 → 编辑精选 → 套餐比较 / 机场搜索 / 优惠码入口 → 测速档案（含测试指南摘要）
+ *          → 最新文章 → 新手教程 → 常见问题。
+ * 精选家数与顺序来自 src/data/editorial-order.ts；价格来自统一的套餐数据（plan-snapshots.json）。
+ */
+import Layout from "@/layouts/Layout.astro";
+import BrandCard from "@/components/BrandCard.astro";
+import HeroArt from "@/components/HeroArt.astro";
+import { render } from "astro:content";
+import { getProviders, getPlans } from "@/utils/plans";
+import { getPublishedPosts, postUrl } from "@/utils/posts";
+import { getTestRecords, recordsOf, recordWindow } from "@/utils/testRecords";
+import { getVerifiedRuns } from "@/utils/testRuns";
+import { CATEGORIES } from "@/data/categories";
+import { USE_CASES } from "@/data/editorial";
+import { FEATURED_COUNT } from "@/data/editorial-order";
+import { formatDate } from "@/utils/format";
+import { websiteJsonLd } from "@/utils/jsonld";
+import config from "@/config";
+
+const providers = await getProviders();
+const plans = await getPlans();
+const posts = await getPublishedPosts();
+const records = await getTestRecords();
+const ownRuns = getVerifiedRuns();
+
+const featured = providers.filter(p => p.hasProfile).slice(0, FEATURED_COUNT);
+const withCoupon = providers.filter(p => p.coupon).length;
+const testedBrands = providers.filter(
+  p => recordsOf(records, p.slug).length > 0
+).length;
+const latestRecords = records.slice(0, 4);
+const nameOf = Object.fromEntries(providers.map(p => [p.slug, p.name]));
+
+// 机场测试指南：首页只放摘要，正文在独立文章
+const guide = posts.find(p => p.id === "methods/airport-testing-guide");
+const guideHeadings = guide
+  ? (await render(guide)).headings.filter(h => h.depth === 2)
+  : [];
+const latest = posts.filter(p => p !== guide).slice(0, 6);
+const year = new Date().getFullYear();
+
+const tools = [
+  {
+    title: "套餐比较",
+    text: `${plans.length} 档套餐按价格、付款周期和每月流量筛选，年付与一次性流量包分开计算。`,
+    href: "/compare/",
+    cta: "打开比较表",
+    icon: "M4 20V10M10 20V4M16 20v-7M22 20H2",
+  },
+  {
+    title: "优惠码",
+    text: `${withCoupon} 家机场的优惠码一键复制，附每 GB 流量成本、协议与解锁资料对比。`,
+    href: "/coupons/",
+    cta: "查看优惠码",
+    icon: "M20 12V8H6a2 2 0 0 1 0-4h12v4M4 6v12a2 2 0 0 0 2 2h14v-4M18 12a2 2 0 0 0 0 4h4v-4z",
+  },
+];
+
+const steps = [
+  {
+    title: "估算流量",
+    text: "按用途算出每月用量",
+    href: "/guides/how-to-choose-plan/",
+  },
+  { title: "比较单价", text: "够用的档位里比每 GB 成本", href: "/compare/" },
+  {
+    title: "选付款周期",
+    text: "月付、年付与流量包",
+    href: "/guides/annual-vs-monthly-vs-onetime/",
+  },
+  {
+    title: "核对条款",
+    text: "重置、倍率、设备、退款",
+    href: "/guides/check-before-buying/",
+  },
+  {
+    title: "导入订阅",
+    text: "选对客户端与订阅格式",
+    href: "/clients/clash-subscription-import/",
+  },
+];
+
+const homeFaq = [
+  {
+    q: "“机场”和 VPN 是一回事吗？",
+    a: "不完全是。机场通常提供订阅链接，需要配合 Clash 等客户端使用；商业 VPN 一般提供自家 App 和账号登录。两者的协议、计费方式和使用方法都不同。",
+    href: "/guides/what-is-airport/",
+  },
+  {
+    q: "本站的套餐价格是最新的吗？",
+    a: "不一定。套餐资料来自结算页截图和公开资料，每档都标注了核验状态与日期；来源之间不一致的记录会单独标出。付款前请以服务商结算页为准。",
+    href: "/compare/",
+  },
+  {
+    q: "编辑精选的顺序是排名吗？",
+    a: "不是。顺序是编辑安排，不代表测速结果或稳定性排名。只有在发布可复核的本站测试记录后，才会给出基于数据的比较。",
+    href: "/disclosure/",
+  },
+  {
+    q: "测试档案里的数据都是本站测的吗？",
+    a: `不是。「本站测试」只统计本站自己测得并核验的记录（目前 ${ownRuns.length} 条）；其余是公开发布的测速参考，每条都写明来源、时间、环境和局限。`,
+    href: "/test-records/",
+  },
+];
+---
+
+<Layout
+  title={config.site.homeTitle ?? config.site.title}
+  description={config.site.description}
+  canonicalPath="/"
+  jsonLd={[websiteJsonLd()]}
+>
+  <main id="main-content" data-pagefind-body>
+    <!-- 01 首屏 -->
+    <section class="hero-sky relative overflow-hidden">
+      <div
+        class="app-layout relative grid items-center gap-8 pt-8 pb-8 sm:pt-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:pt-14 lg:pb-10"
+      >
+        <div class="min-w-0">
+          <p
+            class="border-accent/20 text-accent-strong inline-flex items-center gap-2 rounded-full border bg-white/80 px-3 py-1 text-xs font-semibold sm:text-sm"
+          >
+            {providers.length} 家机场资料 · 测试方法公开
+          </p>
+          <h1
+            class="mt-4 text-[2rem] leading-[1.15] font-black tracking-tight sm:text-[3.2rem]"
+          >
+            {year} 机场测试与<span class="text-gradient whitespace-nowrap"
+              >机场推荐</span
+            >
+          </h1>
+          <p
+            class="text-foreground/75 mt-4 max-w-xl text-base leading-relaxed sm:text-[1.08rem]"
+          >
+            把 {providers.length} 家机场的套餐价格、每 GB 成本和测速记录放在同一口径下比较，写清楚每条资料从哪里来、能说明什么，帮你按预算和用途选到合适的机场。
+          </p>
+          <nav
+            class="mt-6 grid grid-cols-3 gap-2 sm:gap-3"
+            aria-label="主要入口"
+          >
+            <a
+              href="/airports/"
+              class="btn btn-primary h-12 px-2 text-sm sm:text-base"
+            >
+              机场目录
+            </a>
+            <a
+              href="/compare/"
+              class="btn btn-outline h-12 bg-white/80 px-2 text-sm sm:text-base"
+            >
+              套餐比较
+            </a>
+            <a
+              href="/test-records/"
+              class="btn btn-outline h-12 bg-white/80 px-2 text-sm sm:text-base"
+            >
+              测速记录
+            </a>
+          </nav>
+        </div>
+        <div class="hidden lg:block" data-pagefind-ignore>
+          <HeroArt brands={providers.length} />
+        </div>
+      </div>
+    </section>
+
+    <!-- 02 编辑精选 -->
+    <section class="app-layout pt-8 sm:pt-12" aria-labelledby="picks">
+      <div class="flex flex-wrap items-end justify-between gap-2">
+        <div>
+          <p class="eyebrow">编辑精选 · {featured.length} 家</p>
+          <h2 id="picks" class="section-title mt-1">精选机场与关键套餐资料</h2>
+          <p class="text-muted-foreground mt-1.5 text-sm leading-relaxed">
+            按编辑精选顺序排列，不是测速排名。起步价与每 GB
+            成本取最便宜的月付档；“结算页核验”与“历史参考”分开标注，线路、AI、流媒体为服务商资料中的说法。
+          </p>
+        </div>
+        <a
+          href="/airports/"
+          class="text-accent-strong text-sm font-semibold whitespace-nowrap hover:underline"
+          >全部 {providers.length} 家 →</a
+        >
+      </div>
+      <div class="mt-5 grid gap-4 sm:gap-5">
+        {
+          featured.map((p, i) => (
+            <BrandCard provider={p} plans={plans} rank={i + 1} />
+          ))
+        }
+      </div>
+    </section>
+
+    <!-- 03 实用功能 -->
+    <section class="app-layout pt-10 sm:pt-14" aria-labelledby="tools">
+      <h2 id="tools" class="section-title">比较、搜索与优惠码</h2>
+      <div class="mt-4 grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-3">
+        <form
+          action="/search/"
+          method="get"
+          role="search"
+          class="card flex flex-col p-5"
+          aria-labelledby="home-search-title"
+        >
+          <h3 id="home-search-title" class="font-bold">机场搜索</h3>
+          <p class="text-muted-foreground mt-1.5 text-sm leading-relaxed">
+            输入品牌名、别名、套餐或问题，例如“灵动云”“晚高峰”“Clash”。
+          </p>
+          <label class="mt-3 flex gap-2">
+            <span class="sr-only">搜索关键词</span>
+            <input
+              type="search"
+              name="q"
+              required
+              placeholder="搜索机场、教程、问题"
+              class="bg-background h-11 min-w-0 flex-1 rounded-lg border px-3 text-base sm:text-sm"
+              enterkeyhint="search"
+            />
+            <button type="submit" class="btn btn-primary h-11 shrink-0 px-4"
+              >搜索</button
+            >
+          </label>
+        </form>
+        {
+          tools.map(t => (
+            <a
+              href={t.href}
+              class="card group hover:border-accent/40 flex flex-col p-5 transition"
+            >
+              <span class="flex items-center gap-2.5">
+                <span class="bg-accent-soft text-accent-strong flex size-9 items-center justify-center rounded-[10px]">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d={t.icon} />
+                  </svg>
+                </span>
+                <h3 class="font-bold">{t.title}</h3>
+              </span>
+              <p class="text-muted-foreground mt-2 flex-1 text-sm leading-relaxed">
+                {t.text}
+              </p>
+              <span class="text-accent-strong mt-3 text-sm font-semibold group-hover:underline">
+                {t.cta} →
+              </span>
+            </a>
+          ))
+        }
+      </div>
+    </section>
+
+    <!-- 04 测速档案 -->
+    <section class="app-layout pt-10 sm:pt-14" aria-labelledby="records">
+      <div class="flex flex-wrap items-end justify-between gap-2">
+        <h2 id="records" class="section-title">测速档案</h2>
+        <a
+          href="/test-records/"
+          class="text-accent-strong text-sm font-semibold whitespace-nowrap hover:underline"
+          >进入测试档案 →</a
+        >
+      </div>
+      <div class="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
+        <div class="card p-5">
+          <dl class="grid grid-cols-3 gap-2 text-center">
+            <div>
+              <dt class="text-muted-foreground text-xs">本站测试（已核验）</dt>
+              <dd class="num text-signal mt-1 text-2xl font-extrabold">
+                {ownRuns.length}
+              </dd>
+            </div>
+            <div>
+              <dt class="text-muted-foreground text-xs">公开测速参考</dt>
+              <dd class="num text-accent-strong mt-1 text-2xl font-extrabold">
+                {records.length}
+              </dd>
+            </div>
+            <div>
+              <dt class="text-muted-foreground text-xs">有记录的机场</dt>
+              <dd class="num text-accent-strong mt-1 text-2xl font-extrabold">
+                {testedBrands}
+              </dd>
+            </div>
+          </dl>
+          <p class="text-muted-foreground mt-4 text-sm leading-relaxed">
+            本站实测与公开参考分开统计。公开参考逐条写明来源、测试时间、测试环境、工具和局限，不当作本站结论。测试档案页还提供在线测速表，可以直接测当前网络。
+          </p>
+        </div>
+        <div class="card p-5">
+          <h3 class="font-bold">最近的公开测速参考</h3>
+          <ul class="mt-2 divide-y text-sm">
+            {
+              latestRecords.map(r => (
+                <li class="flex items-center justify-between gap-3 py-2.5">
+                  <a
+                    href={`/test-records/${r.data.brandSlug}/#${r.id}`}
+                    class="hover:text-accent-strong min-w-0 font-semibold"
+                  >
+                    {nameOf[r.data.brandSlug] ?? r.data.brandSlug}
+                    <span class="text-muted-foreground ms-1 font-normal">
+                      {r.data.rows.length} 组数据
+                    </span>
+                  </a>
+                  <span class="text-muted-foreground num shrink-0 text-xs">
+                    {r.data.recordedAt}
+                    {recordWindow(r) ? ` · ${recordWindow(r)}` : ""}
+                  </span>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+
+      {
+        guide && (
+          <article class="card mt-4 p-5 sm:p-7" aria-labelledby="guide-summary">
+            <p class="eyebrow">机场测试指南 · 摘要</p>
+            <h3
+              id="guide-summary"
+              class="mt-1.5 text-lg leading-snug font-extrabold sm:text-xl"
+            >
+              <a href={postUrl(guide)} class="hover:text-accent-strong">
+                {guide.data.title}
+              </a>
+            </h3>
+            <p class="text-muted-foreground mt-2 text-[0.95rem] leading-relaxed">
+              {guide.data.description}
+            </p>
+            {guideHeadings.length > 0 && (
+              <ol class="mt-3 grid gap-x-6 gap-y-1.5 text-sm sm:grid-cols-2">
+                {guideHeadings.map((h, i) => (
+                  <li class="flex gap-2">
+                    <span class="num text-accent-strong">{i + 1}.</span>
+                    <a
+                      href={`${postUrl(guide)}#${h.slug}`}
+                      class="hover:text-accent-strong"
+                    >
+                      {h.text}
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            )}
+            <a
+              href={postUrl(guide)}
+              class="text-accent-strong mt-4 inline-block text-sm font-semibold hover:underline"
+            >
+              阅读完整指南 →
+            </a>
+          </article>
+        )
+      }
+    </section>
+
+    <!-- 05 最新文章（直接列出标题与摘要） -->
+    <section class="app-layout pt-10 sm:pt-14" aria-labelledby="latest">
+      <div class="flex flex-wrap items-end justify-between gap-2">
+        <h2 id="latest" class="section-title">最新文章</h2>
+        <a
+          href="/archives/"
+          class="text-accent-strong text-sm font-semibold whitespace-nowrap hover:underline"
+          >全部文章 →</a
+        >
+      </div>
+      <ul class="mt-3 divide-y">
+        {
+          latest.map(post => (
+            <li class="py-4">
+              <h3 class="text-[1.02rem] leading-snug font-bold">
+                <a href={postUrl(post)} class="hover:text-accent-strong">
+                  {post.data.title}
+                </a>
+              </h3>
+              <p class="text-muted-foreground mt-1 line-clamp-2 text-sm leading-relaxed">
+                {post.data.description}
+              </p>
+              <p class="text-muted-foreground mt-1.5 text-xs">
+                <a
+                  href={`/${post.data.category}/`}
+                  class="hover:text-accent-strong"
+                >
+                  {CATEGORIES[post.data.category].name}
+                </a>
+                {" · "}
+                <time
+                  datetime={(
+                    post.data.modDatetime ?? post.data.pubDatetime
+                  ).toISOString()}
+                >
+                  {formatDate(post.data.modDatetime ?? post.data.pubDatetime)}
+                </time>
+              </p>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <!-- 06 新手教程 -->
+    <section class="app-layout pt-10 sm:pt-14" aria-labelledby="beginner">
+      <h2 id="beginner" class="section-title">新手教程：五步选出合适的套餐</h2>
+      <p class="text-muted-foreground mt-1.5 text-sm leading-relaxed">
+        先估算用量，再在够用的档位里比单价，第一次购买先选月付，付款前核对重置、倍率和退款规则。
+      </p>
+      <ol class="mt-4 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-5">
+        {
+          steps.map((s, i) => (
+            <li>
+              <a
+                href={s.href}
+                class="card hover:border-accent/40 flex h-full gap-3 p-4 transition lg:flex-col lg:gap-1.5"
+              >
+                <span class="num bg-accent-soft text-accent-strong flex size-7 shrink-0 items-center justify-center rounded-full text-sm font-bold">
+                  {i + 1}
+                </span>
+                <span>
+                  <b class="block text-sm">{s.title}</b>
+                  <span class="text-muted-foreground text-xs">{s.text}</span>
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+      <ul class="mt-4 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
+        {
+          USE_CASES.map(u => (
+            <li>
+              <a href={u.href} class="group block">
+                <b class="group-hover:text-accent-strong">{u.title}</b>
+                <span class="text-muted-foreground">：{u.text}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <!-- 07 常见问题 -->
+    <section class="app-layout pt-10 sm:pt-14" aria-labelledby="home-faq">
+      <div class="flex flex-wrap items-end justify-between gap-2">
+        <h2 id="home-faq" class="section-title">常见问题</h2>
+        <a
+          href="/faq/"
+          class="text-accent-strong text-sm font-semibold whitespace-nowrap hover:underline"
+          >全部问题 →</a
+        >
+      </div>
+      <dl class="mt-3 grid gap-3 md:grid-cols-2">
+        {
+          homeFaq.map(f => (
+            <div class="card p-4 sm:p-5">
+              <dt class="font-bold">{f.q}</dt>
+              <dd class="text-muted-foreground mt-1.5 text-sm leading-relaxed">
+                {f.a}{" "}
+                <a
+                  href={f.href}
+                  class="text-accent-strong whitespace-nowrap hover:underline"
+                >
+                  详细说明 →
+                </a>
+              </dd>
+            </div>
+          ))
+        }
+      </dl>
+    </section>
+  </main>
+</Layout>

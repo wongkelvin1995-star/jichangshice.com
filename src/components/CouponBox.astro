@@ -1,0 +1,65 @@
+---
+/** 优惠码：可选择的文本 + 复制按钮（复制失败时文本仍可手动选择）+ 核验状态 */
+import { couponVerifiedAt } from "@/data/coupon-status";
+
+type Props = {
+  code: string;
+  note?: string | null;
+  brand: string;
+  /** 品牌 slug，用于读取核验状态 */
+  slug: string;
+  compact?: boolean;
+};
+const { code, note, brand, slug, compact = false } = Astro.props;
+const verifiedAt = couponVerifiedAt(slug);
+---
+
+<div
+  class:list={[
+    "border-gold/30 bg-gold-soft rounded-[10px] border border-dashed",
+    compact ? "px-3 py-2" : "px-3.5 py-2.5",
+  ]}
+>
+  <div class="flex items-center gap-2">
+    <span class="text-gold shrink-0 text-xs font-bold">优惠码</span>
+    <code
+      class="num text-foreground min-w-0 flex-1 truncate text-sm font-bold select-all"
+      >{code}</code
+    >
+    <button
+      type="button"
+      class="bg-card text-gold shrink-0 rounded-md border border-current/30 px-2 py-0.5 text-xs font-semibold hover:bg-white"
+      data-copy={code}
+      data-brand={brand}
+      aria-label={`复制${brand}优惠码 ${code}`}
+    >
+      复制
+    </button>
+  </div>
+  <p class="mt-1 flex items-center gap-1.5 text-[0.7rem] leading-snug">
+    <span
+      class:list={[
+        "rounded px-1.5 py-px font-semibold",
+        verifiedAt
+          ? "bg-signal-soft text-signal"
+          : "text-muted-foreground bg-white/80",
+      ]}
+    >
+      {verifiedAt ? "已验证" : "待验证"}
+    </span>
+    <span class="text-muted-foreground">
+      {
+        verifiedAt
+          ? `${verifiedAt} 结算页确认可用`
+          : "站长提供，折扣以结算页为准"
+      }
+    </span>
+  </p>
+  {
+    note && !compact && (
+      <p class="text-muted-foreground mt-1 text-[0.72rem] leading-snug">
+        {note}
+      </p>
+    )
+  }
+</div>

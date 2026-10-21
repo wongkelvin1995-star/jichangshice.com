@@ -1,0 +1,596 @@
+---
+/**
+ * 个人中心 /user/（noindex）
+ * 本站没有账号系统：收藏、浏览历史、比较清单、偏好保存在访客浏览器的 localStorage（键名见 utils/userStore.ts）。
+ * 页面是静态的：机场摘要在构建时嵌入，列表和数量由浏览器端脚本按本地记录渲染；
+ * 服务端只输出空壳和占位，避免与本地数据不一致。
+ */
+import { getCollection } from "astro:content";
+import Layout from "@/layouts/Layout.astro";
+import Breadcrumbs from "@/components/Breadcrumbs.astro";
+import { getProviders, getPlans, startingMonthly } from "@/utils/plans";
+import { fmtMoney } from "@/utils/format";
+import { COMPARE_MAX } from "@/utils/userStore";
+
+const providers = await getProviders();
+const plans = await getPlans();
+const reviews = new Map(
+  (await getCollection("airports")).map(e => [e.id, e.data.title])
+);
+const palette = [
+  ["#5aa0ff", "#1a6dff"],
+  ["#9b7bff", "#6a3df0"],
+  ["#3ad29f", "#11a36f"],
+  ["#ffb24d", "#f47b1f"],
+  ["#4fd1e8", "#0e9fc4"],
+  ["#ff7aa8", "#e23d7b"],
+  ["#7f8cff", "#4d5be8"],
+  ["#2fd0b8", "#0f9f8f"],
+];
+const gradient = (name: string) => {
+  let h = 0;
+  for (const ch of name) h = (h * 31 + ch.codePointAt(0)!) >>> 0;
+  const [a, b] = palette[h % palette.length];
+  return `linear-gradient(150deg, ${a}, ${b})`;
+};
+/** 简介：取测评标题冒号后的摘要（站内已有文字，不另写） */
+const brief = (slug: string) => {
+  const t = reviews.get(slug);
+  if (!t) return null;
+  const i = t.indexOf("：");
+  return i >= 0 ? t.slice(i + 1) : null;
+};
+
+/** 嵌入页面的机场摘要（全部来自站内数据） */
+const data = Object.fromEntries(
+  providers.map(p => {
+    const s = startingMonthly(plans, p.slug);
+    return [
+      p.slug,
+      {
+        name: p.name,
+        url: p.hasProfile ? `/airports/${p.slug}/` : "/airports/",
+        brief: p.hasProfile ? brief(p.slug) : null,
+        start: s ? `${fmtMoney(s.paymentAmount!)}/月起` : null,
+        bg: gradient(p.name),
+      },
+    ];
+  })
+);
+const json = JSON.stringify(data).replace(/</g, "\\u003c");
+const crumbs = [{ name: "个人中心" }];
+const tabs = [
+  { id: "favorites", label: "我的收藏", count: true },
+  { id: "history", label: "浏览历史", count: true },
+  { id: "compare", label: "我的比较", count: true },
+  { id: "prefs", label: "个人偏好", count: false },
+] as const;
+const control =
+  "bg-background h-10 w-full rounded-lg border px-3 text-sm sm:w-56";
+const emptyBox =
+  "mt-2 hidden flex-col items-center gap-3 rounded-xl border border-dashed px-4 py-10 text-center text-sm";
+---
+
+<Layout
+  title="个人中心 - 机场测试"
+  description="机场测试个人中心：管理收藏的机场、浏览记录和比较清单，设置浏览偏好。"
+  canonicalPath="/user/"
+  noindex
+>
+  <main id="main-content" data-user-center-page>
+    <section class="hero-band relative border-b">
+      <div class="app-layout relative py-5 sm:py-6">
+        <Breadcrumbs items={crumbs} />
+        <h1 class="text-[1.6rem] font-black tracking-tight sm:text-[2rem]">
+          个人中心
+        </h1>
+        <p class="text-muted-foreground mt-1.5 text-sm sm:text-base">
+          管理您的机场收藏、浏览记录和比较清单，快速找到感兴趣的内容。
+        </p>
+        <p
+          class="bg-warn-soft text-warn mt-3 hidden max-w-3xl rounded-lg px-4 py-2.5 text-sm"
+          data-storage-warning
+        >
+          当前浏览器禁止网站保存数据（例如隐私模式或关闭了网站数据），收藏、历史和比较清单无法保存。
+        </p>
+        <ul
+          class="mt-4 grid max-w-xl grid-cols-3 gap-2 sm:gap-3"
+          aria-label="记录概览"
+        >
+          {
+            tabs
+              .filter(t => t.count)
+              .map(t => (
+                <li>
+                  <button
+                    type="button"
+                    data-goto={t.id}
+                    class="card hover:border-accent flex w-full flex-col items-center px-2 py-2.5 sm:flex-row sm:justify-between sm:px-4"
+                  >
+                    <span class="text-muted-foreground text-xs sm:text-sm">
+                      {t.id === "favorites"
+                        ? "我的收藏"
+                        : t.id === "history"
+                          ? "浏览记录"
+                          : "比较清单"}
+                    </span>
+                    <span
+                      class="num text-accent-strong text-xl font-extrabold"
+                      data-count={t.id}
+                    >
+                      —
+                    </span>
+                  </button>
+                </li>
+              ))
+          }
+        </ul>
+      </div>
+    </section>
+
+    <div
+      class="app-layout grid grid-cols-[minmax(0,1fr)] gap-4 pt-5 lg:grid-cols-[200px_minmax(0,1fr)] lg:gap-6 lg:pt-6"
+    >
+      <nav aria-label="个人中心栏目" class="min-w-0 lg:self-start">
+        <div
+          role="tablist"
+          aria-orientation="vertical"
+          class="card grid grid-cols-4 gap-1 p-1.5 lg:flex lg:flex-col"
+          data-tablist
+        >
+          {
+            tabs.map((t, i) => (
+              <button
+                type="button"
+                role="tab"
+                id={`tab-${t.id}`}
+                aria-controls={`panel-${t.id}`}
+                aria-selected={i === 0 ? "true" : "false"}
+                tabindex={i === 0 ? 0 : -1}
+                data-tab={t.id}
+                class="text-muted-foreground hover:bg-accent-soft hover:text-accent-strong aria-selected:bg-accent aria-selected:hover:bg-accent flex items-center justify-center gap-3 rounded-lg px-1 py-2.5 text-[0.8125rem] font-semibold whitespace-nowrap aria-selected:text-white sm:text-sm lg:w-full lg:justify-between lg:px-3.5"
+              >
+                {t.label}
+                {t.count && (
+                  <span
+                    class="num hidden rounded-full bg-black/5 px-1.5 text-xs lg:inline"
+                    data-tab-count={t.id}
+                  />
+                )}
+              </button>
+            ))
+          }
+        </div>
+      </nav>
+
+      <div class="card min-w-0 p-4 sm:p-6">
+        <!-- 我的收藏 -->
+        <section
+          role="tabpanel"
+          id="panel-favorites"
+          aria-labelledby="tab-favorites"
+          data-panel="favorites"
+        >
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <h2 class="text-lg font-extrabold">我的收藏</h2>
+            <a
+              href="/airports/"
+              class="text-accent-strong text-sm font-semibold hover:underline"
+              data-more="favorites">浏览机场目录 →</a
+            >
+          </div>
+          <ul class="mt-4 grid gap-3 md:grid-cols-2" data-list="favorites"></ul>
+          <div class={emptyBox} data-empty="favorites">
+            <p class="text-muted-foreground">还没有收藏的机场。</p>
+            <a href="/airports/" class="btn btn-primary min-h-10 px-5 text-sm"
+              >浏览机场目录</a
+            >
+          </div>
+        </section>
+
+        <!-- 浏览历史 -->
+        <section
+          role="tabpanel"
+          id="panel-history"
+          aria-labelledby="tab-history"
+          data-panel="history"
+          hidden
+        >
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <h2 class="text-lg font-extrabold">浏览历史</h2>
+            <span class="text-muted-foreground text-xs" data-history-note
+            ></span>
+          </div>
+          <ul class="mt-3 divide-y" data-list="history"></ul>
+          <div class={emptyBox} data-empty="history">
+            <p class="text-muted-foreground">还没有浏览记录。</p>
+            <a href="/airports/" class="btn btn-outline min-h-10 px-5 text-sm"
+              >去看看机场资料</a
+            >
+          </div>
+        </section>
+
+        <!-- 我的比较 -->
+        <section
+          role="tabpanel"
+          id="panel-compare"
+          aria-labelledby="tab-compare"
+          data-panel="compare"
+          hidden
+        >
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <h2 class="text-lg font-extrabold">
+              我的比较
+              <span
+                class="text-muted-foreground num ms-1 text-sm font-semibold"
+                data-compare-cap></span>
+            </h2>
+            <a
+              href="/compare/#my-compare"
+              class="btn btn-primary hidden min-h-10 px-5 text-sm"
+              data-start-compare>开始比较 →</a
+            >
+          </div>
+          <ul class="mt-4 grid gap-3 sm:grid-cols-2" data-list="compare"></ul>
+          <div class={emptyBox} data-empty="compare">
+            <p class="text-muted-foreground">
+              比较清单是空的，最多可加入 {COMPARE_MAX} 家机场。
+            </p>
+            <a
+              href="/compare/#my-compare"
+              class="btn btn-primary min-h-10 px-5 text-sm">前往套餐比较</a
+            >
+          </div>
+        </section>
+
+        <!-- 个人偏好 -->
+        <section
+          role="tabpanel"
+          id="panel-prefs"
+          aria-labelledby="tab-prefs"
+          data-panel="prefs"
+          hidden
+        >
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <h2 class="text-lg font-extrabold">个人偏好</h2>
+            <p
+              class="text-signal min-h-5 text-sm font-semibold"
+              aria-live="polite"
+              data-prefs-status
+            >
+            </p>
+          </div>
+          <form class="mt-3 divide-y" data-prefs onsubmit="return false">
+            <label
+              class="flex items-center justify-between gap-4 py-4"
+              for="pref-record"
+            >
+              <span>
+                <span class="block text-sm font-semibold">记录浏览历史</span>
+                <span class="text-muted-foreground block text-xs"
+                  >关闭后不再记录新访问的页面，已有记录保留。</span
+                >
+              </span>
+              <input
+                id="pref-record"
+                type="checkbox"
+                name="recordHistory"
+                class="accent-accent size-5 shrink-0"
+                disabled
+              />
+            </label>
+            <label
+              class="flex flex-col gap-2 py-4 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <span class="text-sm font-semibold">浏览历史保留条数</span>
+              <select name="historyLimit" class={control} disabled>
+                <option value="20">最近 20 条</option>
+                <option value="50">最近 50 条</option>
+                <option value="100">最近 100 条</option>
+              </select>
+            </label>
+            <label
+              class="flex flex-col gap-2 py-4 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <span class="text-sm font-semibold">套餐比较默认预算</span>
+              <select name="defaultBudget" class={control} disabled>
+                <option value="">不限</option>
+                <option value="le20">¥20 及以下</option>
+                <option value="le50">¥20–50</option>
+                <option value="le100">¥50–100</option>
+                <option value="gt100">¥100 以上</option>
+                <option value="onetime">一次性流量包</option>
+              </select>
+            </label>
+            <label
+              class="flex flex-col gap-2 py-4 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <span class="text-sm font-semibold">字体大小</span>
+              <select name="fontSize" class={control} disabled>
+                <option value="normal">标准</option>
+                <option value="large">较大（约放大 12%）</option>
+              </select>
+            </label>
+          </form>
+          <p class="text-muted-foreground mt-2 text-xs">
+            设置与记录保存在当前浏览器，不会同步到其他设备。
+          </p>
+        </section>
+      </div>
+    </div>
+  </main>
+  <script
+    type="application/json"
+    id="user-provider-data"
+    is:inline
+    set:html={json}
+  />
+</Layout>
+
+<script>
+  import {
+    CHANGE_EVENT,
+    COMPARE_MAX,
+    clearHistory,
+    getCompare,
+    getFavorites,
+    getHistory,
+    getPrefs,
+    removeCompare,
+    removeFavorite,
+    removeHistory,
+    setPrefs,
+    storageAvailable,
+    type Prefs,
+  } from "@/utils/userStore";
+
+  type Info = {
+    name: string;
+    url: string;
+    brief: string | null;
+    start: string | null;
+    bg: string;
+  };
+  type Tab = "favorites" | "history" | "compare" | "prefs";
+  const TABS: Tab[] = ["favorites", "history", "compare", "prefs"];
+
+  const DATA: Record<string, Info> = JSON.parse(
+    document.getElementById("user-provider-data")?.textContent || "{}"
+  );
+  const $ = <T extends Element>(sel: string) => document.querySelector<T>(sel);
+  const esc = (s: string) =>
+    s.replace(
+      /[&<>"']/g,
+      c =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        })[c]!
+    );
+  const avatar = (i: Info, size = "size-11 text-lg") =>
+    `<span aria-hidden="true" class="${size} inline-flex shrink-0 items-center justify-center rounded-xl font-black text-white" style="background:${i.bg}">${esc([...i.name][0].toUpperCase())}</span>`;
+  const fmtTime = (t: number) => {
+    const d = new Date(t);
+    const p = (n: number) => String(n).padStart(2, "0");
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+  };
+  const setCount = (k: string, n: number) => {
+    const el = $<HTMLElement>(`[data-count="${k}"]`);
+    if (el) el.textContent = String(n);
+    const t = $<HTMLElement>(`[data-tab-count="${k}"]`);
+    if (t) t.textContent = String(n);
+  };
+  const toggleEmpty = (k: string, empty: boolean) => {
+    const el = $<HTMLElement>(`[data-empty="${k}"]`);
+    el?.classList.toggle("hidden", !empty);
+    el?.classList.toggle("flex", empty);
+    $<HTMLElement>(`[data-list="${k}"]`)?.classList.toggle("hidden", empty);
+  };
+  const btn =
+    "inline-flex min-h-9 items-center rounded-lg px-3 text-sm font-semibold";
+
+  // ---- 栏目切换（不刷新页面，地址栏 #hash 可直达） ----
+  function showTab(id: Tab, focus = false) {
+    document.querySelectorAll<HTMLElement>("[data-tab]").forEach(t => {
+      const on = t.dataset.tab === id;
+      t.setAttribute("aria-selected", String(on));
+      t.tabIndex = on ? 0 : -1;
+      if (on && focus) t.focus();
+      if (on) t.scrollIntoView({ block: "nearest", inline: "nearest" });
+    });
+    document
+      .querySelectorAll<HTMLElement>("[data-panel]")
+      .forEach(p => (p.hidden = p.dataset.panel !== id));
+    if (location.hash.slice(1) !== id)
+      history.replaceState(
+        null,
+        "",
+        id === "favorites" ? location.pathname + location.search : `#${id}`
+      );
+  }
+  const fromHash = () => {
+    const h = location.hash.slice(1) as Tab;
+    return TABS.includes(h) ? h : "favorites";
+  };
+  const tablist = $<HTMLElement>("[data-tablist]")!;
+  tablist.addEventListener("click", e => {
+    const t = (e.target as HTMLElement).closest<HTMLElement>("[data-tab]");
+    if (t) showTab(t.dataset.tab as Tab);
+  });
+  tablist.addEventListener("keydown", e => {
+    const cur = TABS.indexOf(
+      (document.activeElement as HTMLElement)?.dataset.tab as Tab
+    );
+    if (cur < 0) return;
+    const next =
+      e.key === "ArrowDown" || e.key === "ArrowRight"
+        ? (cur + 1) % TABS.length
+        : e.key === "ArrowUp" || e.key === "ArrowLeft"
+          ? (cur + TABS.length - 1) % TABS.length
+          : -1;
+    if (next < 0) return;
+    e.preventDefault();
+    showTab(TABS[next], true);
+  });
+  document.querySelectorAll<HTMLElement>("[data-goto]").forEach(b =>
+    b.addEventListener("click", () => {
+      showTab(b.dataset.goto as Tab);
+      $("[data-tablist]")?.scrollIntoView({ block: "nearest" });
+    })
+  );
+  window.addEventListener("hashchange", () => showTab(fromHash()));
+  showTab(fromHash());
+
+  // ---- 列表 ----
+  function renderFavorites() {
+    const list = getFavorites().filter(f => DATA[f.slug]);
+    setCount("favorites", list.length);
+    toggleEmpty("favorites", list.length === 0);
+    $<HTMLElement>('[data-more="favorites"]')?.classList.toggle(
+      "hidden",
+      list.length === 0
+    );
+    $<HTMLElement>('[data-list="favorites"]')!.innerHTML = list
+      .map(f => {
+        const i = DATA[f.slug];
+        return `<li class="flex flex-col rounded-xl border bg-white p-4">
+          <div class="flex items-start gap-3">
+            ${avatar(i)}
+            <div class="min-w-0 flex-1">
+              <p class="flex flex-wrap items-baseline gap-x-2"><a href="${esc(i.url)}" class="font-bold hover:text-accent-strong">${esc(i.name)}</a>${i.start ? `<span class="num text-accent-strong text-sm font-semibold">${esc(i.start)}</span>` : ""}</p>
+              ${i.brief ? `<p class="text-muted-foreground mt-1 line-clamp-2 text-xs leading-relaxed">${esc(i.brief)}</p>` : ""}
+            </div>
+          </div>
+          <div class="mt-3 flex flex-wrap gap-2 border-t pt-3">
+            <a href="${esc(i.url)}" class="${btn} bg-accent text-white hover:bg-accent-strong">查看详情</a>
+            <button type="button" class="${btn} text-muted-foreground border hover:border-red-300 hover:text-red-600" data-act="unfav" data-slug="${esc(f.slug)}" aria-label="取消收藏：${esc(i.name)}">取消收藏</button>
+          </div>
+        </li>`;
+      })
+      .join("");
+  }
+
+  function renderHistory() {
+    const list = getHistory();
+    const prefs = getPrefs();
+    setCount("history", list.length);
+    toggleEmpty("history", list.length === 0);
+    $<HTMLElement>("[data-history-note]")!.innerHTML = prefs.recordHistory
+      ? `保留最近 ${prefs.historyLimit} 条${list.length ? ` · <button type="button" class="hover:text-red-600 underline underline-offset-2" data-act="clear-history">清空历史</button>` : ""}`
+      : "已在「个人偏好」中关闭记录";
+    $<HTMLElement>('[data-list="history"]')!.innerHTML = list
+      .map(
+        h => `<li class="flex items-center gap-3 py-2.5">
+          <span class="${h.type === "airport" ? "bg-accent-soft text-accent-strong" : "bg-muted text-muted-foreground"} shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold">${h.type === "airport" ? "机场" : "文章"}</span>
+          <div class="min-w-0 flex-1">
+            <a href="${esc(h.url)}" class="block truncate text-sm font-semibold hover:text-accent-strong">${esc(h.title)}</a>
+            <p class="text-muted-foreground num text-xs">${fmtTime(h.at)}</p>
+          </div>
+          <button type="button" class="text-muted-foreground hover:bg-muted hover:text-red-600 size-9 shrink-0 rounded-full text-lg leading-none" data-act="unhis" data-url="${esc(h.url)}" aria-label="删除这条记录：${esc(h.title)}">×</button>
+        </li>`
+      )
+      .join("");
+  }
+
+  function renderCompare() {
+    const list = getCompare().filter(s => DATA[s]);
+    setCount("compare", list.length);
+    toggleEmpty("compare", list.length === 0);
+    $<HTMLElement>("[data-compare-cap]")!.textContent =
+      `${list.length} / ${COMPARE_MAX}`;
+    const start = $<HTMLAnchorElement>("[data-start-compare]")!;
+    start.classList.toggle("hidden", list.length === 0);
+    start.href = `/compare/?brands=${list.join(",")}#plans-compare`;
+    $<HTMLElement>('[data-list="compare"]')!.innerHTML = list
+      .map(s => {
+        const i = DATA[s];
+        return `<li class="flex items-center gap-3 rounded-xl border bg-white p-3">
+          ${avatar(i, "size-9 text-base")}
+          <div class="min-w-0 flex-1">
+            <a href="${esc(i.url)}" class="block truncate font-bold hover:text-accent-strong">${esc(i.name)}</a>
+            <a href="${esc(i.url)}" class="text-accent-strong text-xs font-semibold hover:underline">查看详情</a>
+          </div>
+          <button type="button" class="${btn} text-muted-foreground shrink-0 border hover:border-red-300 hover:text-red-600" data-act="uncmp" data-slug="${esc(s)}" aria-label="移出比较：${esc(i.name)}">移除</button>
+        </li>`;
+      })
+      .join("");
+  }
+
+  function renderPrefs() {
+    const p = getPrefs();
+    const f = $<HTMLFormElement>("[data-prefs]")!;
+    (f.elements.namedItem("recordHistory") as HTMLInputElement).checked =
+      p.recordHistory;
+    (f.elements.namedItem("historyLimit") as HTMLSelectElement).value = String(
+      p.historyLimit
+    );
+    (f.elements.namedItem("defaultBudget") as HTMLSelectElement).value =
+      p.defaultBudget;
+    (f.elements.namedItem("fontSize") as HTMLSelectElement).value = p.fontSize;
+  }
+
+  function renderAll() {
+    renderFavorites();
+    renderHistory();
+    renderCompare();
+    renderPrefs();
+  }
+
+  if (!storageAvailable()) {
+    $<HTMLElement>("[data-storage-warning]")?.classList.remove("hidden");
+    ["favorites", "history", "compare"].forEach(k => {
+      toggleEmpty(k, true);
+      setCount(k, 0);
+    });
+  } else {
+    document
+      .querySelectorAll<HTMLInputElement | HTMLSelectElement>(
+        "[data-prefs] [disabled]"
+      )
+      .forEach(el => (el.disabled = false));
+
+    document.addEventListener("click", e => {
+      const t = (e.target as HTMLElement).closest<HTMLElement>("[data-act]");
+      if (!t) return;
+      switch (t.dataset.act) {
+        case "unfav":
+          removeFavorite(t.dataset.slug ?? "");
+          break;
+        case "uncmp":
+          removeCompare(t.dataset.slug ?? "");
+          break;
+        case "unhis":
+          removeHistory(t.dataset.url ?? "");
+          break;
+        case "clear-history":
+          clearHistory();
+          break;
+      }
+    });
+
+    // 偏好：修改即保存
+    const status = $<HTMLElement>("[data-prefs-status]")!;
+    let timer = 0;
+    $<HTMLFormElement>("[data-prefs]")!.addEventListener("change", e => {
+      const el = e.target as HTMLInputElement;
+      const patch: Partial<Prefs> = {};
+      if (el.name === "recordHistory") patch.recordHistory = el.checked;
+      if (el.name === "historyLimit") patch.historyLimit = Number(el.value);
+      if (el.name === "defaultBudget")
+        patch.defaultBudget = el.value as Prefs["defaultBudget"];
+      if (el.name === "fontSize")
+        patch.fontSize = el.value as Prefs["fontSize"];
+      setPrefs(patch);
+      status.textContent = "已保存";
+      clearTimeout(timer);
+      timer = window.setTimeout(() => (status.textContent = ""), 2000);
+    });
+
+    window.addEventListener(CHANGE_EVENT, renderAll);
+    window.addEventListener("storage", renderAll);
+    renderAll();
+  }
+</script>

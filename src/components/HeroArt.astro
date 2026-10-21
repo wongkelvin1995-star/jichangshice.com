@@ -1,0 +1,214 @@
+---
+/**
+ * 首屏插画：等距平台 + 玻璃方块 + 节点标识（原创 SVG），
+ * 周围三张浮动说明卡只写可核对的事实。
+ */
+type Props = { brands: number };
+const { brands } = Astro.props;
+---
+
+<div
+  class="relative mx-auto aspect-[5/4] w-full max-w-[560px]"
+  aria-hidden="true"
+>
+  <svg viewBox="0 0 500 400" class="absolute inset-0 h-full w-full">
+    <defs>
+      <radialGradient id="ha-glow" cx="50%" cy="55%" r="50%">
+        <stop offset="0" stop-color="#9cc5ff" stop-opacity="0.55"></stop>
+        <stop offset="1" stop-color="#9cc5ff" stop-opacity="0"></stop>
+      </radialGradient>
+      <linearGradient id="ha-top" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#ffffff"></stop>
+        <stop offset="1" stop-color="#dfeaff"></stop>
+      </linearGradient>
+      <linearGradient id="ha-side-l" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#d4e3fb"></stop>
+        <stop offset="1" stop-color="#b9cff2"></stop>
+      </linearGradient>
+      <linearGradient id="ha-side-r" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#e8f0fd"></stop>
+        <stop offset="1" stop-color="#cbdcf6"></stop>
+      </linearGradient>
+      <linearGradient id="ha-cube" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#6fb0ff"></stop>
+        <stop offset="0.55" stop-color="#2a7bff"></stop>
+        <stop offset="1" stop-color="#1450d6"></stop>
+      </linearGradient>
+      <linearGradient id="ha-cube-side" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#1d63e8"></stop>
+        <stop offset="1" stop-color="#0f43b8"></stop>
+      </linearGradient>
+    </defs>
+    <ellipse cx="250" cy="250" rx="240" ry="150" fill="url(#ha-glow)"></ellipse>
+    <!-- 轨道 -->
+    <g fill="none" stroke="#bcd5fb" stroke-width="1.2">
+      <ellipse cx="250" cy="270" rx="200" ry="70" stroke-dasharray="4 6"
+      ></ellipse>
+      <ellipse cx="250" cy="270" rx="150" ry="50"></ellipse>
+    </g>
+    <!-- 底座三层 -->
+    <g>
+      <path d="M250 330 L400 275 L250 220 L100 275 Z" fill="url(#ha-top)"
+      ></path>
+      <path d="M100 275 L250 330 L250 350 L100 295 Z" fill="url(#ha-side-l)"
+      ></path>
+      <path d="M400 275 L250 330 L250 350 L400 295 Z" fill="url(#ha-side-r)"
+      ></path>
+      <path
+        d="M250 300 L350 262 L250 225 L150 262 Z"
+        fill="#ffffff"
+        opacity="0.9"></path>
+      <path d="M150 262 L250 300 L250 314 L150 276 Z" fill="#cfe0fb"></path>
+      <path d="M350 262 L250 300 L250 314 L350 276 Z" fill="#e3edfd"></path>
+    </g>
+    <!-- 光束 -->
+    <path d="M205 255 L250 120 L295 255 Z" fill="#7fb4ff" opacity="0.18"></path>
+    <!-- 主方块 -->
+    <g>
+      <path
+        d="M190 120 Q190 98 212 92 L288 92 Q310 98 310 120 L310 205 Q310 226 288 232 L212 232 Q190 226 190 205 Z"
+        fill="url(#ha-cube)"></path>
+      <path
+        d="M190 205 Q190 226 212 232 L288 232 Q310 226 310 205 L310 222 Q310 244 288 250 L212 250 Q190 244 190 222 Z"
+        fill="url(#ha-cube-side)"></path>
+      <path
+        d="M202 108 Q205 100 216 100 L284 100 Q295 100 298 108"
+        stroke="#ffffff"
+        stroke-opacity="0.6"
+        stroke-width="3"
+        fill="none"
+        stroke-linecap="round"></path>
+      <!-- 节点标识 -->
+      <g transform="translate(250 162)">
+        <path
+          d="M-30 22 L-2 -24 L30 -6 M-2 -24 L10 32 M-30 22 L10 32"
+          stroke="#ffffff"
+          stroke-opacity="0.55"
+          stroke-width="5"
+          stroke-linecap="round"
+          fill="none"></path>
+        <circle cx="-2" cy="-24" r="11" fill="#ffffff"></circle>
+        <circle cx="-30" cy="22" r="9" fill="#ffffff"></circle>
+        <circle cx="30" cy="-6" r="8" fill="#dbe9ff"></circle>
+        <circle cx="10" cy="32" r="7" fill="#b9f3ea"></circle>
+      </g>
+    </g>
+    <!-- 小光点 -->
+    <g fill="#5aa0ff">
+      <circle cx="70" cy="140" r="3" opacity="0.5"></circle>
+      <circle cx="440" cy="120" r="4" opacity="0.4"></circle>
+      <circle cx="420" cy="320" r="3" opacity="0.5"></circle>
+      <circle cx="90" cy="330" r="2.5" opacity="0.5"></circle>
+    </g>
+  </svg>
+
+  <div class="float-card absolute top-[6%] left-[2%]">
+    <span
+      class="float-icon"
+      style="background:linear-gradient(150deg,#5aa0ff,#1a6dff)"
+    >
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#fff"
+        stroke-width="2.2"
+        stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"></path></svg
+      >
+    </span>
+    <span><b>{brands} 个品牌</b><small>资料与套餐整理</small></span>
+  </div>
+  <div class="float-card absolute top-[42%] -left-[2%] hidden sm:flex">
+    <span
+      class="float-icon"
+      style="background:linear-gradient(150deg,#3ad29f,#11a36f)"
+    >
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#fff"
+        stroke-width="2.2"
+        stroke-linecap="round"
+        ><rect x="3" y="4" width="18" height="12" rx="2"></rect><path
+          d="M8 20h8"></path></svg
+      >
+    </span>
+    <span><b>多端教程</b><small>Windows / macOS<br />iOS / Android</small></span
+    >
+  </div>
+  <div class="float-card absolute top-[30%] right-0">
+    <span
+      class="float-icon"
+      style="background:linear-gradient(150deg,#9b7bff,#6a3df0)"
+    >
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#fff"
+        stroke-width="2.2"
+        stroke-linecap="round"
+        ><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"></path></svg
+      >
+    </span>
+    <span
+      ><b>协议科普</b><small>SS / VLESS / Clash<br />Trojan / Hysteria</small
+      ></span
+    >
+  </div>
+</div>
+
+<style>
+  .float-card {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem 0.8rem;
+    border-radius: 14px;
+    background: rgb(255 255 255 / 0.82);
+    border: 1px solid rgb(255 255 255 / 0.9);
+    box-shadow: 0 14px 30px -14px rgb(20 60 140 / 0.35);
+    backdrop-filter: blur(8px);
+    font-size: 0.82rem;
+    line-height: 1.35;
+    color: var(--foreground);
+  }
+  .float-card b {
+    display: block;
+    font-weight: 800;
+  }
+  .float-card small {
+    display: block;
+    color: var(--muted-foreground);
+    font-size: 0.68rem;
+  }
+  .float-icon {
+    display: inline-flex;
+    width: 2rem;
+    height: 2rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    flex-shrink: 0;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .float-card {
+      animation: bob 6s ease-in-out infinite;
+    }
+    .float-card:nth-of-type(3) {
+      animation-delay: -2s;
+    }
+    .float-card:nth-of-type(4) {
+      animation-delay: -4s;
+    }
+  }
+  @keyframes bob {
+    50% {
+      transform: translateY(-6px);
+    }
+  }
+</style>

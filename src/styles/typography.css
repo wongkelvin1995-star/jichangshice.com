@@ -1,0 +1,120 @@
+@plugin "@tailwindcss/typography";
+
+@layer base {
+  /* 中文长文阅读：16–18px、行高约 1.8、正文宽度约 40 个汉字 */
+  .app-prose {
+    @apply prose max-w-none;
+    font-size: 1.0625rem;
+    line-height: 1.85;
+    color: var(--foreground);
+
+    > :first-child {
+      @apply mt-0;
+    }
+    h2 {
+      @apply text-foreground mt-12 mb-4 border-b pb-2 text-[1.4rem] leading-snug font-bold;
+    }
+    h3 {
+      @apply text-foreground mt-8 mb-3 text-[1.15rem] leading-snug font-bold;
+    }
+    h4 {
+      @apply text-foreground mt-6 mb-2 font-bold;
+    }
+    p,
+    li,
+    strong,
+    td,
+    th,
+    figcaption {
+      @apply text-foreground;
+    }
+    p {
+      @apply my-4;
+    }
+    a {
+      @apply text-accent-strong font-normal wrap-break-word underline decoration-1 underline-offset-4;
+    }
+    a:hover {
+      @apply decoration-2;
+    }
+    ul,
+    ol {
+      @apply my-4 ps-6;
+    }
+    li {
+      @apply marker:text-accent my-1.5;
+    }
+    hr {
+      @apply border-border my-10;
+    }
+    blockquote {
+      @apply border-s-accent bg-surface rounded-e-md border-s-4 px-4 py-1 font-normal not-italic;
+      quotes: none;
+    }
+    blockquote p::before,
+    blockquote p::after {
+      content: none;
+    }
+    img {
+      @apply border-border mx-auto rounded-md border;
+    }
+    img[role="button"] {
+      @apply cursor-zoom-in;
+    }
+    figcaption {
+      @apply text-muted-foreground text-center text-sm;
+    }
+    code {
+      @apply bg-muted rounded px-1 py-0.5 text-[0.9em] font-normal wrap-break-word;
+    }
+    code::before,
+    code::after {
+      content: none;
+    }
+    pre {
+      @apply border-border rounded-md border text-sm;
+    }
+    pre code {
+      @apply bg-transparent p-0;
+    }
+    .table-scroll {
+      @apply my-6 rounded-md border;
+    }
+    table {
+      @apply my-0 w-full min-w-[34rem] text-[0.95rem];
+    }
+    thead {
+      @apply bg-surface;
+    }
+    th,
+    td {
+      @apply border-border border-b px-3 py-2 align-top;
+    }
+    th {
+      @apply text-start font-semibold whitespace-nowrap;
+    }
+    tbody tr:last-child td {
+      @apply border-b-0;
+    }
+    details {
+      @apply border-border my-4 rounded-md border px-4 py-2;
+    }
+    summary {
+      @apply cursor-pointer font-semibold;
+    }
+  }
+}
+
+/* 首页正文：节标题更醒目，层次清晰 */
+@layer components {
+  .home-article h3 {
+    @apply mt-12 mb-4 border-b pb-2 text-[1.3rem] sm:text-[1.4rem];
+  }
+  .home-article h4 {
+    @apply mt-7 mb-2 text-[1.05rem];
+  }
+  .home-article p {
+    @apply my-3.5;
+  }
+}
+

@@ -1,0 +1,48 @@
+---
+/** 正文目录：锚点与正文标题一一对应（来自 render() 返回的 headings） */
+type Heading = { depth: number; slug: string; text: string };
+type Props = { headings: Heading[]; variant: "mobile" | "desktop" };
+const { headings, variant } = Astro.props;
+const items = headings.filter(h => h.depth === 2 || h.depth === 3);
+---
+
+{
+  items.length >= 3 &&
+    (variant === "mobile" ? (
+      <details
+        class="bg-surface my-6 rounded-lg border px-4 py-3 lg:hidden"
+        data-pagefind-ignore
+      >
+        <summary class="cursor-pointer font-semibold">本文目录</summary>
+        <ol class="mt-3 space-y-1.5 text-[0.95rem]">
+          {items.map(h => (
+            <li class:list={[h.depth === 3 && "ps-4 text-sm"]}>
+              <a href={`#${h.slug}`} class="text-accent-strong hover:underline">
+                {h.text}
+              </a>
+            </li>
+          ))}
+        </ol>
+      </details>
+    ) : (
+      <nav aria-label="本文目录" class="hidden lg:block" data-pagefind-ignore>
+        <p class="mb-2 text-sm font-semibold">本文目录</p>
+        <ol class="space-y-1.5 border-s text-sm" data-toc>
+          {items.map(h => (
+            <li>
+              <a
+                href={`#${h.slug}`}
+                data-toc-link={h.slug}
+                class:list={[
+                  "text-muted-foreground hover:text-accent -ms-px block border-s-2 border-transparent py-0.5",
+                  h.depth === 3 ? "ps-6" : "ps-3",
+                ]}
+              >
+                {h.text}
+              </a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+    ))
+}

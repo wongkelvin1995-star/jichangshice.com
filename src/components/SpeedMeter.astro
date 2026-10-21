@@ -1,0 +1,376 @@
+---
+/**
+ * 在线测速表：浏览器直接连接 Cloudflare 测速服务器（speed.cloudflare.com 的 __down / __up 接口）测量
+ * 延迟、抖动、下载、上传。结果反映访客当前网络（开启代理时即所连节点）。
+ * 测试结果只显示在页面上，不会上传或自动写入本站记录。
+ */
+const ticks = [0, 5, 10, 50, 100, 250, 500, 1000];
+// 刻度位置与脚本中的 scale() 一致：分段线性，0–1000 Mbps 映射到 0–1
+const STOPS = [0, 5, 10, 50, 100, 250, 500, 1000];
+const pos = (v: number) => {
+  for (let i = 1; i < STOPS.length; i++)
+    if (v <= STOPS[i])
+      return (i - 1 + (v - STOPS[i - 1]) / (STOPS[i] - STOPS[i - 1])) / 7;
+  return 1;
+};
+// 半圆仪表：圆心 (160,160)，半径 130，从 180° 扫到 0°
+const pt = (t: number, r: number) => {
+  const a = Math.PI * (1 - t);
+  return [160 + r * Math.cos(a), 160 - r * Math.sin(a)];
+};
+---
+
+<section
+  class="card mt-4 overflow-hidden"
+  aria-labelledby="speed-meter-title"
+  data-speed-meter
+>
+  <div
+    class="grid grid-cols-[minmax(0,1fr)] gap-6 p-5 sm:p-6 md:grid-cols-[minmax(0,340px)_minmax(0,1fr)] md:items-center"
+  >
+    <div class="mx-auto w-full max-w-[340px]">
+      <h3 id="speed-meter-title" class="sr-only">在线测速表</h3>
+      <svg
+        viewBox="0 0 320 190"
+        class="w-full"
+        role="img"
+        aria-label="测速表"
+        data-gauge
+      >
+        <path
+          d="M30 160 A130 130 0 0 1 290 160"
+          fill="none"
+          stroke="var(--muted)"
+          stroke-width="18"
+          stroke-linecap="round"></path>
+        <path
+          d="M30 160 A130 130 0 0 1 290 160"
+          fill="none"
+          stroke="var(--accent)"
+          stroke-width="18"
+          stroke-linecap="round"
+          pathLength="1000"
+          stroke-dasharray="0 1000"
+          data-arc></path>
+        {
+          ticks.map(v => {
+            const [x, y] = pt(pos(v), 104);
+            return (
+              <text
+                x={x}
+                y={y + 4}
+                text-anchor="middle"
+                font-size="11"
+                fill="var(--muted-foreground)"
+                class="num"
+              >
+                {v}
+              </text>
+            );
+          })
+        }
+        <g
+          data-needle
+          style="transform-origin:160px 160px;transform:rotate(-90deg);transition:transform .35s ease-out"
+        >
+          <line
+            x1="160"
+            y1="160"
+            x2="160"
+            y2="84"
+            stroke="var(--foreground)"
+            stroke-width="3"
+            stroke-linecap="round"></line>
+          <circle cx="160" cy="160" r="7" fill="var(--foreground)"></circle>
+        </g>
+      </svg>
+      <div class="-mt-6 text-center">
+        <p class="num text-4xl font-black tracking-tight" data-live>—</p>
+        <p class="text-muted-foreground text-xs" data-phase>Mbps</p>
+      </div>
+      <button
+        type="button"
+        class="btn btn-primary mx-auto mt-4 flex min-h-11 w-full max-w-60 justify-center text-base"
+        data-start
+      >
+        开始测速
+      </button>
+    </div>
+
+    <div class="min-w-0">
+      <dl class="grid grid-cols-2 gap-3">
+        <div class="bg-muted/50 rounded-xl p-3">
+          <dt class="text-muted-foreground text-xs">下载</dt>
+          <dd>
+            <span class="num text-2xl font-extrabold" data-r="down">—</span>
+            <span class="text-muted-foreground ms-1 text-xs">Mbps</span>
+          </dd>
+        </div>
+        <div class="bg-muted/50 rounded-xl p-3">
+          <dt class="text-muted-foreground text-xs">上传</dt>
+          <dd>
+            <span class="num text-2xl font-extrabold" data-r="up">—</span>
+            <span class="text-muted-foreground ms-1 text-xs">Mbps</span>
+          </dd>
+        </div>
+        <div class="bg-muted/50 rounded-xl p-3">
+          <dt class="text-muted-foreground text-xs">延迟</dt>
+          <dd>
+            <span class="num text-2xl font-extrabold" data-r="latency">—</span>
+            <span class="text-muted-foreground ms-1 text-xs">ms</span>
+          </dd>
+        </div>
+        <div class="bg-muted/50 rounded-xl p-3">
+          <dt class="text-muted-foreground text-xs">抖动</dt>
+          <dd>
+            <span class="num text-2xl font-extrabold" data-r="jitter">—</span>
+            <span class="text-muted-foreground ms-1 text-xs">ms</span>
+          </dd>
+        </div>
+      </dl>
+      <p
+        class="text-muted-foreground mt-3 min-h-5 text-xs leading-relaxed"
+        aria-live="polite"
+        data-status
+      >
+        测速服务器：Cloudflare，测试约需 15 秒。
+      </p>
+      <p
+        class="bg-warn-soft text-warn mt-2 rounded-lg px-3 py-2 text-xs leading-relaxed"
+      >
+        只有确认测速流量经过代理时（例如客户端开全局模式，或规则模式下
+        speed.cloudflare.com
+        走代理），结果才能用来评估当前节点；否则测到的是你的本地宽带。
+        <span class="block" data-exit></span>
+      </p>
+      <div class="mt-3 hidden flex-wrap gap-2" data-after>
+        <button
+          type="button"
+          class="btn btn-outline min-h-9 px-3 text-sm"
+          data-copy>复制结果</button
+        >
+        <a
+          href="/test-records/submit/"
+          class="btn btn-outline min-h-9 px-3 text-sm"
+          data-record>生成测速记录</a
+        >
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const BASE = "https://speed.cloudflare.com";
+  const STOPS = [0, 5, 10, 50, 100, 250, 500, 1000];
+  const DURATION = 6000; // 每个方向测试时长
+  const DOWN_CAP = 100e6; // 单次测速最多下载 100MB（节省机场流量）
+  const UP_CAP = 30e6; // 最多上传 30MB
+
+  const root = document.querySelector<HTMLElement>("[data-speed-meter]");
+  if (root) {
+    const $ = <T extends Element>(s: string) => root.querySelector<T>(s)!;
+    const live = $<HTMLElement>("[data-live]");
+    const phase = $<HTMLElement>("[data-phase]");
+    const status = $<HTMLElement>("[data-status]");
+    const btn = $<HTMLButtonElement>("[data-start]");
+    const arc = $<SVGPathElement>("[data-arc]");
+    const needle = $<SVGGElement>("[data-needle]");
+    const after = $<HTMLElement>("[data-after]");
+    const out = (k: string, v: string) =>
+      ($<HTMLElement>(`[data-r="${k}"]`).textContent = v);
+    const fmt = (n: number) =>
+      n >= 100 ? n.toFixed(0) : n >= 10 ? n.toFixed(1) : n.toFixed(2);
+    const rnd = () => Math.random().toString(36).slice(2);
+
+    const scale = (v: number) => {
+      for (let i = 1; i < STOPS.length; i++)
+        if (v <= STOPS[i])
+          return (i - 1 + (v - STOPS[i - 1]) / (STOPS[i] - STOPS[i - 1])) / 7;
+      return 1;
+    };
+    function gauge(mbps: number) {
+      const t = Math.max(0, Math.min(1, scale(mbps)));
+      arc.setAttribute("stroke-dasharray", `${t * 1000} 1000`);
+      needle.style.transform = `rotate(${-90 + t * 180}deg)`;
+      live.textContent = mbps > 0 ? fmt(mbps) : "0";
+    }
+
+    let result: Record<string, number> = {};
+    let usedBytes = 0;
+    let running = false;
+
+    async function measureLatency() {
+      phase.textContent = "正在测延迟…";
+      const samples: number[] = [];
+      for (let i = 0; i < 21; i++) {
+        const t0 = performance.now();
+        const r = await fetch(`${BASE}/__down?bytes=0&r=${rnd()}`, {
+          cache: "no-store",
+        });
+        await r.arrayBuffer();
+        if (i > 0) samples.push(performance.now() - t0); // 第一次含建连，丢弃
+      }
+      const sorted = [...samples].sort((a, b) => a - b);
+      const median = sorted[Math.floor(sorted.length / 2)];
+      let j = 0;
+      for (let i = 1; i < samples.length; i++)
+        j += Math.abs(samples[i] - samples[i - 1]);
+      return { latency: median, jitter: j / (samples.length - 1) };
+    }
+
+    /** 并发流式下载，固定时长；返回 Mbps（去掉第 1 秒爬坡） */
+    async function measureDownload() {
+      phase.textContent = "正在测下载…";
+      const ctrl = new AbortController();
+      let bytes = 0;
+      let warmBytes = 0;
+      const start = performance.now();
+      let warmAt = 0;
+      const tick = setInterval(() => {
+        const el = (performance.now() - start) / 1000;
+        if (el > 0.3) gauge((bytes * 8) / el / 1e6);
+        if (!warmAt && el >= 1) {
+          warmAt = performance.now();
+          warmBytes = bytes;
+        }
+      }, 200);
+      const stop = setTimeout(() => ctrl.abort(), DURATION);
+      const stream = async () => {
+        let size = 10e6;
+        while (!ctrl.signal.aborted && bytes < DOWN_CAP) {
+          const r = await fetch(`${BASE}/__down?bytes=${size}&r=${rnd()}`, {
+            cache: "no-store",
+            signal: ctrl.signal,
+          });
+          const reader = r.body!.getReader();
+          for (;;) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            bytes += value.byteLength;
+            if (bytes >= DOWN_CAP) ctrl.abort();
+          }
+          size = 25e6;
+        }
+      };
+      await Promise.allSettled([stream(), stream(), stream(), stream()]);
+      clearTimeout(stop);
+      clearInterval(tick);
+      if (bytes === 0) throw new Error("download");
+      usedBytes += bytes;
+      const end = performance.now();
+      const span = warmAt ? (end - warmAt) / 1000 : (end - start) / 1000;
+      const b = warmAt ? bytes - warmBytes : bytes;
+      return (b * 8) / span / 1e6;
+    }
+
+    /** 并发上传，固定时长；按完成的请求计算 Mbps */
+    async function measureUpload() {
+      phase.textContent = "正在测上传…";
+      const ctrl = new AbortController();
+      let bytes = 0;
+      const start = performance.now();
+      const stop = setTimeout(() => ctrl.abort(), DURATION);
+      const blob = (n: number) => new Blob([new Uint8Array(n)]);
+      const stream = async () => {
+        let size = 1e6;
+        while (!ctrl.signal.aborted && bytes < UP_CAP) {
+          const t0 = performance.now();
+          await fetch(`${BASE}/__up?r=${rnd()}`, {
+            method: "POST",
+            body: blob(size),
+            signal: ctrl.signal,
+          });
+          bytes += size;
+          const el = (performance.now() - start) / 1000;
+          gauge((bytes * 8) / el / 1e6);
+          // 请求太快时加大数据块，减少请求开销的影响
+          if (performance.now() - t0 < 1500 && size < 8e6) size *= 2;
+        }
+      };
+      await Promise.allSettled([stream(), stream(), stream()]);
+      clearTimeout(stop);
+      if (bytes === 0) throw new Error("upload");
+      usedBytes += bytes;
+      return (bytes * 8) / ((performance.now() - start) / 1000) / 1e6;
+    }
+
+    async function run() {
+      if (running) return;
+      running = true;
+      btn.disabled = true;
+      btn.textContent = "测速中…";
+      after.classList.add("hidden");
+      after.classList.remove("flex");
+      ["down", "up", "latency", "jitter"].forEach(k => out(k, "—"));
+      result = {};
+      usedBytes = 0;
+      gauge(0);
+      status.textContent =
+        "测速服务器：Cloudflare。测试约需 15 秒，请保持页面打开。";
+      const at = new Date();
+      try {
+        const lat = await measureLatency();
+        result.latency = lat.latency;
+        result.jitter = lat.jitter;
+        out("latency", fmt(lat.latency));
+        out("jitter", fmt(lat.jitter));
+        result.down = await measureDownload();
+        out("down", fmt(result.down));
+        gauge(0);
+        result.up = await measureUpload();
+        out("up", fmt(result.up));
+        gauge(result.down);
+        phase.textContent = "下载 Mbps";
+        const p = (n: number) => String(n).padStart(2, "0");
+        const stamp = `${at.getFullYear()}-${p(at.getMonth() + 1)}-${p(at.getDate())} ${p(at.getHours())}:${p(at.getMinutes())}`;
+        result.at = at.getTime();
+        status.textContent = `测试时间 ${stamp} · 本次约消耗 ${Math.round(usedBytes / 1e6)} MB 流量 · 测速服务器：Cloudflare`;
+        const q = new URLSearchParams({
+          tool: "cloudflare",
+          down: fmt(result.down),
+          up: fmt(result.up),
+          latency: fmt(result.latency),
+          jitter: fmt(result.jitter),
+          at: `${stamp.replace(" ", "T")}`,
+        });
+        $<HTMLAnchorElement>("[data-record]").href =
+          `/test-records/submit/?${q}`;
+        // 显示测速出口所在地区，帮助确认是否经过代理（不显示 IP）
+        fetch(`${BASE}/meta`, { cache: "no-store" })
+          .then(r => (r.ok ? r.json() : null))
+          .then(
+            (m: { country?: string; city?: string; colo?: string } | null) => {
+              if (m && (m.country || m.colo))
+                $<HTMLElement>("[data-exit]").textContent =
+                  `本次测速出口：${[m.country, m.city].filter(Boolean).join(" ")}${m.colo ? `（Cloudflare 节点 ${m.colo}）` : ""}。如果显示的是你本地所在地区，说明测速没有经过代理。`;
+            }
+          )
+          .catch(() => {});
+        after.classList.remove("hidden");
+        after.classList.add("flex");
+      } catch {
+        gauge(0);
+        live.textContent = "—";
+        phase.textContent = "测速未完成";
+        status.textContent = "无法连接测速服务器，请检查网络或代理设置后重试。";
+      } finally {
+        running = false;
+        btn.disabled = false;
+        btn.textContent = "重新测速";
+      }
+    }
+
+    btn.addEventListener("click", run);
+    $<HTMLButtonElement>("[data-copy]").addEventListener("click", async e => {
+      const b = e.currentTarget as HTMLButtonElement;
+      const text = `下载 ${fmt(result.down)} Mbps，上传 ${fmt(result.up)} Mbps，延迟 ${fmt(result.latency)} ms，抖动 ${fmt(result.jitter)} ms（Cloudflare 测速）`;
+      try {
+        await navigator.clipboard.writeText(text);
+        b.textContent = "已复制";
+      } catch {
+        b.textContent = "复制失败";
+      }
+      setTimeout(() => (b.textContent = "复制结果"), 1500);
+    });
+  }
+</script>

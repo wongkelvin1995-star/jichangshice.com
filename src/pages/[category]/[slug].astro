@@ -1,0 +1,372 @@
+---
+import { FEATURED_COUNT } from "@/data/editorial-order";
+import { render } from "astro:content";
+import Layout from "@/layouts/Layout.astro";
+import Breadcrumbs from "@/components/Breadcrumbs.astro";
+import Toc from "@/components/Toc.astro";
+import VisitTracker from "@/components/VisitTracker.astro";
+import BrandAvatar from "@/components/BrandAvatar.astro";
+import EntryLink from "@/components/EntryLink.astro";
+import {
+  getPublishedPosts,
+  postSlug,
+  postUrl,
+  findByRef,
+  readingMinutes,
+  type Post,
+} from "@/utils/posts";
+import { getProviders, getPlans, startingMonthly } from "@/utils/plans";
+import { CATEGORIES, CATEGORY_LIST } from "@/data/categories";
+import { formatDate, fmtMoney, fmtGB } from "@/utils/format";
+import { articleJsonLd, breadcrumbJsonLd } from "@/utils/jsonld";
+import config from "@/config";
+
+export async function getStaticPaths() {
+  const posts = await getPublishedPosts();
+  return posts.map(post => ({
+    params: { category: post.data.category, slug: postSlug(post) },
+    props: { post, all: posts },
+  }));
+}
+
+type Props = { post: Post; all: Post[] };
+const { post, all } = Astro.props;
+const { Content, headings } = await render(post);
+const d = post.data;
+const cat = CATEGORIES[d.category];
+const path = postUrl(post);
+const minutes = readingMinutes(post);
+
+const AUDIENCE: Record<string, string> = {
+  methods: "想看懂测速截图、自己记录测试结果，或判断别人测试是否可信的读者。",
+  guides: "第一次挑选机场、正在比较套餐价格和付款周期的新手。",
+  clients: "已经买了套餐，需要在电脑或手机上导入订阅、完成首次配置的读者。",
+  routes: "想读懂套餐介绍里线路、协议和节点说法的读者。",
+  troubleshooting: "遇到订阅更新失败、节点超时或连不上网的读者。",
+};
+const audience = d.audience ?? AUDIENCE[d.category];
+
+// 相关阅读：先用 front matter 指定的，再用同栏目补足到 4 篇
+const related: Post[] = [];
+for (const ref of d.related) {
+  const p = findByRef(all, ref);
+  if (p && p !== post && !related.includes(p)) related.push(p);
+}
+for (const p of all) {
+  if (related.length >= 4) break;
+  if (p !== post && p.data.category === d.category && !related.includes(p))
+    related.push(p);
+}
+for (const p of all) {
+  if (related.length >= 4) break;
+  if (p !== post && !related.includes(p)) related.push(p);
+}
+
+const providers = await getProviders();
+const plans = await getPlans();
+const picks = providers.filter(p => p.hasProfile).slice(0, FEATURED_COUNT);
+const crumbs = [
+  { name: cat.name, href: `/${cat.slug}/` },
+  { name: d.shortTitle ?? d.title },
+];
+const modified =
+  d.modDatetime && d.modDatetime > d.pubDatetime ? d.modDatetime : null;
+const sideCats = CATEGORY_LIST.map(c => ({
+  cat: c,
+  list: all.filter(p => p.data.category === c.slug),
+})).filter(x => x.list.length);
+---
+
+<Layout
+  title={`${d.title}｜${config.site.title}`}
+  description={d.description}
+  canonicalPath={path}
+  ogType="article"
+  publishedTime={d.pubDatetime.toISOString()}
+  modifiedTime={(modified ?? d.pubDatetime).toISOString()}
+  jsonLd={[
+    articleJsonLd({
+      title: d.title,
+      description: d.description,
+      path,
+      published: d.pubDatetime,
+      modified,
+      section: cat.name,
+    }),
+    breadcrumbJsonLd(crumbs, path),
+  ]}
+>
+  <main id="main-content" class="app-layout pt-6">
+    <div
+      class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_230px] xl:grid-cols-[220px_minmax(0,1fr)_230px]"
+    >
+      <!-- 左栏：栏目导航（宽屏） -->
+      <nav aria-label="栏目文章" class="hidden xl:block" data-pagefind-ignore>
+        <div
+          class="sticky top-[calc(var(--header-h)+24px)] max-h-[calc(100vh-var(--header-h)-48px)] space-y-5 overflow-y-auto pe-1 text-sm"
+        >
+          {
+            sideCats.map(({ cat: c, list }) => (
+              <div>
+                <a
+                  href={`/${c.slug}/`}
+                  class="text-foreground hover:text-accent-strong font-bold"
+                >
+                  {c.name}
+                </a>
+                <ul class="mt-2 space-y-1 border-s">
+                  {list.map(p => (
+                    <li>
+                      <a
+                        href={postUrl(p)}
+                        class:list={[
+                          "-ms-px block border-s-2 py-1 ps-3 leading-snug",
+                          p === post
+                            ? "border-accent text-accent-strong font-semibold"
+                            : "text-muted-foreground hover:text-foreground border-transparent",
+                        ]}
+                        aria-current={p === post ? "page" : undefined}
+                      >
+                        {p.data.shortTitle ?? p.data.title}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))
+          }
+        </div>
+      </nav>
+
+      <article class="min-w-0" data-pagefind-body>
+        <div class="card p-5 sm:p-8">
+          <Breadcrumbs items={crumbs} />
+          <h1
+            class="text-[1.65rem] leading-snug font-black tracking-tight text-balance sm:text-[2.05rem]"
+          >
+            {d.title}
+          </h1>
+          <VisitTracker type="article" title={d.title} />
+          <div
+            class="text-muted-foreground mt-4 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm"
+            data-pagefind-ignore
+          >
+            <a href={`/${cat.slug}/`} class="tag">{cat.name}</a>
+            <span>{d.author}</span>
+            <span
+              >发布 <time datetime={d.pubDatetime.toISOString()}
+                >{formatDate(d.pubDatetime)}</time
+              ></span
+            >
+            {
+              modified && (
+                <span>
+                  更新{" "}
+                  <time datetime={modified.toISOString()}>
+                    {formatDate(modified)}
+                  </time>
+                </span>
+              )
+            }
+            <span>约 {minutes} 分钟读完</span>
+          </div>
+
+          <div
+            class="mt-5 grid gap-3 sm:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]"
+          >
+            <p
+              class="bg-accent-soft rounded-[10px] px-4 py-3 text-[0.95rem] leading-relaxed"
+            >
+              <b class="text-accent-strong">摘要：</b>{d.description}
+            </p>
+            <p
+              class="bg-signal-soft rounded-[10px] px-4 py-3 text-sm leading-relaxed"
+            >
+              <b class="text-signal">适合谁读：</b>{audience}
+            </p>
+          </div>
+
+          <Toc headings={headings} variant="mobile" />
+
+          <div class="app-prose mt-6" id="article">
+            <Content />
+          </div>
+
+          <!-- 作者与免责声明 -->
+          <div
+            class="bg-background mt-10 flex gap-4 rounded-xl border p-4"
+            data-pagefind-ignore
+          >
+            <span
+              class="bg-ink flex size-11 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
+              >编</span
+            >
+            <div class="text-sm leading-relaxed">
+              <p class="font-bold">{d.author}</p>
+              <p class="text-muted-foreground mt-1">
+                整理机场资料、测试方法与客户端教程。资料标注来源层级与核验日期，不把服务商说法写成本站实测。编辑原则见
+                <a
+                  href="/about/"
+                  class="text-accent-strong underline underline-offset-2"
+                  >关于本站</a
+                >，测试方式见
+                <a
+                  href="/testing-methodology/"
+                  class="text-accent-strong underline underline-offset-2"
+                  >测试方法</a
+                >。
+              </p>
+              <p class="text-muted-foreground mt-2 text-xs">
+                本文仅供学习交流与合法用途参考，请遵守所在地法律法规和各平台服务条款。
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 相关机场（文末、简短） -->
+        <section
+          class="card mt-6 p-5 sm:p-6"
+          aria-labelledby="picks"
+          data-pagefind-ignore
+          data-placement="article-picks"
+        >
+          <div class="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 id="picks" class="font-extrabold">读完想对比机场？</h2>
+            <a
+              href="/recommendations/"
+              class="text-accent-strong text-sm font-semibold hover:underline"
+              >查看完整机场推荐 →</a
+            >
+          </div>
+          <ul class="mt-4 grid gap-2.5 sm:grid-cols-2">
+            {
+              picks.map((p, i) => {
+                const s = startingMonthly(plans, p.slug);
+                return (
+                  <li class="bg-background flex items-center gap-3 rounded-[10px] border px-3 py-2.5">
+                    <span class="num text-gold text-xs font-bold">
+                      No.{i + 1}
+                    </span>
+                    <BrandAvatar name={p.name} size="sm" />
+                    <a
+                      href={`/airports/${p.slug}/`}
+                      class="hover:text-accent-strong min-w-0 flex-1 truncate font-semibold"
+                    >
+                      {p.name}
+                    </a>
+                    <span class="num text-muted-foreground hidden text-xs whitespace-nowrap min-[380px]:inline">
+                      {s
+                        ? `${fmtMoney(s.paymentAmount!)} · ${fmtGB(s.trafficGB!)}`
+                        : "以结算页为准"}
+                    </span>
+                    <EntryLink
+                      href={p.entryUrl}
+                      brand={p.name}
+                      label="套餐"
+                      class="text-accent-strong text-xs font-semibold whitespace-nowrap hover:underline"
+                    />
+                  </li>
+                );
+              })
+            }
+          </ul>
+          <p class="text-muted-foreground mt-3 text-xs">
+            顺序为编辑安排，不是测速排名；价格为历史参考，入口含邀请码。
+          </p>
+        </section>
+
+        {
+          related.length > 0 && (
+            <section
+              class="mt-6"
+              aria-labelledby="related"
+              data-pagefind-ignore
+            >
+              <h2 id="related" class="mb-3 text-lg font-extrabold">
+                相关阅读
+              </h2>
+              <ul class="grid gap-3 sm:grid-cols-2">
+                {related.map(p => (
+                  <li>
+                    <a
+                      href={postUrl(p)}
+                      class="card hover:border-accent/40 block h-full p-4"
+                    >
+                      <span class="tag">
+                        {CATEGORIES[p.data.category].name}
+                      </span>
+                      <span class="mt-2 block leading-snug font-bold">
+                        {p.data.title}
+                      </span>
+                      <span class="text-muted-foreground mt-1 block text-xs">
+                        约 {readingMinutes(p)} 分钟
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )
+        }
+      </article>
+
+      <aside class="hidden lg:block">
+        <div
+          class="sticky top-[calc(var(--header-h)+24px)] max-h-[calc(100vh-var(--header-h)-48px)] space-y-5 overflow-y-auto"
+        >
+          <div class="card p-4">
+            <Toc headings={headings} variant="desktop" />
+          </div>
+          <div class="ink-panel rounded-xl p-4 text-white" data-pagefind-ignore>
+            <p class="text-sm font-bold">还没选好机场？</p>
+            <p class="mt-1 text-xs leading-relaxed text-white/70">
+              按预算、流量和付款周期筛选 {plans.length} 档套餐。
+            </p>
+            <a
+              href="/compare/"
+              class="btn text-ink mt-3 min-h-9 w-full bg-white text-sm"
+              >打开套餐比较表</a
+            >
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  const links = new Map<string, HTMLElement>();
+  document
+    .querySelectorAll<HTMLElement>("[data-toc-link]")
+    .forEach(a => links.set(a.dataset.tocLink!, a));
+  if (links.size) {
+    const obs = new IntersectionObserver(
+      entries => {
+        for (const e of entries) {
+          if (!e.isIntersecting) continue;
+          links.forEach(a =>
+            a.classList.remove("text-accent-strong", "border-accent")
+          );
+          links
+            .get(e.target.id)
+            ?.classList.add("text-accent-strong", "border-accent");
+        }
+      },
+      { rootMargin: "-120px 0px -70% 0px" }
+    );
+    document
+      .querySelectorAll("#article h2[id], #article h3[id]")
+      .forEach(h => obs.observe(h));
+  }
+  document.querySelectorAll<HTMLImageElement>("#article img").forEach(img => {
+    img.setAttribute("role", "button");
+    img.setAttribute("tabindex", "0");
+    const open = () =>
+      window.open(img.currentSrc || img.src, "_blank", "noopener");
+    img.addEventListener("click", open);
+    img.addEventListener(
+      "keydown",
+      e => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), open())
+    );
+  });
+</script>

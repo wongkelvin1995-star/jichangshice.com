@@ -1,0 +1,58 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Breadcrumbs from "@/components/Breadcrumbs.astro";
+import { getPublishedPosts, postUrl } from "@/utils/posts";
+import { CATEGORIES } from "@/data/categories";
+import { formatDate } from "@/utils/format";
+import { breadcrumbJsonLd } from "@/utils/jsonld";
+import config from "@/config";
+
+const posts = [...(await getPublishedPosts())].sort(
+  (a, b) => b.data.pubDatetime.getTime() - a.data.pubDatetime.getTime()
+);
+const groups = new Map<string, typeof posts>();
+for (const p of posts) {
+  const key = formatDate(p.data.pubDatetime).slice(0, 7);
+  groups.set(key, [...(groups.get(key) ?? []), p]);
+}
+const crumbs = [{ name: "文章归档" }];
+---
+
+<Layout
+  title={`文章归档：全部 ${posts.length} 篇文章｜${config.site.title}`}
+  description={`机场测试全部 ${posts.length} 篇文章，按发布月份排列，涵盖测试方法、新手教程、客户端配置、线路知识和故障排查。`}
+  canonicalPath="/archives/"
+  jsonLd={[breadcrumbJsonLd(crumbs, "/archives/")]}
+>
+  <main id="main-content" class="app-layout max-w-read pt-6">
+    <Breadcrumbs items={crumbs} />
+    <h1 class="text-[1.75rem] font-bold sm:text-3xl">文章归档</h1>
+    {
+      [...groups].map(([month, list]) => (
+        <section class="mt-8">
+          <h2 class="text-muted-foreground mb-2 font-semibold">
+            {month.replace("-", " 年 ")} 月 · {list.length} 篇
+          </h2>
+          <ul class="divide-y border-y">
+            {list.map(p => (
+              <li class="flex flex-col gap-1 py-3 sm:flex-row sm:items-baseline sm:gap-4">
+                <time class="text-muted-foreground w-24 shrink-0 text-sm">
+                  {formatDate(p.data.pubDatetime)}
+                </time>
+                <a
+                  href={postUrl(p)}
+                  class="hover:text-accent flex-1 font-medium"
+                >
+                  {p.data.title}
+                </a>
+                <a href={`/${p.data.category}/`} class="tag self-start">
+                  {CATEGORIES[p.data.category].name}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))
+    }
+  </main>
+</Layout>

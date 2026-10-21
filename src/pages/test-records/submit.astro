@@ -1,0 +1,619 @@
+---
+/**
+ * 测速录入助手（编辑用，noindex）。
+ * 全部在浏览器本地处理：校验 Speedtest 链接、解析 Cloudflare 导出文件、预览截图，
+ * 生成待核验的记录 JSON 和导入命令。页面不上传任何数据，也不会直接发布记录。
+ */
+import Layout from "@/layouts/Layout.astro";
+import Breadcrumbs from "@/components/Breadcrumbs.astro";
+import { getProviders } from "@/utils/plans";
+
+const providers = await getProviders();
+const crumbs = [
+  { name: "机场测试档案", href: "/test-records/" },
+  { name: "测速录入助手" },
+];
+const regions = [
+  "香港",
+  "台湾",
+  "日本",
+  "新加坡",
+  "韩国",
+  "美国",
+  "英国",
+  "德国",
+  "其他",
+];
+const field =
+  "bg-background h-11 w-full rounded-lg border px-3 text-sm focus:outline-2 focus:outline-offset-1";
+---
+
+<Layout
+  title="测速录入助手 - 机场测试"
+  description="机场测试的测速录入助手：校验 Speedtest 分享链接、解析 Cloudflare 测速导出数据、预览测速截图，生成待核验的本站测速记录。"
+  canonicalPath="/test-records/submit/"
+  noindex
+>
+  <main id="main-content">
+    <section class="hero-band relative border-b">
+      <div class="app-layout relative py-6 sm:py-8">
+        <Breadcrumbs items={crumbs} />
+        <h1 class="text-[1.6rem] font-black tracking-tight sm:text-[2rem]">
+          测速录入助手
+        </h1>
+        <p class="text-muted-foreground mt-2 max-w-3xl text-sm leading-relaxed">
+          把一次真实测速整理成本站记录：贴 Speedtest 分享链接、上传 Cloudflare
+          测速导出文件或测速截图，核对数值后生成记录。数据只在你的浏览器里处理，不会上传；生成的记录状态为「待核验」，核验后才会出现在测试档案并计入「本站测试」。
+        </p>
+      </div>
+    </section>
+
+    <form
+      class="app-layout grid grid-cols-[minmax(0,1fr)] gap-6 pt-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]"
+      data-submit-form
+      novalidate
+    >
+      <div class="grid min-w-0 content-start gap-6">
+        <fieldset class="card p-5">
+          <legend class="px-1 text-base font-extrabold">1. 原始证据</legend>
+          <div
+            class="mt-2 grid grid-cols-3 gap-2 text-sm"
+            role="radiogroup"
+            aria-label="证据类型"
+          >
+            <label
+              class="has-[:checked]:border-accent has-[:checked]:bg-accent-soft has-[:checked]:text-accent-strong cursor-pointer rounded-lg border px-2 py-2 text-center font-semibold"
+              ><input
+                type="radio"
+                name="source"
+                value="speedtest_link"
+                class="sr-only"
+                checked
+              />Speedtest 链接</label
+            >
+            <label
+              class="has-[:checked]:border-accent has-[:checked]:bg-accent-soft has-[:checked]:text-accent-strong cursor-pointer rounded-lg border px-2 py-2 text-center font-semibold"
+              ><input
+                type="radio"
+                name="source"
+                value="cloudflare_export"
+                class="sr-only"
+              />Cloudflare 数据</label
+            >
+            <label
+              class="has-[:checked]:border-accent has-[:checked]:bg-accent-soft has-[:checked]:text-accent-strong cursor-pointer rounded-lg border px-2 py-2 text-center font-semibold"
+              ><input
+                type="radio"
+                name="source"
+                value="screenshot"
+                class="sr-only"
+              />测速截图</label
+            >
+          </div>
+
+          <div class="mt-4 grid gap-3" data-panel="speedtest_link">
+            <label class="grid gap-1.5 text-sm">
+              <span class="font-semibold">Speedtest 分享链接</span>
+              <input
+                type="url"
+                name="speedtestUrl"
+                class={field}
+                placeholder="https://www.speedtest.net/result/…"
+                inputmode="url"
+                autocomplete="off"
+              />
+            </label>
+            <p class="text-muted-foreground text-xs leading-relaxed">
+              在 <a
+                href="https://www.speedtest.net/"
+                target="_blank"
+                rel="nofollow noopener noreferrer"
+                class="text-accent-strong underline underline-offset-2"
+                >speedtest.net</a
+              > 测完后点「分享」复制结果链接。浏览器不能直接读取 Speedtest 页面里的数据：请对照下方结果图填写数值，或在电脑上用导入命令自动读取。
+            </p>
+            <p class="text-sm font-semibold" data-st-status aria-live="polite">
+            </p>
+            <img
+              alt="Speedtest 结果图预览"
+              class="hidden w-full max-w-md rounded-lg border"
+              data-st-img
+              referrerpolicy="no-referrer"
+            />
+          </div>
+
+          <div class="mt-4 hidden gap-3" data-panel="cloudflare_export">
+            <label class="grid gap-1.5 text-sm">
+              <span class="font-semibold"
+                >Cloudflare 测速导出文件（JSON / CSV）</span
+              >
+              <input
+                type="file"
+                name="cfFile"
+                accept=".json,.csv,.txt,application/json,text/csv"
+                class="text-sm"
+              />
+            </label>
+            <p class="text-muted-foreground text-xs leading-relaxed">
+              在 <a
+                href="https://speed.cloudflare.com/"
+                target="_blank"
+                rel="nofollow noopener noreferrer"
+                class="text-accent-strong underline underline-offset-2"
+                >speed.cloudflare.com</a
+              > 测完后下载结果文件。导出文件可能包含你的 IP，只用于核验，不会公开。识别出的数值会自动填入右侧，请逐项核对。
+            </p>
+            <p class="text-sm" data-cf-status aria-live="polite"></p>
+          </div>
+
+          <div class="mt-4 hidden gap-3" data-panel="screenshot">
+            <label class="grid gap-1.5 text-sm">
+              <span class="font-semibold">测速截图</span>
+              <input
+                type="file"
+                name="shot"
+                accept="image/png,image/jpeg,image/webp"
+                class="text-sm"
+              />
+            </label>
+            <label class="grid gap-1.5 text-sm">
+              <span class="font-semibold">测速工具</span>
+              <select name="shotTool" class={field}>
+                <option value="speedtest">Speedtest by Ookla</option>
+                <option value="cloudflare">Cloudflare Speed Test</option>
+                <option value="other">其他工具</option>
+              </select>
+            </label>
+            <p class="text-muted-foreground text-xs leading-relaxed">
+              只用自己测试的截图。公开前请裁掉
+              IP、账号、订阅链接等信息；截图会随记录公开，需要保密时在导入命令中加
+              <code>--private</code>。
+            </p>
+            <img
+              alt="测速截图预览"
+              class="hidden w-full rounded-lg border"
+              data-shot-img
+            />
+          </div>
+        </fieldset>
+      </div>
+
+      <div class="grid min-w-0 content-start gap-6">
+        <fieldset class="card grid gap-4 p-5 sm:grid-cols-2">
+          <legend class="px-1 text-base font-extrabold">2. 测试信息</legend>
+          <label class="grid gap-1.5 text-sm">
+            <span class="font-semibold">品牌 *</span>
+            <select name="brand" class={field} required>
+              <option value="">请选择</option>
+              {providers.map(p => <option value={p.slug}>{p.name}</option>)}
+            </select>
+          </label>
+          <label class="grid gap-1.5 text-sm">
+            <span class="font-semibold">节点地区 *</span>
+            <input
+              name="region"
+              list="region-list"
+              class={field}
+              required
+              autocomplete="off"
+            />
+            <datalist id="region-list">
+              {regions.map(r => <option value={r} />)}
+            </datalist>
+          </label>
+          <label class="grid gap-1.5 text-sm">
+            <span class="font-semibold">节点名称</span>
+            <input name="node" class={field} placeholder="如 香港 03" />
+          </label>
+          <label class="grid gap-1.5 text-sm">
+            <span class="font-semibold">测试时间（北京时间）*</span>
+            <input type="datetime-local" name="at" class={field} required />
+          </label>
+          <label class="grid gap-1.5 text-sm">
+            <span class="font-semibold">下载 Mbps *</span>
+            <input
+              type="number"
+              name="down"
+              class={field}
+              min="0"
+              step="any"
+              inputmode="decimal"
+            />
+          </label>
+          <label class="grid gap-1.5 text-sm">
+            <span class="font-semibold">上传 Mbps *</span>
+            <input
+              type="number"
+              name="up"
+              class={field}
+              min="0"
+              step="any"
+              inputmode="decimal"
+            />
+          </label>
+          <label class="grid gap-1.5 text-sm">
+            <span class="font-semibold">延迟 ms *</span>
+            <input
+              type="number"
+              name="latency"
+              class={field}
+              min="0"
+              step="any"
+              inputmode="decimal"
+            />
+          </label>
+          <label class="grid gap-1.5 text-sm">
+            <span class="font-semibold">抖动 ms</span>
+            <input
+              type="number"
+              name="jitter"
+              class={field}
+              min="0"
+              step="any"
+              inputmode="decimal"
+            />
+          </label>
+          <label class="grid gap-1.5 text-sm">
+            <span class="font-semibold">本地运营商</span>
+            <input name="isp" class={field} placeholder="如 中国电信" />
+          </label>
+          <label class="grid gap-1.5 text-sm">
+            <span class="font-semibold">测试地点</span>
+            <input name="location" class={field} placeholder="如 广东深圳" />
+          </label>
+          <label class="grid gap-1.5 text-sm">
+            <span class="font-semibold">宽带</span>
+            <input name="bandwidth" class={field} placeholder="如 500M" />
+          </label>
+          <label class="grid gap-1.5 text-sm">
+            <span class="font-semibold">客户端 / 协议</span>
+            <input
+              name="client"
+              class={field}
+              placeholder="如 Clash Verge Rev / VLESS"
+            />
+          </label>
+          <label class="grid gap-1.5 text-sm sm:col-span-2">
+            <span class="font-semibold">备注</span>
+            <input name="notes" class={field} />
+          </label>
+          <p class="text-muted-foreground text-xs sm:col-span-2">
+            带 * 为必填。数值必须来自原始结果，没测的项目留空，不要估算。使用
+            Speedtest 链接时，数值可以留空，由导入命令自动读取。
+          </p>
+        </fieldset>
+
+        <section class="card p-5" aria-labelledby="h-out">
+          <h2 id="h-out" class="text-base font-extrabold">3. 生成记录</h2>
+          <ul
+            class="mt-2 hidden list-disc space-y-1 ps-5 text-sm text-red-700"
+            data-errors
+          >
+          </ul>
+          <button type="submit" class="btn btn-primary mt-3 min-h-11 px-5"
+            >校验并生成</button
+          >
+          <div class="mt-4 hidden gap-3" data-output>
+            <p class="text-sm font-semibold">
+              导入命令（在网站项目文件夹运行）
+            </p>
+            <pre
+              class="bg-muted overflow-x-auto rounded-lg p-3 text-xs leading-relaxed whitespace-pre-wrap"
+              data-cmd>
+            </pre>
+            <p class="text-sm font-semibold">记录 JSON（状态：待核验）</p>
+            <pre
+              class="bg-muted max-h-72 overflow-auto rounded-lg p-3 text-xs"
+              data-json>
+            </pre>
+            <div class="flex flex-wrap gap-2">
+              <button
+                type="button"
+                class="btn btn-outline min-h-10 px-4 text-sm"
+                data-copy="cmd">复制命令</button
+              >
+              <button
+                type="button"
+                class="btn btn-outline min-h-10 px-4 text-sm"
+                data-copy="json">复制 JSON</button
+              >
+              <button
+                type="button"
+                class="btn btn-outline min-h-10 px-4 text-sm"
+                data-download>下载 JSON</button
+              >
+            </div>
+            <p
+              class="text-signal min-h-5 text-sm font-semibold"
+              aria-live="polite"
+              data-copy-status
+            >
+            </p>
+            <ol
+              class="text-muted-foreground list-decimal space-y-1 ps-5 text-xs leading-relaxed"
+            >
+              <li>
+                运行上面的命令，记录写入 <code>src/data/test-runs/</code
+                >，状态为待核验。
+              </li>
+              <li>
+                对照原始结果逐项核对，无误后运行 <code data-verify-cmd></code>。
+              </li>
+              <li>重新构建网站，记录出现在测试档案，「本站测试」数量加 1。</li>
+            </ol>
+          </div>
+        </section>
+      </div>
+    </form>
+  </main>
+</Layout>
+
+<script>
+  import {
+    parseCloudflare,
+    speedtestId,
+    toLocalInput,
+  } from "@/utils/speedImport";
+
+  const form = document.querySelector<HTMLFormElement>("[data-submit-form]")!;
+  const $ = <T extends Element>(s: string) => form.querySelector<T>(s)!;
+  const input = (n: string) =>
+    form.elements.namedItem(n) as HTMLInputElement | HTMLSelectElement;
+  const val = (n: string) => input(n).value.trim();
+  let shotName = "";
+
+  const source = () =>
+    (form.querySelector<HTMLInputElement>('input[name="source"]:checked')
+      ?.value ?? "speedtest_link") as
+      "speedtest_link" | "cloudflare_export" | "screenshot";
+
+  function showPanel() {
+    form.querySelectorAll<HTMLElement>("[data-panel]").forEach(p => {
+      const on = p.dataset.panel === source();
+      p.classList.toggle("hidden", !on);
+      p.classList.toggle("grid", on);
+    });
+  }
+  form
+    .querySelectorAll('input[name="source"]')
+    .forEach(r => r.addEventListener("change", showPanel));
+
+  // 从测速表「生成测速记录」带入的结果：数值预填，证据选“测速截图”（需上传本次截图）
+  {
+    const q = new URLSearchParams(location.search);
+    if (q.get("tool") === "cloudflare") {
+      const shot = form.querySelector<HTMLInputElement>(
+        'input[name="source"][value="screenshot"]'
+      );
+      if (shot) shot.checked = true;
+      input("shotTool").value = "cloudflare";
+      for (const k of ["down", "up", "latency", "jitter"]) {
+        const v = q.get(k);
+        if (v && Number(v) > 0) input(k).value = v;
+      }
+      const at = q.get("at");
+      if (at && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(at))
+        input("at").value = at;
+      showPanel();
+    }
+  }
+
+  // Speedtest 链接：校验格式，显示结果图帮助核对
+  input("speedtestUrl").addEventListener("input", () => {
+    const url = val("speedtestUrl");
+    const st = $<HTMLElement>("[data-st-status]");
+    const img = $<HTMLImageElement>("[data-st-img]");
+    const id = speedtestId(url);
+    if (!url) {
+      st.textContent = "";
+      img.classList.add("hidden");
+      return;
+    }
+    if (!id) {
+      st.textContent = "✗ 不是 Speedtest 结果链接";
+      st.className = "text-sm font-semibold text-red-700";
+      img.classList.add("hidden");
+      return;
+    }
+    st.textContent = `✓ 结果 ID ${id}`;
+    st.className = "text-signal text-sm font-semibold";
+    img.onerror = () => {
+      img.classList.add("hidden");
+      st.textContent = `✓ 结果 ID ${id}（结果图无法加载，请打开链接核对数值）`;
+    };
+    img.onload = () => img.classList.remove("hidden");
+    img.src = `https://www.speedtest.net/result/${id}.png`;
+  });
+
+  // Cloudflare 导出文件：本地解析并预填
+  input("cfFile").addEventListener("change", async e => {
+    const f = (e.target as HTMLInputElement).files?.[0];
+    const st = $<HTMLElement>("[data-cf-status]");
+    if (!f) return;
+    try {
+      const p = parseCloudflare(await f.text());
+      if (!p) throw new Error("empty");
+      const fill = (n: string, v: number | null) => {
+        if (v !== null && Number.isFinite(v)) input(n).value = String(v);
+      };
+      fill("down", p.downloadMbps);
+      fill("up", p.uploadMbps);
+      fill("latency", p.latencyMs);
+      fill("jitter", p.jitterMs);
+      if (p.date) input("at").value = toLocalInput(p.date);
+      else if (p.localTime)
+        input("at").value = p.localTime.replace(" ", "T").slice(0, 16);
+      const m = Object.entries(p.matched).filter(([, k]) => k);
+      st.className = "text-signal text-sm";
+      st.textContent = m.length
+        ? `已识别：${m.map(([a, k]) => `${a} ← ${k}`).join("；")}。请对照原始结果核对。`
+        : "没有识别到数值，请手动填写。";
+    } catch {
+      st.className = "text-sm text-red-700";
+      st.textContent = "文件无法解析，请改用截图方式并手动填写数值。";
+    }
+  });
+
+  // 截图：本地预览
+  input("shot").addEventListener("change", e => {
+    const f = (e.target as HTMLInputElement).files?.[0];
+    const img = $<HTMLImageElement>("[data-shot-img]");
+    if (!f) return;
+    shotName = f.name;
+    img.src = URL.createObjectURL(f);
+    img.classList.remove("hidden");
+  });
+
+  const numOrNull = (n: string) => {
+    const v = val(n);
+    return v === "" ? null : Number(v);
+  };
+  const q = (s: string) => `"${s.replace(/(["\\$`])/g, "\\$1")}"`;
+
+  form.addEventListener("submit", e => {
+    e.preventDefault();
+    const errs: string[] = [];
+    const src = source();
+    const stUrl = val("speedtestUrl");
+    const stId = speedtestId(stUrl);
+    const tool =
+      src === "speedtest_link"
+        ? "speedtest"
+        : src === "cloudflare_export"
+          ? "cloudflare"
+          : val("shotTool");
+    const brand = val("brand");
+    const region = val("region");
+    const at = val("at");
+    const nums = {
+      down: numOrNull("down"),
+      up: numOrNull("up"),
+      latency: numOrNull("latency"),
+      jitter: numOrNull("jitter"),
+    };
+    if (!brand) errs.push("请选择品牌");
+    if (!region) errs.push("请填写节点地区");
+    if (src === "speedtest_link" && !stId)
+      errs.push("请填写有效的 Speedtest 结果链接");
+    if (src === "cloudflare_export" && !input("cfFile").value)
+      errs.push("请选择 Cloudflare 导出文件");
+    if (src === "screenshot" && !shotName) errs.push("请选择测速截图");
+    const autoFetch = src === "speedtest_link";
+    if (!at && !autoFetch) errs.push("请填写测试时间");
+    if (at && new Date(`${at}:00+08:00`).getTime() > Date.now() + 300_000)
+      errs.push("测试时间晚于当前时间");
+    for (const [k, label] of [
+      ["down", "下载"],
+      ["up", "上传"],
+      ["latency", "延迟"],
+    ] as const) {
+      const v = nums[k];
+      if (v === null && !autoFetch) errs.push(`请按原始结果填写${label}`);
+      if (v !== null && !(v > 0 && v <= 100000)) errs.push(`${label}数值无效`);
+    }
+    if (nums.jitter !== null && !(nums.jitter >= 0)) errs.push("抖动数值无效");
+
+    const errBox = $<HTMLElement>("[data-errors]");
+    errBox.innerHTML = errs.map(x => `<li>${x}</li>`).join("");
+    errBox.classList.toggle("hidden", errs.length === 0);
+    const out = $<HTMLElement>("[data-output]");
+    if (errs.length) {
+      out.classList.add("hidden");
+      return;
+    }
+
+    const stamp = at ? at.replace(/[-:]/g, "").replace("T", "-") : "自动";
+    const id = `${brand}-${stamp}-${tool}`;
+    const [client, protocol] = val("client")
+      .split("/")
+      .map(s => s.trim());
+    const opt = (s: string) => s || null;
+    const record = {
+      id,
+      brandSlug: brand,
+      nodeRegion: region,
+      nodeName: opt(val("node")),
+      testedAt: at ? `${at}:00+08:00` : null,
+      downloadMbps: nums.down,
+      uploadMbps: nums.up,
+      latencyMs: nums.latency,
+      jitterMs: nums.jitter,
+      packetLossPct: null,
+      tool,
+      toolName: null,
+      dataSource: src,
+      evidenceUrl: stId ? `https://www.speedtest.net/result/${stId}` : null,
+      evidenceFiles: [],
+      server: null,
+      isp: opt(val("isp")),
+      location: opt(val("location")),
+      bandwidth: opt(val("bandwidth")),
+      device: null,
+      client: opt(client ?? ""),
+      protocol: opt(protocol ?? ""),
+      notes: opt(val("notes")),
+      importedAt: null,
+      verification: { status: "pending", verifiedAt: null, notes: null },
+    };
+
+    const args = [
+      "node scripts/import-test.mjs",
+      `--brand ${brand}`,
+      `--region ${q(region)}`,
+    ];
+    if (src === "speedtest_link")
+      args.push(`--speedtest https://www.speedtest.net/result/${stId}`);
+    if (src === "cloudflare_export")
+      args.push(
+        `--cloudflare ${q(input("cfFile").value.split(/[\\/]/).pop()!)}`
+      );
+    if (src === "screenshot")
+      args.push(`--screenshot ${q(shotName)}`, `--tool ${tool}`);
+    if (val("node")) args.push(`--node ${q(val("node"))}`);
+    if (at) args.push(`--at ${q(at.replace("T", " "))}`);
+    if (nums.down !== null) args.push(`--down ${nums.down}`);
+    if (nums.up !== null) args.push(`--up ${nums.up}`);
+    if (nums.latency !== null) args.push(`--latency ${nums.latency}`);
+    if (nums.jitter !== null) args.push(`--jitter ${nums.jitter}`);
+    for (const k of ["isp", "location", "bandwidth", "notes"])
+      if (val(k)) args.push(`--${k} ${q(val(k))}`);
+    if (client) args.push(`--client ${q(client)}`);
+    if (protocol) args.push(`--protocol ${q(protocol)}`);
+
+    $<HTMLElement>("[data-cmd]").textContent = args.join(" \\\n  ");
+    $<HTMLElement>("[data-json]").textContent = JSON.stringify(record, null, 2);
+    $<HTMLElement>("[data-verify-cmd]").textContent =
+      `node scripts/import-test.mjs --verify ${id}`;
+    out.classList.remove("hidden");
+    out.classList.add("grid");
+  });
+
+  const status = () => $<HTMLElement>("[data-copy-status]");
+  form.addEventListener("click", async e => {
+    const t = (e.target as HTMLElement).closest<HTMLElement>(
+      "[data-copy],[data-download]"
+    );
+    if (!t) return;
+    if (t.dataset.copy) {
+      const text =
+        $<HTMLElement>(t.dataset.copy === "cmd" ? "[data-cmd]" : "[data-json]")
+          .textContent ?? "";
+      try {
+        await navigator.clipboard.writeText(text);
+        status().textContent = "已复制";
+      } catch {
+        status().textContent = "复制失败，请手动选择文字复制";
+      }
+    } else {
+      const text = $<HTMLElement>("[data-json]").textContent ?? "";
+      const id = JSON.parse(text).id as string;
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(
+        new Blob([text], { type: "application/json" })
+      );
+      a.download = `${id}.json`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+  });
+</script>

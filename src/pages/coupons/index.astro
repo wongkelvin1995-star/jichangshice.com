@@ -1,0 +1,495 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Breadcrumbs from "@/components/Breadcrumbs.astro";
+import BrandAvatar from "@/components/BrandAvatar.astro";
+import CouponBox from "@/components/CouponBox.astro";
+import EntryLink from "@/components/EntryLink.astro";
+import {
+  getProviders,
+  getPlans,
+  startingMonthly,
+  trafficLabel,
+} from "@/utils/plans";
+import { brandRows } from "@/utils/brandProfile";
+import { couponVerifiedAt } from "@/data/coupon-status";
+import { fmtMoney } from "@/utils/format";
+import { breadcrumbJsonLd } from "@/utils/jsonld";
+import config from "@/config";
+
+const providers = await getProviders();
+const plans = await getPlans();
+const withCoupon = providers.filter(p => p.coupon);
+const without = providers.filter(p => !p.coupon && p.hasProfile);
+const checked = withCoupon
+  .map(p => p.couponCheckedAt)
+  .filter(Boolean)
+  .sort()
+  .at(-1);
+const rows = brandRows(withCoupon, plans);
+const protocolOptions = [...new Set(rows.flatMap(r => r.protocols))];
+const crumbs = [{ name: "机场优惠码" }];
+const path = "/coupons/";
+---
+
+<Layout
+  title={`机场优惠码大全｜机场套餐价格、每GB流量成本与服务对比｜${config.site.title}`}
+  description={`${withCoupon.length} 家机场优惠码汇总，包括${withCoupon
+    .slice(0, 5)
+    .map(p => `${p.name} ${p.coupon}`)
+    .join(
+      "、"
+    )}等，一键复制；对比每 GB 流量成本、协议、付款方式与解锁资料，附使用方法，折扣以结算页为准。`}
+  canonicalPath={path}
+  jsonLd={[breadcrumbJsonLd(crumbs, path)]}
+>
+  <main id="main-content" data-pagefind-body>
+    <section class="hero-band relative border-b">
+      <div class="app-layout relative py-8 sm:py-10">
+        <Breadcrumbs items={crumbs} />
+        <h1 class="text-[1.8rem] font-black tracking-tight sm:text-[2.4rem]">
+          机场优惠码大全
+        </h1>
+        <p class="text-muted-foreground mt-3 max-w-3xl leading-relaxed">
+          这里汇总 {withCoupon.length} 家机场的优惠码，由站长整理提供，最后更新 {
+            checked
+          }。折扣幅度、适用套餐、有效期和能否叠加，以服务商结算页显示为准；如果输入后提示无效，说明活动已调整，欢迎到
+          TG 频道反馈。
+        </p>
+      </div>
+    </section>
+
+    <section class="app-layout pt-8" aria-labelledby="quick">
+      <h2 id="quick" class="section-title">机场优惠码与资料对比表</h2>
+      <p class="text-muted-foreground mt-2 max-w-4xl text-sm leading-relaxed">
+        「1GB 流量」是每 GB
+        的套餐成本：用各家最便宜、价格和每月流量都明确的月付档计算（价格 ÷
+        每月流量），不计优惠码折扣。年付或一次性流量包的单价不能和月付直接比，表中不混用；没有准确资料的项目显示“—”。
+      </p>
+
+      <form
+        class="card mt-4 grid grid-cols-2 gap-3 p-3 sm:grid-cols-3 sm:p-4"
+        data-coupon-filters
+        aria-label="筛选与排序"
+        onsubmit="return false"
+      >
+        <label class="col-span-2 flex flex-col gap-1 text-sm sm:col-span-1">
+          <span class="font-medium">搜索机场</span>
+          <input
+            type="search"
+            name="q"
+            placeholder="输入名称，如 灵动云"
+            class="bg-background h-10 rounded-lg border px-3"
+            autocomplete="off"
+          />
+        </label>
+        <label class="flex flex-col gap-1 text-sm">
+          <span class="font-medium">排序</span>
+          <select name="sort" class="bg-background h-10 rounded-lg border px-2">
+            <option value="">编辑精选顺序</option>
+            <option value="asc">1GB 单价从低到高</option>
+            <option value="desc">1GB 单价从高到低</option>
+          </select>
+        </label>
+        <label class="flex flex-col gap-1 text-sm">
+          <span class="font-medium">协议</span>
+          <select
+            name="protocol"
+            class="bg-background h-10 rounded-lg border px-2"
+          >
+            <option value="">全部协议</option>
+            {protocolOptions.map(x => <option value={x}>{x}</option>)}
+          </select>
+        </label>
+        <p
+          class="text-muted-foreground col-span-2 text-xs sm:col-span-3"
+          aria-live="polite"
+          data-coupon-count
+        >
+          共 {rows.length} 家
+        </p>
+      </form>
+
+      <p class="text-muted-foreground mt-3 mb-2 text-xs md:hidden">
+        ← 表格可左右滑动 →
+      </p>
+      <div
+        class="table-scroll card md:mt-3"
+        tabindex="0"
+        role="region"
+        aria-label="机场优惠码与资料对比表"
+      >
+        <table
+          class="coupon-table w-full min-w-[1080px] text-[0.8125rem]"
+          data-coupon-table
+        >
+          <caption class="sr-only">机场优惠码与资料对比表</caption>
+          <thead>
+            <tr>
+              <th scope="col" class="sticky-col">名称</th>
+              <th scope="col">优惠码</th>
+              <th scope="col">1GB 流量</th>
+              <th scope="col" class="text-center">成立时间</th>
+              <th scope="col" class="text-center">免翻墙</th>
+              <th scope="col">协议</th>
+              <th scope="col">付款方式</th>
+              <th scope="col" title="服务商资料中的解锁说法，未经本站逐节点测试"
+                >解锁（资料）</th
+              >
+              <th scope="col">特色</th>
+              <th scope="col">入口</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              rows.map((r, i) => (
+                <tr
+                  data-row
+                  class={i % 2 === 1 ? "alt" : undefined}
+                  data-order={i}
+                  data-search={r.search}
+                  data-pergb={r.perGB ?? ""}
+                  data-protocols={r.protocols.join("|")}
+                  data-placement={`coupon-table-${i + 1}`}
+                >
+                  <th scope="row" class="sticky-col font-semibold">
+                    {r.url ? (
+                      <a
+                        href={r.url}
+                        class="text-accent-strong underline underline-offset-2 hover:no-underline"
+                      >
+                        {r.name}
+                      </a>
+                    ) : (
+                      <a
+                        href="/airports/"
+                        class="text-accent-strong underline underline-offset-2 hover:no-underline"
+                      >
+                        {r.name}
+                      </a>
+                    )}
+                  </th>
+                  <td>
+                    {r.coupon ? (
+                      <span class="flex items-center gap-1.5 whitespace-nowrap">
+                        <code class="num bg-gold-soft text-foreground rounded px-2 py-0.5 font-bold select-all">
+                          {r.coupon}
+                        </code>
+                        <button
+                          type="button"
+                          class="text-gold rounded px-1 text-xs font-semibold hover:underline"
+                          data-copy={r.coupon}
+                          data-brand={r.name}
+                          aria-label={`复制${r.name}优惠码 ${r.coupon}`}
+                        >
+                          复制
+                        </button>
+                        <span
+                          class:list={[
+                            "rounded px-1.5 py-0.5 text-[0.68rem] font-semibold",
+                            couponVerifiedAt(r.slug)
+                              ? "bg-signal-soft text-signal"
+                              : "bg-muted text-muted-foreground",
+                          ]}
+                          title={
+                            couponVerifiedAt(r.slug)
+                              ? `已于 ${couponVerifiedAt(r.slug)} 在结算页验证`
+                              : "站长提供，尚未在结算页验证折扣"
+                          }
+                        >
+                          {couponVerifiedAt(r.slug) ? "已验证" : "待验证"}
+                        </span>
+                      </span>
+                    ) : (
+                      <span class="text-muted-foreground">—</span>
+                    )}
+                  </td>
+                  <td class="whitespace-nowrap">
+                    {r.perGB !== null ? (
+                      <span
+                        title={`按 ${r.perGBBasis} 计算${r.perGBObservedAt ? `，资料日期 ${r.perGBObservedAt}` : ""}${r.perGBVerified ? "，结算页核对" : ""}`}
+                      >
+                        <b class="num text-accent-strong">
+                          ¥{r.perGB.toFixed(2)}/GB
+                        </b>
+                        <span class="text-muted-foreground num block text-[0.7rem]">
+                          {r.perGBBasis}
+                        </span>
+                      </span>
+                    ) : (
+                      <span class="text-muted-foreground">—</span>
+                    )}
+                  </td>
+                  <td class="text-center">
+                    {r.founded ? <span class="num">{r.founded}</span> : "—"}
+                  </td>
+                  <td class="text-center">
+                    {r.freeAccess === null ? "—" : r.freeAccess ? "是" : "否"}
+                  </td>
+                  <td class="whitespace-nowrap">
+                    {r.protocols.length
+                      ? r.protocols
+                          .map(x => (x === "Shadowsocks" ? "SS" : x))
+                          .join(", ")
+                      : "—"}
+                  </td>
+                  <td class="whitespace-nowrap">
+                    {r.payments.length ? r.payments.join(", ") : "—"}
+                  </td>
+                  <td>{r.unlock.length ? r.unlock.join(", ") : "—"}</td>
+                  <td>{r.features.length ? r.features.join(", ") : "—"}</td>
+                  <td class="whitespace-nowrap">
+                    <EntryLink
+                      href={r.entryUrl}
+                      brand={r.name}
+                      label="当前套餐"
+                      class="text-accent-strong font-semibold hover:underline"
+                    />
+                  </td>
+                </tr>
+              ))
+            }
+            <tr class="hidden" data-coupon-empty>
+              <td colspan="10" class="text-muted-foreground py-8 text-center">
+                没有符合条件的机场，请调整搜索或筛选。
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section
+      class="app-layout app-prose max-w-read pt-10"
+      aria-labelledby="price-guide"
+    >
+      <h2 id="price-guide">怎样比较流量单价、套餐周期和优惠码</h2>
+      <p>
+        同样标价 ¥20，一家给 100GB、另一家给 200GB，每 GB
+        成本就差了一倍。所以比较套餐时先看「1GB
+        流量」：用付款金额除以每月流量。单价越低，同样的钱能用的流量越多；但只看单价也不够，还要看自己每月大约用多少——每月只用
+        50GB 的人，买 500GB 的低单价大档反而多花钱。
+      </p>
+      <p>
+        付款周期要分开看。季付、年付通常有折扣，但需要一次付清，中途不想用了也不一定能退；一次性流量包不按月重置，用完为止，单价往往比月付高，适合用量很少的人。建议第一次购买先选月付，用一个月确认速度和稳定性，再考虑长周期。
+      </p>
+      <p>
+        优惠码在结算页的“优惠码”输入框使用，折扣幅度、适用周期和能否叠加以结算页显示为准，表中的单价没有计入折扣。部分优惠码只适用于特定周期，见表中优惠码下方的说明。
+      </p>
+    </section>
+
+    <section class="app-layout pt-12" aria-labelledby="list">
+      <h2 id="list" class="section-title">
+        各机场优惠码详情（{withCoupon.length}）
+      </h2>
+      <div class="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {
+          withCoupon.map((p, i) => {
+            const s = startingMonthly(plans, p.slug);
+            return (
+              <article
+                class="card flex flex-col p-5"
+                data-placement={`coupon-${i + 1}`}
+              >
+                <h3 class="flex items-center gap-2.5 text-lg font-extrabold">
+                  <BrandAvatar name={p.name} size="sm" />
+                  {p.name}
+                </h3>
+                {s && (
+                  <p class="text-muted-foreground num mt-2 text-sm">
+                    月付起步参考{" "}
+                    <b class="text-accent-strong">
+                      {fmtMoney(s.paymentAmount!)}/月
+                    </b>{" "}
+                    · {trafficLabel(s).main}
+                  </p>
+                )}
+                <div class="mt-3 flex-1">
+                  <CouponBox
+                    code={p.coupon!}
+                    note={p.couponNote}
+                    brand={p.name}
+                    slug={p.slug}
+                  />
+                </div>
+                <div class="mt-4 grid gap-2">
+                  <EntryLink
+                    href={p.entryUrl}
+                    brand={p.name}
+                    label="使用优惠码查看当前套餐"
+                    class="btn btn-primary w-full px-3 text-[0.9rem] whitespace-nowrap"
+                  />
+                  {p.hasProfile && (
+                    <a
+                      href={`/airports/${p.slug}/`}
+                      class="btn btn-outline w-full"
+                    >
+                      查看 {p.name} 机场测评
+                    </a>
+                  )}
+                </div>
+              </article>
+            );
+          })
+        }
+      </div>
+    </section>
+
+    <section
+      class="app-layout app-prose max-w-read pt-12"
+      aria-labelledby="howto"
+    >
+      <h2 id="howto">优惠码怎么用</h2>
+      <ol>
+        <li>点击上方“使用优惠码查看当前套餐”，进入服务商页面并注册或登录；</li>
+        <li>选择套餐和付款周期，进入结算页；</li>
+        <li>在“优惠码”或“折扣码”输入框粘贴优惠码，点击验证；</li>
+        <li>确认结算页显示的折后价格，再完成付款。</li>
+      </ol>
+      <h2>使用前注意</h2>
+      <ul>
+        <li>
+          部分优惠码只适用于新用户或特定付款周期，例如资料记录飞猫云的优惠码适用于季付及以上；
+        </li>
+        <li>优惠码通常不能与其他活动叠加，续费时可能恢复原价；</li>
+        <li>
+          折后价以结算页为准，本站列出的价格都是折扣前价格（历史参考或结算页截图）；
+        </li>
+        <li>
+          付款前仍要核对流量重置、设备数和退款规则，见<a
+            href="/guides/check-before-buying/">购买前核对的条款</a
+          >。
+        </li>
+      </ul>
+    </section>
+
+    {
+      without.length > 0 && (
+        <section class="app-layout pt-10" aria-labelledby="none">
+          <h2 id="none" class="section-title">
+            暂无优惠码的机场
+          </h2>
+          <p class="text-muted-foreground mt-2 mb-4 text-sm">
+            以下机场目前没有确认可用的优惠码，可直接查看资料与当前套餐。
+          </p>
+          <ul class="flex flex-wrap gap-2">
+            {without.map(p => (
+              <li>
+                <a
+                  href={`/airports/${p.slug}/`}
+                  class="chip hover:text-accent-strong"
+                >
+                  {p.name} · 暂无
+                </a>
+              </li>
+            ))}
+            <li>
+              <a href="/airports/" class="chip text-accent-strong">
+                全部机场目录 →
+              </a>
+            </li>
+          </ul>
+        </section>
+      )
+    }
+  </main>
+</Layout>
+
+<style>
+  .coupon-table {
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  .coupon-table th,
+  .coupon-table td {
+    padding: 0.7rem 0.6rem;
+    text-align: start;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .coupon-table thead th {
+    background: var(--muted);
+    color: var(--foreground);
+    font-weight: 700;
+    font-size: 0.8125rem;
+    white-space: nowrap;
+  }
+  .coupon-table tbody tr[data-row] > * {
+    background: #fff;
+  }
+  .coupon-table tbody tr[data-row].alt > * {
+    background: #f6f8fb;
+  }
+  .coupon-table tbody tr[data-row]:hover > * {
+    background: var(--accent-soft);
+  }
+  .coupon-table .sticky-col {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    min-width: 6.5rem;
+    white-space: nowrap;
+    box-shadow: 1px 0 0 var(--border);
+  }
+  .coupon-table thead .sticky-col {
+    z-index: 2;
+  }
+</style>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>("[data-coupon-filters]");
+  const table = document.querySelector<HTMLTableElement>("[data-coupon-table]");
+  if (form && table) {
+    const tbody = table.tBodies[0];
+    const rows = Array.from(
+      tbody.querySelectorAll<HTMLTableRowElement>("tr[data-row]")
+    );
+    const empty = tbody.querySelector<HTMLTableRowElement>(
+      "tr[data-coupon-empty]"
+    );
+    const count = form.querySelector<HTMLElement>("[data-coupon-count]");
+    const val = (n: string) =>
+      (form.elements.namedItem(n) as HTMLInputElement | HTMLSelectElement)
+        .value;
+
+    function apply() {
+      const q = val("q").trim().toLowerCase();
+      const sort = val("sort");
+      const proto = val("protocol");
+      const sorted = [...rows].sort((a, b) => {
+        if (!sort) return Number(a.dataset.order) - Number(b.dataset.order);
+        const pa = a.dataset.pergb ? Number(a.dataset.pergb) : null;
+        const pb = b.dataset.pergb ? Number(b.dataset.pergb) : null;
+        // 没有单价的排在最后，其余按单价排序，单价相同按默认顺序
+        if (pa === null || pb === null)
+          return pa === null && pb === null
+            ? Number(a.dataset.order) - Number(b.dataset.order)
+            : pa === null
+              ? 1
+              : -1;
+        return (
+          (sort === "asc" ? pa - pb : pb - pa) ||
+          Number(a.dataset.order) - Number(b.dataset.order)
+        );
+      });
+      let shown = 0;
+      for (const r of sorted) {
+        const ok =
+          (!q || (r.dataset.search ?? "").includes(q)) &&
+          (!proto || (r.dataset.protocols ?? "").split("|").includes(proto));
+        r.hidden = !ok;
+        tbody.insertBefore(r, empty);
+        if (ok) r.classList.toggle("alt", shown++ % 2 === 1);
+      }
+      empty?.classList.toggle("hidden", shown > 0);
+      if (count)
+        count.textContent =
+          shown === rows.length
+            ? `共 ${rows.length} 家`
+            : `显示 ${shown} / ${rows.length} 家`;
+    }
+    form.addEventListener("input", apply);
+    form.addEventListener("change", apply);
+    apply();
+  }
+</script>

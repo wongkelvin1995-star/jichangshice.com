@@ -1,0 +1,151 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Breadcrumbs from "@/components/Breadcrumbs.astro";
+import {
+  getPublishedPosts,
+  postUrl,
+  readingMinutes,
+  type Post,
+} from "@/utils/posts";
+import { CATEGORIES, CATEGORY_LIST, type Category } from "@/data/categories";
+import { formatDate } from "@/utils/format";
+import { breadcrumbJsonLd, itemListJsonLd } from "@/utils/jsonld";
+import config from "@/config";
+
+/** 只为已有正式文章的栏目生成页面，不发布空栏目 */
+export async function getStaticPaths() {
+  const posts = await getPublishedPosts();
+  return Object.values(CATEGORIES)
+    .map(cat => ({
+      cat,
+      list: posts.filter(p => p.data.category === cat.slug),
+    }))
+    .filter(x => x.list.length > 0)
+    .map(({ cat, list }) => ({
+      params: { category: cat.slug },
+      props: { cat, list },
+    }));
+}
+
+type Props = { cat: Category; list: Post[] };
+const { cat, list } = Astro.props;
+const path = `/${cat.slug}/`;
+const crumbs = [{ name: cat.name }];
+const allPosts = await getPublishedPosts();
+const otherCats = CATEGORY_LIST.filter(
+  c => c.slug !== cat.slug && allPosts.some(p => p.data.category === c.slug)
+);
+const [first, ...rest] = list;
+---
+
+<Layout
+  title={`${cat.title}｜${config.site.title}`}
+  description={cat.description}
+  canonicalPath={path}
+  jsonLd={[
+    breadcrumbJsonLd(crumbs, path),
+    itemListJsonLd(
+      cat.name,
+      list.map(p => ({ name: p.data.title, url: postUrl(p) }))
+    ),
+  ]}
+>
+  <main id="main-content" data-pagefind-body>
+    <section class="hero-band relative border-b">
+      <div class="app-layout relative py-8 sm:py-10">
+        <Breadcrumbs items={crumbs} />
+        <p class="eyebrow">{list.length} 篇文章</p>
+        <h1
+          class="mt-2 text-[1.8rem] font-black tracking-tight sm:text-[2.4rem]"
+        >
+          {cat.name}
+        </h1>
+        <p
+          class="text-muted-foreground mt-3 max-w-3xl text-[1.05rem] leading-relaxed"
+        >
+          {cat.intro}
+        </p>
+        <nav aria-label="其他栏目" class="mt-5" data-pagefind-ignore>
+          <ul class="flex flex-wrap gap-2">
+            {
+              otherCats.map(c => (
+                <li>
+                  <a href={`/${c.slug}/`} class="chip hover:text-accent-strong">
+                    {c.name}
+                  </a>
+                </li>
+              ))
+            }
+            <li>
+              <a href="/recommendations/" class="chip hover:text-accent-strong"
+                >机场推荐</a
+              >
+            </li>
+            <li>
+              <a href="/faq/" class="chip hover:text-accent-strong">常见问题</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </section>
+
+    <div class="app-layout pt-8">
+      {
+        first && (
+          <a
+            href={postUrl(first)}
+            class="ink-panel block rounded-[18px] p-6 text-white sm:p-8"
+          >
+            <span class="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold">
+              栏目精选
+            </span>
+            <h2 class="mt-4 text-[1.35rem] leading-snug font-extrabold sm:text-[1.7rem]">
+              {first.data.title}
+            </h2>
+            <p class="mt-2 max-w-3xl text-sm leading-relaxed text-white/75">
+              {first.data.description}
+            </p>
+            <span class="mt-4 inline-block text-sm font-semibold text-[#9cc3ff]">
+              阅读全文 →{" "}
+              <span class="ms-2 text-white/50">
+                约 {readingMinutes(first)} 分钟
+              </span>
+            </span>
+          </a>
+        )
+      }
+      <ul class="mt-6 grid gap-4 md:grid-cols-2">
+        {
+          rest.map(p => (
+            <li class="card flex flex-col p-5">
+              <div
+                class="text-muted-foreground flex gap-2 text-xs"
+                data-pagefind-ignore
+              >
+                <time datetime={p.data.pubDatetime.toISOString()}>
+                  {formatDate(p.data.modDatetime ?? p.data.pubDatetime)}
+                </time>
+                <span>· 约 {readingMinutes(p)} 分钟</span>
+              </div>
+              <h2 class="mt-2 text-[1.05rem] leading-snug font-bold">
+                <a href={postUrl(p)} class="hover:text-accent-strong">
+                  {p.data.title}
+                </a>
+              </h2>
+              <p class="text-muted-foreground mt-2 flex-1 text-sm leading-relaxed">
+                {p.data.description}
+              </p>
+              <a
+                href={postUrl(p)}
+                class="text-accent-strong mt-3 text-sm font-semibold hover:underline"
+                data-pagefind-ignore
+              >
+                阅读全文 →
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </main>
+</Layout>

@@ -1,0 +1,142 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Breadcrumbs from "@/components/Breadcrumbs.astro";
+import BrandAvatar from "@/components/BrandAvatar.astro";
+import EntryLink from "@/components/EntryLink.astro";
+import TestRecordCard from "@/components/TestRecordCard.astro";
+import OwnRunsTable from "@/components/OwnRunsTable.astro";
+import { getProviders } from "@/utils/plans";
+import { getTestRecords, recordsOf } from "@/utils/testRecords";
+import { getVerifiedRuns, runsOf } from "@/utils/testRuns";
+import { breadcrumbJsonLd } from "@/utils/jsonld";
+import config from "@/config";
+
+export async function getStaticPaths() {
+  const providers = await getProviders();
+  const records = await getTestRecords();
+  const runs = getVerifiedRuns();
+  return providers
+    .map(p => ({
+      p,
+      rs: recordsOf(records, p.slug),
+      own: runsOf(runs, p.slug),
+    }))
+    .filter(x => x.rs.length > 0 || x.own.length > 0)
+    .map(x => ({ params: { slug: x.p.slug }, props: x }));
+}
+const { p, rs, own } = Astro.props;
+const path = `/test-records/${p.slug}/`;
+const crumbs = [
+  { name: "机场测试档案", href: "/test-records/" },
+  { name: `${p.name}测速记录` },
+];
+const evidence = rs.reduce(
+  (n, r) => n + r.data.rows.filter(x => x.evidenceUrl).length,
+  0
+);
+const dates = [
+  ...rs.map(r => r.data.recordedAt),
+  ...own.map(r => r.testedAt.slice(0, 10)),
+].sort();
+const range =
+  dates[0] === dates.at(-1) ? dates[0] : `${dates[0]} 至 ${dates.at(-1)}`;
+const hasPeak = rs.some(r =>
+  [r.data.window, ...r.data.rows.map(x => x.window)].some(w =>
+    w?.includes("晚高峰")
+  )
+);
+---
+
+<Layout
+  title={`${p.name}测速记录：${own.length ? `本站实测 ${own.length} 条，` : ""}公开测速参考 ${rs.length} 批｜${config.site.title}`}
+  description={`${p.name}机场测试档案（${range}）：${own.length ? `本站实测 ${own.length} 条，` : "暂无本站实测，"}公开测速参考 ${rs.length} 批${evidence ? `（含 ${evidence} 条 Speedtest 原始结果）` : ""}，注明来源、测试时段、工具与数据局限。`}
+  canonicalPath={path}
+  jsonLd={[breadcrumbJsonLd(crumbs, path)]}
+>
+  <main id="main-content" data-pagefind-body>
+    <section class="hero-band relative border-b">
+      <div class="app-layout relative py-8 sm:py-10">
+        <Breadcrumbs items={crumbs} />
+        <div class="flex items-start gap-4">
+          <BrandAvatar name={p.name} />
+          <div class="min-w-0">
+            <h1
+              class="text-[1.6rem] leading-snug font-black tracking-tight sm:text-[2.1rem]"
+            >
+              {p.name}测速记录
+            </h1>
+            <p class="text-muted-foreground mt-2 max-w-3xl leading-relaxed">
+              本站测试 {own.length} 条（已核验）；公开测速参考 {rs.length} 批{
+                evidence ? `，其中 ${evidence} 条附 Speedtest 原始结果链接` : ""
+              }{
+                hasPeak ? "，包含晚高峰时段" : ""
+              }。不同批次的工具和测试端不同，请勿横向比较。
+            </p>
+          </div>
+        </div>
+        <div class="mt-5 flex flex-wrap gap-2">
+          {
+            p.hasProfile && (
+              <a href={`/airports/${p.slug}/`} class="btn btn-outline">
+                {p.name}机场测评
+              </a>
+            )
+          }
+          <EntryLink
+            href={p.entryUrl}
+            brand={p.name}
+            label="查看当前套餐"
+            class="btn btn-primary"
+          />
+        </div>
+      </div>
+    </section>
+
+    <div class="app-layout grid grid-cols-[minmax(0,1fr)] gap-6 pt-8">
+      <section aria-labelledby="own-tests">
+        <h2 id="own-tests" class="section-title">本站测试</h2>
+        {
+          own.length > 0 ? (
+            <div class="mt-4">
+              <OwnRunsTable runs={own} caption={`${p.name}本站测试记录`} />
+            </div>
+          ) : (
+            <p class="text-muted-foreground mt-2 text-sm leading-relaxed">
+              暂无本站测试记录。本站只发布自己测得、附原始结果并核验通过的数据，
+              {p.name}
+              还没有这样的记录。
+            </p>
+          )
+        }
+      </section>
+      {
+        rs.length > 0 && (
+          <section aria-labelledby="public-refs" class="grid gap-6">
+            <div>
+              <h2 id="public-refs" class="section-title">
+                公开测速参考
+              </h2>
+              <p class="text-muted-foreground mt-2 text-sm">
+                每条记录注明来源并链接原页面，不计入「本站测试」。
+              </p>
+            </div>
+            {rs.map(r => (
+              <TestRecordCard record={r} headingLevel="h3" />
+            ))}
+          </section>
+        )
+      }
+      <p class="text-muted-foreground text-sm">
+        想自己复测？按<a
+          href="/methods/record-node-speed-test/"
+          class="text-accent-strong underline underline-offset-2"
+          >怎样记录一次可复核的节点测速</a
+        >操作，并在 20:00–23:00 至少补测一次。其他机场的记录见<a
+          href="/test-records/"
+          class="text-accent-strong underline underline-offset-2"
+          >机场测试档案</a
+        >。
+      </p>
+    </div>
+  </main>
+</Layout>

@@ -1,0 +1,56 @@
+---
+/** 独立说明页（关于、合作说明、测试方法、FAQ 等），内容来自 src/content/pages/*.md */
+import { getEntry, render } from "astro:content";
+import Layout from "./Layout.astro";
+import Breadcrumbs from "@/components/Breadcrumbs.astro";
+import Toc from "@/components/Toc.astro";
+import { formatDate } from "@/utils/format";
+import { breadcrumbJsonLd } from "@/utils/jsonld";
+import config from "@/config";
+
+type Props = { id: string; crumbName: string; titleTag?: string };
+const { id, crumbName, titleTag } = Astro.props;
+const entry = await getEntry("pages", id);
+if (!entry) throw new Error(`缺少页面内容：src/content/pages/${id}.md`);
+const { Content, headings } = await render(entry);
+const path = `/${id}/`;
+const crumbs = [{ name: crumbName }];
+const jsonLd: Record<string, unknown>[] = [breadcrumbJsonLd(crumbs, path)];
+---
+
+<Layout
+  title={titleTag ?? `${entry.data.title}｜${config.site.title}`}
+  description={entry.data.description}
+  canonicalPath={path}
+  jsonLd={jsonLd}
+>
+  <main id="main-content" class="app-layout pt-6">
+    <div
+      class="grid gap-10 lg:grid-cols-[minmax(0,760px)_240px] lg:justify-between"
+    >
+      <article data-pagefind-body class="card min-w-0 p-5 sm:p-8">
+        <Breadcrumbs items={crumbs} />
+        <h1 class="text-[1.65rem] leading-snug font-bold sm:text-[2rem]">
+          {entry.data.title}
+        </h1>
+        <p class="text-muted-foreground mt-2 text-sm" data-pagefind-ignore>
+          更新于 <time datetime={entry.data.updated.toISOString()}
+            >{formatDate(entry.data.updated)}</time
+          >
+        </p>
+        <slot name="after-title" />
+        {entry.data.showToc && <Toc headings={headings} variant="mobile" />}
+        <div class="app-prose mt-6" id="article"><Content /></div>
+      </article>
+      {
+        entry.data.showToc && (
+          <aside class="hidden lg:block">
+            <div class="sticky top-[calc(var(--header-h)+24px)]">
+              <Toc headings={headings} variant="desktop" />
+            </div>
+          </aside>
+        )
+      }
+    </div>
+  </main>
+</Layout>

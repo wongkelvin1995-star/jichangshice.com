@@ -1,0 +1,19 @@
+---
+/** 把当前页面记入本地浏览历史（机场详情页、文章页使用）。 */
+type Props = { type: "airport" | "article"; title: string };
+const { type, title } = Astro.props;
+---
+
+<span hidden data-visit-type={type} data-visit-title={title}></span>
+
+<script>
+  import { recordVisit } from "@/utils/userStore";
+  const el = document.querySelector<HTMLElement>("[data-visit-type]");
+  if (el) {
+    recordVisit({
+      url: location.pathname,
+      title: el.dataset.visitTitle ?? document.title,
+      type: el.dataset.visitType === "airport" ? "airport" : "article",
+    });
+  }
+</script>

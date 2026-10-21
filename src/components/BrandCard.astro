@@ -1,0 +1,190 @@
+---
+/**
+ * 品牌卡片：编辑排列徽章 + 资料要点 + 右侧参考价格框 + 入口按钮。
+ * 不显示评分与“实测名次”：本站尚无测试记录。
+ */
+import { FEATURED_COUNT } from "@/data/editorial-order";
+import BrandAvatar from "./BrandAvatar.astro";
+import EntryLink from "./EntryLink.astro";
+import CouponBox from "./CouponBox.astro";
+import {
+  startingMonthly,
+  cycleList,
+  type Plan,
+  type Provider,
+  evidenceLabel,
+  trafficSuffix,
+} from "@/utils/plans";
+import { fmtGB, fmtMoney } from "@/utils/format";
+import { BRAND_BLURBS } from "@/data/editorial";
+
+type Props = {
+  provider: Provider;
+  plans: Plan[];
+  rank: number;
+  headingLevel?: "h2" | "h3";
+};
+const { provider: p, plans, rank, headingLevel: H = "h3" } = Astro.props;
+const start = startingMonthly(plans, p.slug);
+const cycles = cycleList(plans, p.slug);
+const count = plans.filter(x => x.providerId === p.slug).length;
+const conflicts = plans.filter(
+  x => x.providerId === p.slug && x.conflicts.length
+).length;
+const claims = p.claims;
+const blurb = BRAND_BLURBS[p.slug];
+const top = rank <= FEATURED_COUNT;
+const chips = [...(claims?.lineTypes ?? []), ...(claims?.protocols ?? [])];
+---
+
+<article
+  data-placement={`brand-card-${rank}`}
+  class="card grid overflow-hidden md:grid-cols-[minmax(0,1fr)_250px]"
+  aria-labelledby={`brand-${p.slug}`}
+>
+  <div class="min-w-0 p-5 sm:p-6">
+    <div class="flex flex-wrap items-center gap-2">
+      <span
+        class:list={[
+          "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold",
+          top ? "bg-gold-soft text-gold" : "bg-muted text-muted-foreground",
+        ]}
+      >
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          aria-hidden="true"
+          ><path
+            d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17l-6.1 3.4 1.5-6.8L2.2 9l6.9-.7z"
+          ></path></svg
+        >
+        编辑精选 No.{rank}
+      </span>
+      {
+        conflicts > 0 && (
+          <span class="bg-warn-soft text-warn rounded-full px-2.5 py-1 text-xs font-medium">
+            {conflicts} 档来源不一致
+          </span>
+        )
+      }
+    </div>
+
+    <div class="mt-3 flex items-center gap-3">
+      <BrandAvatar name={p.name} />
+      <div class="min-w-0">
+        <H id={`brand-${p.slug}`} class="text-xl leading-tight font-extrabold">
+          <a href={`/airports/${p.slug}/`} class="hover:text-accent-strong"
+            >{p.name}</a
+          >
+        </H>
+        {
+          (p.englishName || p.aliases.length > 0) && (
+            <p class="text-muted-foreground mt-0.5 truncate text-xs">
+              {[p.englishName, ...p.aliases.filter(a => !a.includes(p.name))]
+                .filter(Boolean)
+                .join(" · ")}
+            </p>
+          )
+        }
+      </div>
+    </div>
+
+    {blurb && <p class="mt-3 text-[0.95rem] leading-relaxed">{blurb}</p>}
+
+    <dl class="mt-4 grid gap-x-6 gap-y-2.5 text-sm sm:grid-cols-2">
+      <div class="flex gap-2">
+        <dt class="text-muted-foreground shrink-0">付款周期</dt>
+        <dd class="font-medium">{cycles.join(" / ") || "—"}</dd>
+      </div>
+      <div class="flex gap-2">
+        <dt class="text-muted-foreground shrink-0">历史档位</dt>
+        <dd class="num font-medium">{count} 档</dd>
+      </div>
+      {
+        claims && claims.ai.length > 0 && (
+          <div class="flex gap-2">
+            <dt class="text-muted-foreground shrink-0">资料提及 AI</dt>
+            <dd class="min-w-0">{claims.ai.join("、")}</dd>
+          </div>
+        )
+      }
+      {
+        claims && claims.streaming.length > 0 && (
+          <div class="flex gap-2">
+            <dt class="text-muted-foreground shrink-0">资料提及流媒体</dt>
+            <dd class="min-w-0">{claims.streaming.join("、")}</dd>
+          </div>
+        )
+      }
+    </dl>
+
+    {
+      chips.length > 0 && (
+        <ul
+          class="mt-4 flex flex-wrap gap-1.5"
+          aria-label="资料提及的线路与协议"
+        >
+          {chips.map(c => (
+            <li class="chip">{c}</li>
+          ))}
+        </ul>
+      )
+    }
+  </div>
+
+  <aside
+    class="bg-surface flex flex-col justify-center gap-3 border-t p-5 md:border-s md:border-t-0"
+  >
+    {
+      start ? (
+        <div>
+          <p class="text-muted-foreground text-xs">
+            月付起步 · {evidenceLabel(start)}
+          </p>
+          <p class="num text-accent-strong mt-1 text-[1.9rem] leading-none font-extrabold">
+            {fmtMoney(start.paymentAmount!)}
+            <span class="text-muted-foreground text-sm font-medium">/月</span>
+          </p>
+          <p class="text-muted-foreground mt-1.5 text-xs">
+            基础流量{" "}
+            <span class="num text-foreground font-semibold">
+              {fmtGB(start.trafficGB!)}
+            </span>
+            {trafficSuffix(start)}
+            {!start.currentVerified && start.observedAt && (
+              <> · 整理 {start.observedAt}</>
+            )}
+          </p>
+          {start.trafficGB && (
+            <p class="text-muted-foreground mt-1 text-xs">
+              每 GB 成本{" "}
+              <span class="num text-foreground font-semibold">
+                ¥{(start.paymentAmount! / start.trafficGB).toFixed(2)}/GB
+              </span>
+            </p>
+          )}
+        </div>
+      ) : (
+        <p class="text-muted-foreground text-sm">
+          暂无一致的月付记录，见资料页套餐表。
+        </p>
+      )
+    }
+    {
+      p.coupon && (
+        <CouponBox code={p.coupon} brand={p.name} slug={p.slug} compact />
+      )
+    }
+    <a href={`/airports/${p.slug}/`} class="btn btn-outline w-full"
+      >查看 {p.name} 机场测评</a
+    >
+    <EntryLink
+      href={p.entryUrl}
+      brand={p.name}
+      label={p.coupon ? "使用优惠码查看当前套餐" : "查看当前套餐"}
+      class="btn btn-primary w-full px-3 text-[0.9rem] whitespace-nowrap"
+    />
+  </aside>
+</article>

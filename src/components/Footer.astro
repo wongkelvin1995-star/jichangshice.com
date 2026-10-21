@@ -1,0 +1,93 @@
+---
+import Logo from "./Logo.astro";
+import { FULL_NAV, FOOTER_LINKS } from "@/data/navigation";
+import config from "@/config";
+
+const host = new URL(config.site.url).hostname;
+const year = new Date().getFullYear();
+---
+
+<footer class="bg-ink mt-20 text-white/80" data-pagefind-ignore>
+  <div class="app-layout grid gap-10 py-12 md:grid-cols-[1.4fr_1fr_1fr]">
+    <div>
+      <a href="/" class="flex items-center gap-2.5 text-white">
+        <Logo size={34} light />
+        <span class="font-extrabold">{config.site.title}</span>
+        <span class="num text-xs text-white/50">{host}</span>
+      </a>
+      <p class="mt-4 max-w-md text-sm leading-relaxed text-white/65">
+        本站持续整理机场推荐、性价比机场与 Clash
+        机场测评，覆盖机场节点与线路资料、机场订阅导入、套餐价格比较、机场优惠码和购买前须知，为新手提供带核验日期的选择参考。
+      </p>
+      <p class="mt-2 text-sm text-white/65">
+        套餐与优惠以服务商结算页为准；品牌入口含邀请码，详见<a
+          href="/disclosure/"
+          class="text-white underline underline-offset-4">合作说明</a
+        >。
+      </p>
+      {
+        config.telegramUrl && (
+          <a
+            href={config.telegramUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="mt-5 inline-flex h-10 items-center gap-2 rounded-full bg-white/10 px-4 text-sm font-semibold text-white hover:bg-white/20"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path d="M21.9 4.3 18.6 20c-.2 1.1-.9 1.4-1.8.9l-5-3.7-2.4 2.3c-.3.3-.5.5-1 .5l.4-5.1 9.2-8.3c.4-.4-.1-.6-.6-.2L6 13.6l-4.9-1.5c-1.1-.3-1.1-1.1.2-1.6L20.5 3c.9-.3 1.7.2 1.4 1.3Z" />
+            </svg>
+            加入 TG 交流频道
+          </a>
+        )
+      }
+    </div>
+    <nav aria-label="栏目">
+      <h2 class="mb-4 text-sm font-bold text-white">栏目导航</h2>
+      <ul class="grid grid-cols-2 gap-x-4 gap-y-2.5 text-sm">
+        {
+          FULL_NAV.map(i => (
+            <li>
+              <a href={i.href} class="hover:text-white">
+                {i.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+    <nav aria-label="本站">
+      <h2 class="mb-4 text-sm font-bold text-white">编辑原则与说明</h2>
+      <ul class="grid grid-cols-2 gap-x-4 gap-y-2.5 text-sm">
+        <li>
+          <a href="/testing-methodology/" class="hover:text-white">测试方法</a>
+        </li>
+        <li>
+          <a href="/user/" class="hover:text-white">个人中心</a>
+        </li>
+        {
+          FOOTER_LINKS.map(i => (
+            <li>
+              <a href={i.href} class="hover:text-white">
+                {i.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+  <div class="border-t border-white/10">
+    <p
+      class="app-layout flex flex-wrap justify-between gap-2 py-4 text-xs text-white/45"
+    >
+      <span>© {year} {config.site.title} · {host}</span>
+      <span>资料整理与教程，不提供任何账号或订阅</span>
+    </p>
+  </div>
+</footer>

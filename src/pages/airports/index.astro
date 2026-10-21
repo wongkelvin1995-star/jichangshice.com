@@ -1,0 +1,184 @@
+---
+import { FEATURED_COUNT } from "@/data/editorial-order";
+import { getCollection } from "astro:content";
+import Layout from "@/layouts/Layout.astro";
+import Breadcrumbs from "@/components/Breadcrumbs.astro";
+import BrandAvatar from "@/components/BrandAvatar.astro";
+import BrandCard from "@/components/BrandCard.astro";
+import EntryLink from "@/components/EntryLink.astro";
+import {
+  getProviders,
+  getPlans,
+  startingMonthly,
+  trafficLabel,
+  cycleList,
+} from "@/utils/plans";
+import { fmtMoney } from "@/utils/format";
+import { breadcrumbJsonLd, itemListJsonLd } from "@/utils/jsonld";
+import config from "@/config";
+
+const providers = await getProviders();
+const plans = await getPlans();
+const analyses = new Set((await getCollection("airports")).map(e => e.id));
+const crumbs = [{ name: "机场目录" }];
+const path = "/airports/";
+const withProfile = providers.filter(p => p.hasProfile);
+const featured = withProfile.slice(0, FEATURED_COUNT);
+const rest = withProfile.slice(5);
+const listingOnly = providers.filter(p => !p.hasProfile);
+---
+
+<Layout
+  title={`机场目录：${providers.length} 个机场品牌资料、价格与测评入口｜${config.site.title}`}
+  description={`机场测试收录的 ${providers.length} 个机场品牌目录，包括灵动云、暮光加速、飞猫云、大佬云、微风网络等，每个品牌汇总历史套餐、月付起步价、线路资料与购买前须知。`}
+  canonicalPath={path}
+  jsonLd={[
+    breadcrumbJsonLd(crumbs, path),
+    itemListJsonLd(
+      "机场目录",
+      withProfile.map(p => ({ name: p.name, url: `/airports/${p.slug}/` }))
+    ),
+  ]}
+>
+  <main id="main-content" data-pagefind-body>
+    <section class="hero-band relative border-b">
+      <div class="app-layout relative py-8 sm:py-10">
+        <Breadcrumbs items={crumbs} />
+        <h1 class="text-[1.8rem] font-black tracking-tight sm:text-[2.4rem]">
+          机场目录
+        </h1>
+        <p class="text-muted-foreground mt-3 max-w-3xl leading-relaxed">
+          收录 {providers.length} 个机场品牌，其中 {withProfile.length}
+          个有历史套餐资料和独立资料页。顺序为编辑安排，<strong
+            class="text-foreground">不是测速或稳定性排名</strong
+          >；本站发布可复核的测试记录后，会另行给出基于数据的比较。
+        </p>
+        <div class="mt-5 flex flex-wrap gap-2">
+          <a href="/compare/" class="btn btn-primary">按预算筛选套餐</a>
+          <a href="/guides/how-to-choose-plan/" class="btn btn-outline"
+            >先看怎么选</a
+          >
+        </div>
+      </div>
+    </section>
+
+    <section class="app-layout pt-10" aria-labelledby="picks">
+      <p class="eyebrow">编辑精选</p>
+      <h2 id="picks" class="section-title mt-1.5">前 5 家机场资料</h2>
+      <div class="mt-5 grid gap-5">
+        {
+          featured.map((p, i) => (
+            <BrandCard provider={p} plans={plans} rank={i + 1} />
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="app-layout pt-12" aria-labelledby="more">
+      <p class="eyebrow">更多品牌</p>
+      <h2 id="more" class="section-title mt-1.5">
+        其他 {rest.length} 家机场资料
+      </h2>
+      <ul class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {
+          rest.map((p, i) => {
+            const s = startingMonthly(plans, p.slug);
+            return (
+              <li
+                class="card flex flex-col p-4"
+                data-placement={`directory-${i + 6}`}
+              >
+                <div class="flex items-center gap-3">
+                  <BrandAvatar name={p.name} size="sm" />
+                  <h3 class="min-w-0 flex-1 truncate font-bold">
+                    <a
+                      href={`/airports/${p.slug}/`}
+                      class="hover:text-accent-strong"
+                    >
+                      {p.name}
+                    </a>
+                  </h3>
+                  <span class="bg-muted text-muted-foreground num rounded-full px-2 py-0.5 text-xs font-bold">
+                    #{i + 6}
+                  </span>
+                </div>
+                <div class="mt-3 flex items-end justify-between gap-3">
+                  <div>
+                    <p class="text-muted-foreground text-xs">
+                      月付起步 ·{" "}
+                      {s?.currentVerified ? "结算页核验" : "历史参考"}
+                    </p>
+                    <p class="num text-accent-strong text-xl font-extrabold">
+                      {s ? `${fmtMoney(s.paymentAmount!)}/月` : "以结算页为准"}
+                    </p>
+                  </div>
+                  <p class="text-muted-foreground num text-right text-xs">
+                    {s && (
+                      <>
+                        {trafficLabel(s).main}
+                        <br />
+                      </>
+                    )}
+                    {cycleList(plans, p.slug).length} 种付款周期
+                  </p>
+                </div>
+                <div class="mt-4 grid grid-cols-2 gap-2">
+                  <a
+                    href={`/airports/${p.slug}/`}
+                    class="btn btn-outline min-h-9 px-3 text-sm"
+                  >
+                    查看测评
+                  </a>
+                  <EntryLink
+                    href={p.entryUrl}
+                    brand={p.name}
+                    label="当前套餐"
+                    class="btn btn-primary min-h-9 px-3 text-sm"
+                  />
+                </div>
+                {analyses.has(p.slug) && (
+                  <span class="tag mt-3 self-start">资料分析</span>
+                )}
+              </li>
+            );
+          })
+        }
+      </ul>
+    </section>
+
+    {
+      listingOnly.length > 0 && (
+        <section class="app-layout pt-12">
+          <p class="eyebrow">新收录</p>
+          <h2 class="section-title mt-1.5">
+            新收录品牌（{listingOnly.length}）
+          </h2>
+          <p class="text-muted-foreground mt-2 mb-4 text-sm">
+            这些品牌刚加入目录，本站还没有整理到可引用的套餐资料，暂不单独建页；价格请以当前结算页为准。
+          </p>
+          <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {listingOnly.map(p => (
+              <li class="card flex items-center gap-3 p-3.5">
+                <BrandAvatar name={p.name} size="sm" />
+                <span class="flex-1 font-semibold">{p.name}</span>
+                <EntryLink
+                  href={p.entryUrl}
+                  brand={p.name}
+                  label="当前套餐"
+                  class="text-accent-strong text-sm font-semibold hover:underline"
+                />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    <p class="app-layout text-muted-foreground mt-8 text-xs leading-relaxed">
+      品牌入口链接含邀请码（rel="sponsored"），通过入口购买本站可能获得返佣，不影响价格展示与资料整理方式。详见<a
+        href="/disclosure/"
+        class="underline underline-offset-4">合作说明</a
+      >。
+    </p>
+  </main>
+</Layout>

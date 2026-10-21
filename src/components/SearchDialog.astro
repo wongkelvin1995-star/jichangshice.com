@@ -1,0 +1,335 @@
+---
+/**
+ * 全站搜索（构建时生成的 /search-index.json + 浏览器端中文子串匹配）。
+ * - 页眉搜索框 / 图标 / Ctrl+K / ⌘K 打开；Esc 或点击空白处关闭
+ * - 输入即搜；↑↓ 切换结果，Enter 打开
+ * - 中文输入法组字期间不发起搜索
+ * - inline=true 时用于 /search/ 页面，支持 ?q=
+ */
+type Props = { inline?: boolean };
+const { inline = false } = Astro.props;
+---
+
+<div
+  id={inline ? "search-inline" : "search-dialog"}
+  class:list={[
+    inline
+      ? "relative"
+      : "fixed inset-0 z-50 hidden items-start justify-center bg-black/40 px-3 pt-[8vh] sm:pt-[12vh]",
+  ]}
+  role={inline ? undefined : "dialog"}
+  aria-modal={inline ? undefined : "true"}
+  aria-label="站内搜索"
+  data-search-root
+  data-pagefind-ignore
+>
+  <div
+    class:list={[
+      "bg-background w-full max-w-2xl overflow-hidden rounded-xl",
+      inline ? "border" : "shadow-2xl",
+    ]}
+  >
+    <form
+      class="flex items-center gap-2 border-b px-3"
+      role="search"
+      onsubmit="return false"
+    >
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        class="text-muted-foreground shrink-0"
+        aria-hidden="true"
+        ><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"
+        ></path></svg
+      >
+      <label
+        class="sr-only"
+        for={inline ? "search-input-inline" : "search-input"}
+        >搜索文章、机场名称、套餐或问题</label
+      >
+      <input
+        id={inline ? "search-input-inline" : "search-input"}
+        data-search-input
+        type="search"
+        autocomplete="off"
+        enterkeyhint="search"
+        placeholder="搜索文章、机场名称、套餐或问题"
+        role="combobox"
+        aria-autocomplete="list"
+        aria-expanded="false"
+        aria-controls={inline ? "search-results-inline" : "search-results"}
+        class="h-14 min-w-0 flex-1 bg-transparent text-base outline-none"
+      />
+      <button
+        type="button"
+        data-search-clear
+        class="text-muted-foreground hover:bg-muted hidden rounded px-2 py-1 text-sm"
+        >清空</button
+      >
+      {
+        !inline && (
+          <button
+            type="button"
+            data-search-close
+            class="text-muted-foreground hover:bg-muted rounded border px-2 py-0.5 text-xs"
+            aria-label="关闭搜索"
+          >
+            Esc
+          </button>
+        )
+      }
+    </form>
+    <div class:list={["overflow-y-auto", inline ? "min-h-40" : "max-h-[65vh]"]}>
+      <p
+        data-search-status
+        class="text-muted-foreground px-4 py-4 text-sm"
+        aria-live="polite"
+      >
+        输入关键词，例如“机场测试”“测速”“灵动云”“Clash”。
+      </p>
+      <ul
+        id={inline ? "search-results-inline" : "search-results"}
+        data-search-results
+        role="listbox"
+        aria-label="搜索结果"
+        class="divide-y pb-2"
+      >
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { prepare, search, escHtml, type Hit } from "@/utils/searchEngine";
+  import type { SearchEntry } from "@/utils/searchIndex";
+
+  const HINT = "输入关键词，例如“机场测试”“测速”“灵动云”“Clash”。";
+
+  // 索引地址取自 <head> 中的 link，静态部署和子目录预览都能正确解析
+  function indexUrl(): string {
+    const link = document.querySelector<HTMLLinkElement>(
+      "link[data-search-index]"
+    );
+    return link?.href ?? new URL("/search-index.json", location.href).href;
+  }
+
+  let indexPromise: Promise<ReturnType<typeof prepare>> | null = null;
+  function loadIndex() {
+    if (!indexPromise) {
+      indexPromise = fetch(indexUrl(), { cache: "no-cache" })
+        .then(r => {
+          if (!r.ok) throw new Error(`HTTP ${r.status}`);
+          return r.json() as Promise<{ entries: SearchEntry[] }>;
+        })
+        .then(d => prepare(d.entries))
+        .catch(err => {
+          indexPromise = null; // 允许下次重试
+          throw err;
+        });
+    }
+    return indexPromise;
+  }
+
+  /** 把索引中的站内路径解析为实际地址（相对索引文件所在目录） */
+  function resolve(u: string): string {
+    const [rawPath, hash] = u.replace(/^\//, "").split("#");
+    let path = rawPath;
+    // 首页（空路径）不能直接相对索引文件解析，否则会变成 search-index.json#…
+    // 静态文件预览（地址以 .html 结尾）时，目录地址补上 index.html
+    const fileMode = location.pathname.endsWith(".html");
+    if (path === "" || path.endsWith("/"))
+      path = path + (fileMode ? "index.html" : "");
+    const base = new URL(path || "./", indexUrl());
+    if (hash) base.hash = hash;
+    return base.href;
+  }
+
+  function setup(root: HTMLElement, onNavigate?: () => void) {
+    const input = root.querySelector<HTMLInputElement>("[data-search-input]")!;
+    const list = root.querySelector<HTMLUListElement>("[data-search-results]")!;
+    const status = root.querySelector<HTMLElement>("[data-search-status]")!;
+    const clearBtn = root.querySelector<HTMLButtonElement>(
+      "[data-search-clear]"
+    )!;
+    let seq = 0;
+    let composing = false;
+    let active = -1;
+    let timer = 0;
+
+    const options = () =>
+      Array.from(list.querySelectorAll<HTMLAnchorElement>("[role=option]"));
+
+    function setActive(i: number) {
+      const opts = options();
+      if (!opts.length) {
+        active = -1;
+        input.removeAttribute("aria-activedescendant");
+        return;
+      }
+      active = (i + opts.length) % opts.length;
+      opts.forEach((o, j) => {
+        const on = j === active;
+        o.setAttribute("aria-selected", String(on));
+        o.classList.toggle("bg-muted", on);
+      });
+      input.setAttribute("aria-activedescendant", opts[active].id);
+      opts[active].scrollIntoView({ block: "nearest" });
+    }
+
+    function render(hits: Hit[], q: string) {
+      active = -1;
+      input.removeAttribute("aria-activedescendant");
+      if (!hits.length) {
+        list.innerHTML = "";
+        input.setAttribute("aria-expanded", "false");
+        status.textContent = `没有找到相关内容（“${q}”）。可以换个说法，或浏览机场目录、新手教程。`;
+        return;
+      }
+      status.textContent = `找到 ${hits.length} 条相关结果，↑↓ 选择，Enter 打开`;
+      input.setAttribute("aria-expanded", "true");
+      const pre = root.id || "s";
+      list.innerHTML = hits
+        .map(
+          (h, i) =>
+            `<li><a id="${pre}-opt-${i}" role="option" aria-selected="false" class="block rounded-lg px-3 py-2.5 mx-1 my-1 hover:bg-muted" href="${escHtml(resolve(h.url))}">` +
+            `<span class="flex items-center gap-2"><span class="shrink-0 rounded bg-accent-soft px-1.5 py-0.5 text-[0.7rem] font-semibold text-accent-strong">${escHtml(h.entry.c)}</span>` +
+            `<span class="min-w-0 truncate font-semibold text-foreground">${escHtml(h.entry.t)}</span></span>` +
+            (h.section
+              ? `<span class="mt-1 block truncate text-xs text-accent-strong">↳ ${escHtml(h.section)}</span>`
+              : "") +
+            `<span class="mt-1 block text-sm leading-relaxed text-muted-foreground line-clamp-2">${h.snippet}</span></a></li>`
+        )
+        .join("");
+    }
+
+    async function run() {
+      const q = input.value.trim();
+      const mySeq = ++seq;
+      clearBtn.classList.toggle("hidden", q === "");
+      if (!q) {
+        list.innerHTML = "";
+        input.setAttribute("aria-expanded", "false");
+        status.textContent = HINT;
+        return;
+      }
+      let idx;
+      try {
+        status.textContent = "搜索中…";
+        idx = await loadIndex();
+      } catch {
+        if (mySeq === seq)
+          status.textContent = "搜索索引加载失败，请检查网络后重试。";
+        return;
+      }
+      if (mySeq !== seq) return; // 已被更新的输入取代
+      render(search(idx, q), q);
+    }
+
+    const schedule = () => {
+      clearTimeout(timer);
+      timer = window.setTimeout(run, 80);
+    };
+
+    input.addEventListener("compositionstart", () => (composing = true));
+    input.addEventListener("compositionend", () => {
+      composing = false;
+      schedule();
+    });
+    input.addEventListener("input", e => {
+      if (composing || (e as InputEvent).isComposing) return;
+      schedule();
+    });
+    input.addEventListener("keydown", e => {
+      if (e.isComposing || composing) return;
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setActive(active + 1);
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setActive(active - 1);
+      } else if (e.key === "Enter") {
+        const opts = options();
+        const target = opts[active] ?? opts[0];
+        if (target) {
+          e.preventDefault();
+          onNavigate?.();
+          location.href = target.href;
+        }
+      }
+    });
+    list.addEventListener("click", e => {
+      if ((e.target as Element).closest("a")) onNavigate?.();
+    });
+    clearBtn.addEventListener("click", () => {
+      input.value = "";
+      run();
+      input.focus();
+    });
+    return { input, run };
+  }
+
+  // 弹窗模式
+  const dialog = document.getElementById("search-dialog");
+  if (dialog) {
+    let lastFocus: Element | null = null;
+    const close = () => {
+      dialog.classList.add("hidden");
+      dialog.classList.remove("flex");
+      document.body.style.overflow = "";
+      (lastFocus as HTMLElement | null)?.focus?.();
+    };
+    const { input } = setup(dialog, () => {
+      // 跳转前关闭（首页锚点跳转时不会刷新页面）
+      dialog.classList.add("hidden");
+      dialog.classList.remove("flex");
+      document.body.style.overflow = "";
+    });
+    const open = () => {
+      lastFocus = document.activeElement;
+      dialog.classList.remove("hidden");
+      dialog.classList.add("flex");
+      document.body.style.overflow = "hidden";
+      input.focus();
+      input.select();
+      loadIndex().catch(() => {});
+    };
+    document
+      .querySelectorAll("#search-open, [data-search-trigger]")
+      .forEach(el =>
+        el.addEventListener("click", e => {
+          e.preventDefault();
+          open();
+        })
+      );
+    dialog
+      .querySelector("[data-search-close]")
+      ?.addEventListener("click", close);
+    // 点击弹窗外的空白区域关闭
+    dialog.addEventListener("click", e => e.target === dialog && close());
+    document.addEventListener("keydown", e => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        if (dialog.classList.contains("hidden")) open();
+        else close();
+      } else if (e.key === "Escape" && !dialog.classList.contains("hidden")) {
+        close();
+      }
+    });
+  }
+
+  // /search/ 页面模式，支持 ?q=
+  const inline = document.getElementById("search-inline");
+  if (inline) {
+    const { input, run } = setup(inline);
+    const q = new URLSearchParams(location.search).get("q");
+    if (q) {
+      input.value = q;
+      run();
+    }
+    input.focus();
+  }
+</script>

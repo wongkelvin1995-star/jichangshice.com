@@ -1,0 +1,76 @@
+---
+/**
+ * 机场的“收藏 / 加入比较”按钮（数据保存在本地浏览器，见 utils/userStore.ts）。
+ * 无 JS 时按钮保持禁用，不会出现点了没反应的情况。
+ */
+type Props = {
+  slug: string;
+  name: string;
+  /** compact：小号按钮，用于目录卡片 */
+  size?: "normal" | "compact";
+  class?: string;
+};
+const { slug, name, size = "normal", class: cls } = Astro.props;
+const btn =
+  size === "compact"
+    ? "inline-flex h-9 items-center justify-center gap-1.5 rounded-full border px-3 text-xs font-semibold"
+    : "inline-flex h-10 items-center justify-center gap-1.5 rounded-full border px-4 text-sm font-semibold";
+---
+
+<div class:list={["flex flex-wrap gap-2", cls]} data-user-actions>
+  <button
+    type="button"
+    class:list={[
+      btn,
+      "bg-card hover:border-accent/50 aria-pressed:border-accent aria-pressed:bg-accent-soft aria-pressed:text-accent-strong transition-colors",
+    ]}
+    data-fav={slug}
+    data-name={name}
+    aria-pressed="false"
+    disabled
+  >
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+      ><path
+        d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"
+      ></path></svg
+    >
+    <span data-label>收藏</span>
+  </button>
+  <button
+    type="button"
+    class:list={[
+      btn,
+      "bg-card hover:border-accent/50 aria-pressed:border-accent aria-pressed:bg-accent-soft aria-pressed:text-accent-strong transition-colors",
+    ]}
+    data-cmp={slug}
+    data-name={name}
+    aria-pressed="false"
+    disabled
+  >
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      aria-hidden="true"><path d="M8 3v18M16 3v18M3 8h5M16 16h5"></path></svg
+    >
+    <span data-label>加入比较</span>
+  </button>
+  <span class="sr-only" aria-live="polite" data-ua-status></span>
+</div>
+
+<script>
+  import "@/scripts/userActions";
+</script>

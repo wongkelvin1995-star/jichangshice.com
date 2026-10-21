@@ -1,0 +1,35 @@
+---
+/** 品牌文字头像（渐变圆角方块）；不使用品牌官方 Logo */
+type Props = { name: string; size?: "sm" | "md" | "lg" };
+const { name, size = "md" } = Astro.props;
+const palette = [
+  ["#5aa0ff", "#1a6dff"],
+  ["#9b7bff", "#6a3df0"],
+  ["#3ad29f", "#11a36f"],
+  ["#ffb24d", "#f47b1f"],
+  ["#4fd1e8", "#0e9fc4"],
+  ["#ff7aa8", "#e23d7b"],
+  ["#7f8cff", "#4d5be8"],
+  ["#2fd0b8", "#0f9f8f"],
+];
+let h = 0;
+for (const ch of name) h = (h * 31 + ch.codePointAt(0)!) >>> 0;
+const [a, b] = palette[h % palette.length];
+const char = [...name][0].toUpperCase();
+const cls = {
+  sm: "size-8 rounded-lg text-sm",
+  md: "size-11 rounded-xl text-lg",
+  lg: "size-14 rounded-2xl text-2xl",
+}[size];
+---
+
+<span
+  aria-hidden="true"
+  class:list={[
+    "inline-flex shrink-0 items-center justify-center font-black text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.35)]",
+    cls,
+  ]}
+  style={{ background: `linear-gradient(150deg, ${a}, ${b})` }}
+>
+  {char}
+</span>

@@ -1,0 +1,17 @@
+关键词簇,核心词,长尾候选,搜索意图,主页面,辅助页面,证据需求,发布状态,搜索量与来源
+网站品牌与总主题,机场测试,机场实测;机场测评;机场测速,导航/了解,/,/testing-methodology/;/airports/,无,已发布,未取得数据（需 GSC/关键词工具，注明地区、语言、日期）
+推荐选购,机场怎么选,机场推荐;梯子推荐;稳定机场推荐;便宜机场推荐;机场避坑;机场推荐排名;梯子排名怎么看,商业调查,/guides/how-to-choose-plan/,/compare/;/guides/check-before-buying/;/airports/,排名类需真实测试记录，未有记录前不做排名页,已发布（选购指南）；排名页暂缓,未取得数据
+测试方法,机场测试方法,节点测速;线路测试;晚高峰测试;机场稳定性测试;梯子测速;节点可用率;丢包测试;延迟与速度区别;Jitter;故障恢复时间,信息,/testing-methodology/,/methods/metrics-speed-latency-loss/;/methods/record-node-speed-test/;/methods/peak-hour-testing/,无,已发布,未取得数据
+品牌研究,品牌名+机场,品牌名+测评;品牌名+价格;品牌名+套餐;品牌名+Clash,导航/商业调查,/airports/[slug]/,/compare/,有人工分析的品牌页才索引；测评需真实测试,5 个品牌已索引（灵动云/暮光/飞猫/大佬/微风），24 个 noindex 待补分析,未取得数据
+套餐比较,机场套餐比较,机场套餐对比;机场价格比较;梯子套餐;月付还是年付;100GB够不够;300GB流量;500GB流量;流量单价;不限时流量;流量倍率,商业调查,/compare/,/guides/annual-vs-monthly-vs-onetime/;/guides/how-to-choose-plan/,价格需来源与观察日期；现价需官网核对,已发布,未取得数据
+基础入门,机场是什么,科学上网;魔法上网;梯子是什么;机场和VPN区别;购买机场后怎么用;订阅链接是什么;节点是什么,信息,/guides/what-is-airport/,/faq/;/clients/clash-subscription-import/,无,已发布,未取得数据
+客户端操作,Clash教程,VPN使用教程;Clash Verge Rev教程;Mihomo配置;v2rayN教程;sing-box教程;Shadowrocket教程;Windows代理;macOS安装;Android订阅;iOS导入;规则模式;全局模式;系统代理;TUN模式,信息/操作,/clients/clash-subscription-import/,/clients/windows-setup/;/clients/macos-setup/;/clients/android-ios-import/,需核对客户端当前官方版本,已发布 4 篇；sing-box/v2rayN/Shadowrocket 单篇待写,未取得数据
+线路与地区,IPLC IEPL 区别,IPLC;IEPL;直连;中转;BGP;VLESS;Trojan;香港节点;日本节点;新加坡节点;美国节点;台湾节点;原生IP;住宅IP与机房IP区别,信息,/routes/iplc-iepl-bgp-vless/,/routes/node-region-isp/,无,已发布 2 篇,未取得数据
+故障排查,订阅更新失败,订阅无法导入;节点全部超时;客户端连接但不能上网;机场突然变慢;DNS问题;系统代理冲突;流量用完;付款未到账,信息/操作,/troubleshooting/subscription-update-failed/,/clients/windows-setup/;/faq/,无,已发布 1 篇；分主题拆分待写,未取得数据
+应用场景,机场 AI 流媒体测试,ChatGPT网络访问;Claude网络访问;Gemini网络访问;AI工具兼容;Netflix访问;Disney+访问;YouTube播放;Telegram;远程办公;视频通话;游戏延迟,信息/商业调查,/methods/ai-streaming-checks/,/routes/node-region-isp/,按节点逐项实测；网络连通≠账号地区资格,方法篇已发布；/use-cases/ 栏目待有实测后开设,未取得数据
+推荐选购（2026-10-16 补充）,机场推荐,2026机场推荐;稳定机场推荐;便宜机场推荐;梯子推荐;好用的梯子,商业调查,/recommendations/,/guides/value-airports-2026/;/airports/,编辑顺序，不是测速排名,已优化标题与描述（2026-10-16）,未取得数据；竞争激烈（搜索结果中大量批量推广页）
+品牌词,品牌名+机场,品牌名+优惠码;品牌名+怎么样;品牌名+测评;品牌名+官网,导航/交易,/airports/[slug]/,/coupons/;/test-records/[slug]/,优惠码为待验证状态,已发布 34 家,未取得数据
+优惠码,机场优惠码,机场优惠码大全;机场折扣码;品牌名+优惠码,交易,/coupons/,/airports/[slug]/,区分已验证/待验证,已优化 H1（2026-10-16）,未取得数据
+风险与避坑,机场跑路,机场跑路怎么判断;机场会不会跑路;机场跑路了怎么办;机场年付风险,信息/商业调查,/guides/airport-runaway-signs/,/guides/check-before-buying/;/guides/annual-vs-monthly-vs-onetime/,无,新文章已发布（2026-10-16）,未取得数据
+客户端（待写）,v2rayN 教程,v2rayN 导入订阅;Shadowrocket 小火箭教程;sing-box 教程,信息/操作,（待写）,/clients/,需核对客户端当前官方版本,待写,未取得数据
+工具,节点检测,机场工具箱;节点可用性检测;节点延迟测试;在线测速,工具,/testing-methodology/,/test-records/,说明为近似延迟,已上线（2026-10-16）,未取得数据
