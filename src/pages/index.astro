@@ -7,6 +7,7 @@
 import Layout from "@/layouts/Layout.astro";
 import BrandCard from "@/components/BrandCard.astro";
 import HeroArt from "@/components/HeroArt.astro";
+import SpeedTestIcon from "@/components/SpeedTestIcon.astro";
 import { render } from "astro:content";
 import { getProviders, getPlans } from "@/utils/plans";
 import { getPublishedPosts, postUrl } from "@/utils/posts";
@@ -164,6 +165,25 @@ const homeFaq = [
               测速记录
             </a>
           </nav>
+          <a
+            href="/speedtest/"
+            class="group mt-3 flex items-center gap-3 rounded-2xl border border-blue-100 bg-white/85 px-3 py-2.5 shadow-[0_10px_30px_-22px_rgb(26_109_255/0.7)] transition hover:border-blue-300 hover:bg-white"
+          >
+            <SpeedTestIcon size={40} />
+            <span class="min-w-0 flex-1">
+              <span class="block font-extrabold">网速测试</span>
+              <span
+                class="text-muted-foreground block truncate text-xs sm:text-sm"
+              >
+                测延迟、下载、上传、出口 IP 与网站连通性
+              </span>
+            </span>
+            <span
+              class="text-accent-strong text-sm font-semibold whitespace-nowrap transition group-hover:translate-x-0.5"
+            >
+              开始测速 →
+            </span>
+          </a>
         </div>
         <div class="hidden lg:block" data-pagefind-ignore>
           <HeroArt brands={providers.length} />

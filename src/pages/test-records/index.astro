@@ -4,7 +4,7 @@ import Breadcrumbs from "@/components/Breadcrumbs.astro";
 import BrandAvatar from "@/components/BrandAvatar.astro";
 import { getProviders } from "@/utils/plans";
 import OwnRunsTable from "@/components/OwnRunsTable.astro";
-import SpeedMeter from "@/components/SpeedMeter.astro";
+import SpeedTestIcon from "@/components/SpeedTestIcon.astro";
 import NodeStatusChart from "@/components/NodeStatusChart.astro";
 import TestPhotoCard from "@/components/TestPhoto.astro";
 import TestPhotoNotice from "@/components/TestPhotoNotice.astro";
@@ -126,9 +126,24 @@ const path = "/test-records/";
           ))
         }
       </div>
-      <div class="mt-6">
-        <SpeedMeter />
-      </div>
+      <a
+        href="/speedtest/"
+        class="card hover:border-accent/40 mt-6 flex items-center gap-4 p-4 sm:p-5"
+      >
+        <SpeedTestIcon size={48} />
+        <span class="min-w-0 flex-1">
+          <span class="block font-extrabold">机场网速测试</span>
+          <span class="text-muted-foreground block text-sm">
+            开着代理测出口 IP、延迟、下载、上传、满载延迟和 15
+            个网站的连通性，可生成打码的测速报告图
+          </span>
+        </span>
+        <span
+          class="text-accent-strong text-sm font-semibold whitespace-nowrap"
+        >
+          去测速 →
+        </span>
+      </a>
       {
         ownRuns.length > 0 && (
           <div class="mt-6">

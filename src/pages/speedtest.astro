@@ -1,0 +1,133 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Breadcrumbs from "@/components/Breadcrumbs.astro";
+import SpeedLab from "@/components/SpeedLab.astro";
+import { breadcrumbJsonLd, faqJsonLd } from "@/utils/jsonld";
+import config from "@/config";
+
+const path = "/speedtest/";
+const crumbs = [
+  { name: "机场测试档案", href: "/test-records/" },
+  { name: "机场网速测试" },
+];
+const faq = [
+  {
+    q: "为什么要开代理才能测机场节点？",
+    a: "测速请求只有经过代理，测到的才是机场节点的速度。打开客户端的全局模式，或者在规则模式下让 speed.cloudflare.com 走代理；测速前看「代理检查」，出口不在中国大陆才算测到了节点。",
+  },
+  {
+    q: "延迟多少算正常？",
+    a: "从中国大陆出发，香港节点线路直接时一般在 10–40 ms，日本、新加坡多在 30–90 ms，美国西部常见 130–250 ms。延迟主要由距离和线路决定，不能单看数字高低判断机场好坏。",
+  },
+  {
+    q: "满载延迟是什么？",
+    a: "下载或上传占满带宽时测到的延迟。它比空载延迟高得越多，说明线路排队越严重，边下载边打游戏或开视频会议就越容易卡。",
+  },
+  {
+    q: "网站连通性显示「可连接」就能看 Netflix、用 ChatGPT 吗？",
+    a: "不一定。连通性只说明能连到网站和连接延迟；片库、账号地区和 AI 服务是否开放，要以实际登录为准。",
+  },
+  {
+    q: "测速会用掉多少机场流量？",
+    a: "按你选的数据量计算，默认下载 50 MB、上传 15 MB，再加约 1 MB 的延迟和连通性请求。流量少的套餐可以选 25 MB / 10 MB。",
+  },
+  {
+    q: "测速结果会被上传或保存吗？",
+    a: "不会。测速和连通性检测都在你的浏览器里完成，出口 IP 默认打码，只在你的屏幕上显示。保存报告图、复制结果都由你自己决定。",
+  },
+];
+---
+
+<Layout
+  title={`机场网速测试：在线测速、延迟、满载延迟与网站连通性｜${config.site.title}`}
+  description="机场网速测试工具：开着代理一键测出口 IP 归属、空载延迟与抖动、下载和上传速度、满载延迟，以及 Google、YouTube、ChatGPT、Netflix 等 15 个网站的连通性，并可生成打码的测速报告图。"
+  canonicalPath={path}
+  jsonLd={[breadcrumbJsonLd(crumbs, path), faqJsonLd(faq)]}
+>
+  <main id="main-content" data-pagefind-body>
+    <section class="hero-band relative border-b">
+      <div class="app-layout relative py-8 sm:py-10">
+        <Breadcrumbs items={crumbs} />
+        <h1 class="text-[1.8rem] font-black tracking-tight sm:text-[2.4rem]">
+          机场网速测试
+        </h1>
+        <p class="text-muted-foreground mt-3 max-w-3xl leading-relaxed">
+          连上机场节点后点「开始测速」：先看出口 IP
+          是否在你选的地区，再测延迟、下载、上传和满载延迟，最后检测常用网站能不能连上。测完可以保存一张出口
+          IP 已打码的测速报告图。
+        </p>
+      </div>
+    </section>
+
+    <div class="app-layout pt-8">
+      <SpeedLab />
+    </div>
+
+    <section class="app-layout app-prose pt-12" aria-labelledby="how">
+      <h2 id="how">怎样测出可信的结果</h2>
+      <ol>
+        <li>
+          在客户端选好要测的节点，切到全局模式，或确认规则模式下测速网站走代理。
+        </li>
+        <li>
+          看「代理检查」：出口地区应该和你选的节点一致；显示中国大陆就是没走代理。
+        </li>
+        <li>
+          选择数据量后开始测速，测试期间不要切换节点，也不要同时下载别的东西。
+        </li>
+        <li>
+          同一个节点白天和晚上 20:00–23:00
+          各测一次，对比才能看出晚高峰是否变慢。
+        </li>
+        <li>
+          想把结果交给本站核验，保存报告图后到<a href="/test-records/submit/"
+            >测速录入助手</a
+          >填写，或参考<a href="/methods/record-node-speed-test/"
+            >怎样记录一次可复核的节点测速</a
+          >。
+        </li>
+      </ol>
+      <h2>各项指标代表什么</h2>
+      <ul>
+        <li>
+          <strong>空载延迟与抖动</strong>：网络空闲时测 20
+          次的中位数和波动，决定网页、AI 对话是否跟手。
+        </li>
+        <li>
+          <strong>下载 / 上传</strong
+          >：多连接并发传输、去掉开头爬坡阶段后的平均速度。
+        </li>
+        <li><strong>满载延迟</strong>：传输时同时测延迟，反映线路排队情况。</li>
+        <li>
+          <strong>使用场景评分</strong
+          >：按页面公开的阈值，根据本次数字计算，不代表解锁情况。
+        </li>
+        <li>
+          <strong>丢包率</strong>：需要 UDP，浏览器测不到，所以不显示估算值。
+        </li>
+      </ul>
+      <p>
+        想看各机场的实测结果，见<a href="/test-records/">机场测试档案</a
+        >；指标的详细解释见<a href="/methods/metrics-speed-latency-loss/"
+          >速度、延迟、丢包和可用率</a
+        >。
+      </p>
+    </section>
+
+    <section class="app-layout pt-10 pb-4" aria-labelledby="faq">
+      <h2 id="faq" class="section-title">常见问题</h2>
+      <div class="mt-4 grid gap-3">
+        {
+          faq.map(f => (
+            <details class="card p-4">
+              <summary class="cursor-pointer font-semibold">{f.q}</summary>
+              <p class="text-muted-foreground mt-2 text-sm leading-relaxed">
+                {f.a}
+              </p>
+            </details>
+          ))
+        }
+      </div>
+    </section>
+  </main>
+</Layout>

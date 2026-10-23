@@ -18,6 +18,7 @@
 | 入门指南 / 节点延迟 | 机场测试指南、节点延迟多少算正常 | `/methods/airport-testing-guide/` | `/methods/metrics-speed-latency-loss/` | 标题改为「测哪些指标、节点延迟多少算正常」；primaryKeyword 改为「机场测试指南」 |
 | 测速结果解读 | 机场测速教程、Speedtest 结果 | `/methods/speedtest-results-explained/` | `/methods/record-node-speed-test/` | — |
 | 晚高峰稳定性 | 晚高峰稳定性、机场晚高峰 | `/methods/peak-hour-testing/` | `/routes/node-region-isp/`、`/troubleshooting/subscription-update-failed/` | 标题改为「晚高峰稳定性怎么测」 |
+| 在线测速工具 | 机场网速测试、机场测速、节点测速 | `/speedtest/` | `/`（首屏入口）、`/test-records/` | 新增工具页（2026-10-23） |
 | Clash 机场推荐 | Clash 机场推荐 | `/clients/clash-airports-2026/` | `/clients/clash-subscription-import/` | — |
 | Clash 订阅导入 | Clash 订阅导入、Clash Verge Rev | `/clients/clash-subscription-import/` | `/clients/windows-setup/`、`/clients/macos-setup/` | — |
 | 客户端安装 | Windows / macOS / Android / iOS 客户端 | `/clients/` 及 3 篇平台文章 | `/faq/` | — |

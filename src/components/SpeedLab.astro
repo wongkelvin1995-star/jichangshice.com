@@ -1,0 +1,1209 @@
+---
+/**
+ * 机场网速测试（浏览器端，Cloudflare 全球边缘网络）。
+ *
+ * 测试内容：出口 IP 与归属、空载延迟与抖动、下载、上传、下载/上传时的满载延迟、
+ * 使用场景评分、常用网站连通性，并可生成测速报告图。
+ *
+ * 诚实原则：
+ * - 所有数字都来自本次浏览器实测；浏览器无法测丢包，界面写明「浏览器无法测」。
+ * - 只有测速流量经过代理时结果才代表节点；出口在中国大陆时显示提醒。
+ * - 出口 IP 默认打码，只在本机显示，不上传、不保存。
+ */
+import SpeedTestIcon from "./SpeedTestIcon.astro";
+
+const SITES = [
+  ["Google", "https://www.google.com/favicon.ico"],
+  ["YouTube", "https://www.youtube.com/favicon.ico"],
+  ["ChatGPT", "https://chatgpt.com/favicon.ico"],
+  ["Claude", "https://claude.ai/favicon.ico"],
+  ["Gemini", "https://gemini.google.com/favicon.ico"],
+  ["GitHub", "https://github.com/favicon.ico"],
+  ["Telegram", "https://telegram.org/favicon.ico"],
+  ["Netflix", "https://www.netflix.com/favicon.ico"],
+  ["Disney+", "https://www.disneyplus.com/favicon.ico"],
+  ["Spotify", "https://open.spotify.com/favicon.ico"],
+  ["TikTok", "https://www.tiktok.com/favicon.ico"],
+  ["X", "https://x.com/favicon.ico"],
+  ["Steam", "https://store.steampowered.com/favicon.ico"],
+  ["Cloudflare", "https://www.cloudflare.com/favicon.ico"],
+  ["Wikipedia", "https://www.wikipedia.org/static/favicon/wikipedia.ico"],
+] as const;
+
+/** 仪表刻度：沿弧线外侧排列（圆心 120,130，半径 112） */
+const TICKS = [0, 5, 10, 50, 100, 250, 500, 1000].map((v, i) => {
+  const a = Math.PI - (i / 7) * Math.PI;
+  return {
+    v,
+    x: +(120 + 112 * Math.cos(a)).toFixed(1),
+    y: +(134 - 112 * Math.sin(a)).toFixed(1),
+  };
+});
+
+const tile =
+  "rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-[0_1px_0_rgb(15_23_42/0.03)]";
+---
+
+<section
+  class="speed-lab relative overflow-hidden rounded-[1.6rem] border border-blue-100 bg-gradient-to-b from-white to-blue-50/40 p-4 shadow-[0_24px_60px_-40px_rgb(26_109_255/0.55)] sm:p-6"
+  data-speed-lab
+  aria-labelledby="speed-lab-title"
+>
+  <!-- 标题 -->
+  <div class="flex flex-wrap items-center gap-3">
+    <SpeedTestIcon size={44} />
+    <div class="min-w-0 flex-1">
+      <h2
+        id="speed-lab-title"
+        class="text-xl font-black tracking-tight sm:text-2xl"
+      >
+        机场网速测试
+      </h2>
+      <p class="text-muted-foreground text-sm">
+        测出口 IP、延迟、下载、上传、满载延迟和常用网站连通性，一次完成
+      </p>
+    </div>
+  </div>
+
+  <!-- 出口信息 -->
+  <div
+    class="mt-5 grid grid-cols-[minmax(0,1fr)] gap-3 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]"
+  >
+    <div class={tile} data-exit>
+      <div class="flex items-center justify-between gap-2">
+        <p class="text-muted-foreground text-xs font-semibold tracking-wide">
+          出口 IP
+        </p>
+        <button
+          type="button"
+          class="text-accent-strong text-xs font-semibold hover:underline"
+          data-ip-toggle
+          aria-pressed="false">显示完整 IP</button
+        >
+      </div>
+      <p class="num mt-1 text-xl font-extrabold tracking-tight" data-ip>
+        检测中…
+      </p>
+      <dl class="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-sm sm:grid-cols-4">
+        <div>
+          <dt class="text-muted-foreground text-xs">地区</dt><dd
+            class="font-semibold"
+            data-geo="country"
+          >
+            —
+          </dd>
+        </div>
+        <div>
+          <dt class="text-muted-foreground text-xs">城市</dt><dd
+            class="font-semibold"
+            data-geo="city"
+          >
+            —
+          </dd>
+        </div>
+        <div class="col-span-2 min-w-0">
+          <dt class="text-muted-foreground text-xs">网络 / ASN</dt><dd
+            class="truncate font-semibold"
+            data-geo="asn"
+          >
+            —
+          </dd>
+        </div>
+      </dl>
+    </div>
+    <div class={tile}>
+      <p class="text-muted-foreground text-xs font-semibold tracking-wide">
+        代理检查
+      </p>
+      <p class="mt-1 flex items-start gap-2 text-sm font-semibold" data-proxy>
+        <span
+          class="mt-1.5 inline-block size-2 flex-none rounded-full bg-slate-300"
+          data-proxy-dot></span>
+        <span data-proxy-text>正在读取出口信息…</span>
+      </p>
+      <p class="text-muted-foreground mt-2 text-xs leading-relaxed">
+        测速节点：<span class="font-semibold text-slate-700" data-geo="colo"
+          >—</span
+        >。 只有测速流量经过代理（客户端全局模式，或规则模式下
+        speed.cloudflare.com 走代理），结果才代表当前机场节点。
+      </p>
+    </div>
+  </div>
+
+  <!-- 设置与开始 -->
+  <div class="mt-4 flex flex-wrap items-end gap-3">
+    <label class="text-sm">
+      <span class="text-muted-foreground block text-xs">下载数据量</span>
+      <select
+        class="mt-1 h-10 rounded-xl border bg-white px-3 text-sm"
+        data-size="down"
+      >
+        <option value="25">25 MB</option>
+        <option value="50" selected>50 MB</option>
+        <option value="100">100 MB</option>
+      </select>
+    </label>
+    <label class="text-sm">
+      <span class="text-muted-foreground block text-xs">上传数据量</span>
+      <select
+        class="mt-1 h-10 rounded-xl border bg-white px-3 text-sm"
+        data-size="up"
+      >
+        <option value="10">10 MB</option>
+        <option value="15" selected>15 MB</option>
+        <option value="25">25 MB</option>
+      </select>
+    </label>
+    <p class="text-muted-foreground pb-2 text-xs" data-traffic>
+      本次约消耗 66 MB 机场流量
+    </p>
+    <button
+      type="button"
+      class="btn btn-primary ms-auto h-12 min-w-40 px-6 text-base"
+      data-start>开始测速</button
+    >
+  </div>
+
+  <!-- 进度 -->
+  <div class="mt-4">
+    <div class="flex items-center justify-between text-xs">
+      <span class="font-semibold text-slate-600" data-phase>准备就绪</span>
+      <span class="num text-muted-foreground" data-elapsed></span>
+    </div>
+    <div class="mt-1.5 h-2 overflow-hidden rounded-full bg-slate-100">
+      <div
+        class="h-full w-0 rounded-full bg-gradient-to-r from-sky-400 to-blue-600 transition-[width] duration-300"
+        data-progress
+      >
+      </div>
+    </div>
+  </div>
+
+  <!-- 主结果 -->
+  <div
+    class="mt-5 grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[minmax(0,300px)_minmax(0,1fr)]"
+  >
+    <div class={`${tile} flex flex-col items-center justify-center`}>
+      <svg
+        viewBox="-16 0 272 150"
+        class="w-full max-w-[280px]"
+        aria-hidden="true"
+      >
+        <defs>
+          <linearGradient id="sl-arc" x1="0" x2="1">
+            <stop offset="0" stop-color="#38bdf8"></stop>
+            <stop offset="1" stop-color="#1a6dff"></stop>
+          </linearGradient>
+        </defs>
+        <path
+          d="M30 130a90 90 0 0 1 180 0"
+          stroke="#e8eef8"
+          stroke-width="16"
+          fill="none"
+          stroke-linecap="round"></path>
+        <path
+          d="M30 130a90 90 0 0 1 180 0"
+          stroke="url(#sl-arc)"
+          stroke-width="16"
+          fill="none"
+          stroke-linecap="round"
+          pathLength="1000"
+          stroke-dasharray="0 1000"
+          data-arc></path>
+        <g
+          fill="#8a9ab3"
+          font-size="10"
+          font-family="ui-monospace,monospace"
+          text-anchor="middle"
+        >
+          {
+            TICKS.map(t => (
+              <text x={t.x} y={t.y}>
+                {t.v}
+              </text>
+            ))
+          }
+        </g>
+      </svg>
+      <p class="num -mt-10 text-4xl font-black tracking-tight" data-live>0</p>
+      <p class="text-muted-foreground text-xs" data-live-label>Mbps</p>
+    </div>
+    <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+      {
+        [
+          ["down", "下载", "Mbps"],
+          ["up", "上传", "Mbps"],
+          ["latency", "空载延迟", "ms"],
+          ["jitter", "抖动", "ms"],
+          ["loadedDown", "下载时延迟", "ms"],
+          ["loadedUp", "上传时延迟", "ms"],
+        ].map(([k, label, unit]) => (
+          <div class={tile} data-metric={k}>
+            <p class="text-muted-foreground text-xs font-semibold">{label}</p>
+            <p class="mt-1 flex items-baseline gap-1">
+              <span class="num text-2xl font-extrabold" data-r={k}>
+                —
+              </span>
+              <span class="text-muted-foreground text-xs">{unit}</span>
+            </p>
+          </div>
+        ))
+      }
+      <div class={`${tile} col-span-2 sm:col-span-3`}>
+        <p class="text-muted-foreground text-xs">
+          丢包率：<span class="font-semibold text-slate-600">浏览器无法测</span
+          >（需要 UDP，网页测不到；可用客户端自带测试或 MTR）
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 曲线 -->
+  <div class="mt-4 grid grid-cols-[minmax(0,1fr)] gap-3 md:grid-cols-3">
+    {
+      [
+        ["down", "下载速度（Mbps）", "#0ea5e9"],
+        ["up", "上传速度（Mbps）", "#10b981"],
+        ["ping", "延迟（ms）", "#f59e0b"],
+      ].map(([k, label, color]) => (
+        <figure class={tile}>
+          <figcaption class="text-muted-foreground flex justify-between text-xs font-semibold">
+            <span>{label}</span>
+            <span class="num" data-chart-max={k} />
+          </figcaption>
+          <svg
+            viewBox="0 0 300 90"
+            class="mt-2 h-24 w-full"
+            preserveAspectRatio="none"
+            data-chart={k}
+            data-color={color}
+            aria-hidden="true"
+          >
+            <line x1="0" y1="89" x2="300" y2="89" stroke="#e2e8f0" />
+          </svg>
+        </figure>
+      ))
+    }
+  </div>
+
+  <!-- 使用场景评分 -->
+  <div class={`${tile} mt-4`}>
+    <div class="flex flex-wrap items-baseline justify-between gap-2">
+      <h3 class="font-bold">使用场景评分</h3>
+      <details class="text-xs">
+        <summary class="text-accent-strong cursor-pointer font-semibold"
+          >评分规则</summary
+        >
+        <ul
+          class="text-muted-foreground mt-2 max-w-md space-y-1 leading-relaxed"
+        >
+          <li>
+            网页与 AI 对话：延迟 &lt; 150 ms 且下载 ≥ 5 Mbps 为优秀；延迟 &lt;
+            300 ms 为良好
+          </li>
+          <li>
+            高清视频：下载 ≥ 25 Mbps 可流畅 4K（优秀），≥ 8 Mbps 可流畅
+            1080p（良好），≥ 3 Mbps 为一般
+          </li>
+          <li>
+            视频会议：延迟 &lt; 100 ms、抖动 &lt; 20 ms、上传 ≥ 3 Mbps
+            为优秀；延迟 &lt; 200 ms、上传 ≥ 1.5 Mbps 为良好
+          </li>
+          <li>
+            在线游戏：延迟 &lt; 50 ms 且抖动 &lt; 10 ms 为优秀；&lt; 100 ms
+            且抖动 &lt; 20 ms 为良好；&lt; 150 ms 为一般
+          </li>
+          <li>评分只根据本次测得的数字计算，不代表流媒体或账号地区解锁。</li>
+        </ul>
+      </details>
+    </div>
+    <ul class="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4" data-scores>
+      {
+        [
+          ["web", "网页与 AI 对话"],
+          ["video", "高清视频"],
+          ["meeting", "视频会议"],
+          ["game", "在线游戏"],
+        ].map(([k, label]) => (
+          <li
+            class="rounded-xl border border-slate-100 bg-slate-50/70 px-3 py-2.5"
+            data-score={k}
+          >
+            <p class="text-muted-foreground text-xs">{label}</p>
+            <p class="mt-0.5 font-bold text-slate-400" data-score-v>
+              未测
+            </p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <!-- 网站连通性 -->
+  <div class={`${tile} mt-4`}>
+    <div class="flex flex-wrap items-center justify-between gap-2">
+      <div>
+        <h3 class="font-bold">网站连通性</h3>
+        <p class="text-muted-foreground text-xs">
+          每个网站连 4
+          次取中位数；只测能否连上和连接延迟，不代表片库或账号地区解锁
+        </p>
+      </div>
+      <button
+        type="button"
+        class="btn btn-outline h-9 px-4 text-sm"
+        data-conn-start>检测连通性</button
+      >
+    </div>
+    <ul
+      class="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5"
+      data-conn
+    >
+      {
+        SITES.map(([name, url]) => (
+          <li
+            class="rounded-xl border border-slate-100 bg-white px-3 py-2.5"
+            data-site={url}
+            data-name={name}
+          >
+            <div class="flex items-center justify-between gap-2">
+              <span class="truncate text-sm font-semibold">{name}</span>
+              <span class="num text-muted-foreground text-xs" data-ms>
+                —
+              </span>
+            </div>
+            <div class="mt-1.5 flex items-center justify-between gap-2">
+              <span class="text-xs font-semibold text-slate-400" data-state>
+                未检测
+              </span>
+              <span
+                class="flex h-3 items-end gap-[2px]"
+                data-bars
+                aria-hidden="true"
+              />
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <!-- 报告 -->
+  <div class="mt-4 hidden flex-wrap items-center gap-2" data-after>
+    <button type="button" class="btn btn-primary h-11 px-5 text-sm" data-save
+      >保存测速报告图</button
+    >
+    <button type="button" class="btn btn-outline h-11 px-5 text-sm" data-copy
+      >复制结果</button
+    >
+    <a
+      class="btn btn-outline h-11 px-5 text-sm"
+      href="/test-records/submit/"
+      data-record>生成测速记录</a
+    >
+    <span class="text-muted-foreground text-xs" data-after-msg></span>
+  </div>
+  <p class="text-muted-foreground mt-3 text-xs leading-relaxed" data-status>
+    测速会从 Cloudflare
+    下载和上传你选择的数据量，消耗机场流量；数值受本地宽带、时段和节点负载影响，单次结果仅供参考。本页不上传、不保存任何测速结果和
+    IP。
+  </p>
+</section>
+
+<script>
+  // 测速服务器；__SPEED_BASE__ 只用于本地自动化测试
+  const BASE: string =
+    (window as unknown as { __SPEED_BASE__?: string }).__SPEED_BASE__ ??
+    "https://speed.cloudflare.com";
+  const STOPS = [0, 5, 10, 50, 100, 250, 500, 1000];
+  const COLO: Record<string, string> = {
+    HKG: "香港",
+    TPE: "台北",
+    NRT: "东京",
+    KIX: "大阪",
+    ICN: "首尔",
+    SIN: "新加坡",
+    LAX: "洛杉矶",
+    SJC: "圣何塞",
+    SEA: "西雅图",
+    SLC: "盐湖城",
+    DFW: "达拉斯",
+    ORD: "芝加哥",
+    IAD: "华盛顿",
+    EWR: "纽约",
+    FRA: "法兰克福",
+    LHR: "伦敦",
+    AMS: "阿姆斯特丹",
+    CDG: "巴黎",
+    SYD: "悉尼",
+    BOM: "孟买",
+    KUL: "吉隆坡",
+    BKK: "曼谷",
+    MNL: "马尼拉",
+  };
+
+  const root = document.querySelector<HTMLElement>("[data-speed-lab]");
+  if (root) {
+    const $ = <T extends Element>(s: string) => root.querySelector<T>(s)!;
+    const $$ = <T extends Element>(s: string) => [
+      ...root.querySelectorAll<T>(s),
+    ];
+    const rnd = () => Math.random().toString(36).slice(2);
+    const fmt = (n: number) =>
+      n >= 100 ? n.toFixed(0) : n >= 10 ? n.toFixed(1) : n.toFixed(2);
+    const median = (a: number[]) => {
+      if (!a.length) return NaN;
+      const s = [...a].sort((x, y) => x - y);
+      const m = s.length >> 1;
+      return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+    };
+    const set = (k: string, v: string) =>
+      ($<HTMLElement>(`[data-r="${k}"]`).textContent = v);
+
+    // ---------- 出口信息 ----------
+    type Meta = {
+      clientIp?: string;
+      country?: string;
+      city?: string;
+      asn?: number;
+      asOrganization?: string;
+      colo?: string;
+    };
+    let meta: Meta = {};
+    let showIp = false;
+    const regionName = (c?: string) => {
+      if (!c) return "未知";
+      if (c === "CN") return "中国大陆";
+      try {
+        return new Intl.DisplayNames(["zh-CN"], { type: "region" }).of(c) ?? c;
+      } catch {
+        return c;
+      }
+    };
+    const mask = (ip?: string) => {
+      if (!ip) return "未知";
+      if (ip.includes(":"))
+        return ip.split(":").slice(0, 2).join(":") + ":****:****";
+      const p = ip.split(".");
+      return `${p[0]}.${p[1]}.***.***`;
+    };
+    const renderIp = () => {
+      $<HTMLElement>("[data-ip]").textContent = showIp
+        ? (meta.clientIp ?? "未知")
+        : mask(meta.clientIp);
+      const b = $<HTMLButtonElement>("[data-ip-toggle]");
+      b.textContent = showIp ? "隐藏 IP" : "显示完整 IP";
+      b.setAttribute("aria-pressed", String(showIp));
+    };
+    $<HTMLButtonElement>("[data-ip-toggle]").addEventListener("click", () => {
+      showIp = !showIp;
+      renderIp();
+    });
+    async function loadMeta() {
+      try {
+        const r = await fetch(`${BASE}/meta?r=${rnd()}`, { cache: "no-store" });
+        meta = await r.json();
+      } catch {
+        meta = {};
+      }
+      renderIp();
+      const geo = (k: string, v: string) =>
+        ($<HTMLElement>(`[data-geo="${k}"]`).textContent = v);
+      geo("country", regionName(meta.country));
+      geo("city", meta.city || "未知");
+      geo(
+        "asn",
+        meta.asOrganization
+          ? `${meta.asOrganization}${meta.asn ? `（AS${meta.asn}）` : ""}`
+          : "未知"
+      );
+      geo(
+        "colo",
+        meta.colo
+          ? `${meta.colo}${COLO[meta.colo] ? `（${COLO[meta.colo]}）` : ""}`
+          : "未知"
+      );
+      const dot = $<HTMLElement>("[data-proxy-dot]");
+      const text = $<HTMLElement>("[data-proxy-text]");
+      if (!meta.country) {
+        dot.className =
+          "mt-1.5 inline-block size-2 flex-none rounded-full bg-slate-300";
+        text.textContent =
+          "读取出口信息失败：可能被浏览器插件拦截，测速仍可进行";
+      } else if (meta.country === "CN") {
+        dot.className =
+          "mt-1.5 inline-block size-2 flex-none rounded-full bg-red-500";
+        text.textContent =
+          "出口在中国大陆：测速流量没有经过代理，测到的是本地宽带";
+      } else {
+        dot.className =
+          "mt-1.5 inline-block size-2 flex-none rounded-full bg-emerald-500";
+        text.textContent = `出口在${regionName(meta.country)}：测速流量经过代理或海外网络，结果可代表当前节点`;
+      }
+    }
+    loadMeta();
+
+    // ---------- 数据量 ----------
+    const sizeOf = (k: "down" | "up") =>
+      Number($<HTMLSelectElement>(`[data-size="${k}"]`).value) * 1e6;
+    const updTraffic = () =>
+      ($<HTMLElement>("[data-traffic]").textContent =
+        `本次约消耗 ${Math.round((sizeOf("down") + sizeOf("up")) / 1e6) + 1} MB 机场流量`);
+    $$<HTMLSelectElement>("[data-size]").forEach(s =>
+      s.addEventListener("change", updTraffic)
+    );
+    updTraffic();
+
+    // ---------- 仪表与进度 ----------
+    const arc = $<SVGPathElement>("[data-arc]");
+    const live = $<HTMLElement>("[data-live]");
+    const phase = $<HTMLElement>("[data-phase]");
+    const prog = $<HTMLElement>("[data-progress]");
+    const scale = (v: number) => {
+      for (let i = 1; i < STOPS.length; i++)
+        if (v <= STOPS[i])
+          return (i - 1 + (v - STOPS[i - 1]) / (STOPS[i] - STOPS[i - 1])) / 7;
+      return 1;
+    };
+    const gauge = (mbps: number, label = "Mbps") => {
+      arc.setAttribute(
+        "stroke-dasharray",
+        `${Math.max(0, Math.min(1, scale(mbps))) * 1000} 1000`
+      );
+      live.textContent = mbps > 0 ? fmt(mbps) : "0";
+      $<HTMLElement>("[data-live-label]").textContent = label;
+    };
+    const progress = (p: number) =>
+      (prog.style.width = `${Math.round(p * 100)}%`);
+
+    // ---------- 曲线 ----------
+    const series: Record<string, number[]> = { down: [], up: [], ping: [] };
+    function draw(k: string) {
+      const svg = $<SVGSVGElement>(`[data-chart="${k}"]`);
+      const data = series[k];
+      const color = svg.dataset.color!;
+      svg.querySelectorAll(".s").forEach(n => n.remove());
+      if (!data.length) return;
+      const max = Math.max(...data) * 1.15 || 1;
+      $<HTMLElement>(`[data-chart-max="${k}"]`).textContent =
+        `峰值 ${fmt(Math.max(...data))}`;
+      const ns = "http://www.w3.org/2000/svg";
+      if (k === "ping") {
+        data.forEach((v, i) => {
+          const c = document.createElementNS(ns, "circle");
+          c.setAttribute(
+            "cx",
+            String(data.length === 1 ? 150 : (i / (data.length - 1)) * 292 + 4)
+          );
+          c.setAttribute("cy", String(86 - (v / max) * 80));
+          c.setAttribute("r", "2.6");
+          c.setAttribute("fill", color);
+          c.setAttribute("class", "s");
+          svg.appendChild(c);
+        });
+        return;
+      }
+      const pts = data.map(
+        (v, i) =>
+          `${data.length === 1 ? 0 : (i / (data.length - 1)) * 300},${88 - (v / max) * 82}`
+      );
+      const area = document.createElementNS(ns, "path");
+      area.setAttribute("d", `M0,89 L${pts.join(" L")} L300,89 Z`);
+      area.setAttribute("fill", color);
+      area.setAttribute("opacity", "0.14");
+      area.setAttribute("class", "s");
+      const line = document.createElementNS(ns, "polyline");
+      line.setAttribute("points", pts.join(" "));
+      line.setAttribute("fill", "none");
+      line.setAttribute("stroke", color);
+      line.setAttribute("stroke-width", "2");
+      line.setAttribute("vector-effect", "non-scaling-stroke");
+      line.setAttribute("stroke-linejoin", "round");
+      line.setAttribute("class", "s");
+      svg.append(area, line);
+    }
+
+    // ---------- 测量 ----------
+    async function ping(): Promise<number> {
+      const t0 = performance.now();
+      const r = await fetch(`${BASE}/__down?bytes=0&r=${rnd()}`, {
+        cache: "no-store",
+      });
+      await r.arrayBuffer();
+      return performance.now() - t0;
+    }
+    async function idleLatency() {
+      const s: number[] = [];
+      for (let i = 0; i < 21; i++) {
+        const v = await ping();
+        if (i > 0) {
+          s.push(v);
+          series.ping.push(v);
+          draw("ping");
+        }
+        progress(0.02 + (i / 21) * 0.13);
+      }
+      let j = 0;
+      for (let i = 1; i < s.length; i++) j += Math.abs(s[i] - s[i - 1]);
+      return { latency: median(s), jitter: j / (s.length - 1) };
+    }
+    /** 传输期间每 400 ms 测一次延迟，得到满载延迟 */
+    function loadedPinger() {
+      const s: number[] = [];
+      let on = true;
+      (async () => {
+        while (on) {
+          try {
+            const v = await ping();
+            if (on) s.push(v);
+          } catch {
+            /* 忽略单次失败 */
+          }
+          await new Promise(r => setTimeout(r, 400));
+        }
+      })();
+      return () => {
+        on = false;
+        return median(s);
+      };
+    }
+    async function transfer(
+      kind: "down" | "up",
+      total: number,
+      p0: number,
+      p1: number
+    ) {
+      const ctrl = new AbortController();
+      const limitMs = 20000;
+      let bytes = 0;
+      const start = performance.now();
+      // 最近 1.5 秒的平均速度，避免分块完成造成的尖峰
+      const hist: [number, number][] = [[start, 0]];
+      const tick = setInterval(() => {
+        const now = performance.now();
+        hist.push([now, bytes]);
+        while (hist.length > 2 && now - hist[0][0] > 1500) hist.shift();
+        const [t0, b0] = hist[0];
+        const inst =
+          ((bytes - b0) * 8) / Math.max((now - t0) / 1000, 0.25) / 1e6;
+        if (bytes > 0) {
+          series[kind].push(inst);
+          draw(kind);
+          gauge(inst);
+        }
+        progress(
+          p0 +
+            Math.min(1, Math.max(bytes / total, (now - start) / limitMs)) *
+              (p1 - p0)
+        );
+        $<HTMLElement>("[data-elapsed]").textContent =
+          `${(bytes / 1e6).toFixed(1)} / ${Math.round(total / 1e6)} MB`;
+      }, 250);
+      const stop = setTimeout(() => ctrl.abort(), limitMs);
+      const marks: [number, number][] = [];
+      const note = () => marks.push([performance.now(), bytes]);
+      const worker = async () => {
+        while (!ctrl.signal.aborted && bytes < total) {
+          if (kind === "down") {
+            const size = Math.min(10e6, total - bytes);
+            if (size <= 0) break;
+            const r = await fetch(
+              `${BASE}/__down?bytes=${Math.ceil(size)}&r=${rnd()}`,
+              { cache: "no-store", signal: ctrl.signal }
+            );
+            const reader = r.body!.getReader();
+            for (;;) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              bytes += value.byteLength;
+              note();
+              if (bytes >= total) {
+                ctrl.abort();
+                break;
+              }
+            }
+          } else {
+            const size = Math.min(1e6, total - bytes);
+            if (size <= 0) break;
+            await fetch(`${BASE}/__up?r=${rnd()}`, {
+              method: "POST",
+              body: new Blob([new Uint8Array(size)]),
+              signal: ctrl.signal,
+            });
+            bytes += size;
+            note();
+          }
+        }
+      };
+      await Promise.allSettled(
+        Array.from({ length: kind === "down" ? 4 : 3 }, worker)
+      );
+      clearTimeout(stop);
+      clearInterval(tick);
+      if (bytes === 0) throw new Error(kind);
+      // 去掉开头 15% 的爬坡阶段
+      const end = performance.now();
+      const warm = marks.find(([, b]) => b >= bytes * 0.15) ?? [start, 0];
+      const span = (end - warm[0]) / 1000;
+      return {
+        mbps: ((bytes - warm[1]) * 8) / Math.max(span, 0.2) / 1e6,
+        bytes,
+      };
+    }
+
+    // ---------- 评分 ----------
+    type R = {
+      down: number;
+      up: number;
+      latency: number;
+      jitter: number;
+      loadedDown: number;
+      loadedUp: number;
+    };
+    const LEVEL = {
+      4: ["优秀", "text-emerald-600"],
+      3: ["良好", "text-sky-600"],
+      2: ["一般", "text-amber-600"],
+      1: ["较差", "text-red-600"],
+    } as const;
+    function scores(r: R) {
+      return {
+        web:
+          r.latency < 150 && r.down >= 5
+            ? 4
+            : r.latency < 300 && r.down >= 2
+              ? 3
+              : r.down >= 1
+                ? 2
+                : 1,
+        video: r.down >= 25 ? 4 : r.down >= 8 ? 3 : r.down >= 3 ? 2 : 1,
+        meeting:
+          r.latency < 100 && r.jitter < 20 && r.up >= 3
+            ? 4
+            : r.latency < 200 && r.up >= 1.5
+              ? 3
+              : r.latency < 300
+                ? 2
+                : 1,
+        game:
+          r.latency < 50 && r.jitter < 10
+            ? 4
+            : r.latency < 100 && r.jitter < 20
+              ? 3
+              : r.latency < 150
+                ? 2
+                : 1,
+      } as Record<string, 1 | 2 | 3 | 4>;
+    }
+    const SCORE_LABEL: Record<string, string> = {
+      web: "网页与 AI 对话",
+      video: "高清视频",
+      meeting: "视频会议",
+      game: "在线游戏",
+    };
+
+    // ---------- 连通性 ----------
+    const conn: Record<string, number | null> = {};
+    async function probe(url: string) {
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), 5000);
+      const t0 = performance.now();
+      try {
+        await fetch(`${url}?r=${rnd()}`, {
+          mode: "no-cors",
+          cache: "no-store",
+          signal: ctrl.signal,
+        });
+        return performance.now() - t0;
+      } catch {
+        return null;
+      } finally {
+        clearTimeout(t);
+      }
+    }
+    async function checkSite(li: HTMLElement) {
+      const url = li.dataset.site!;
+      const msEl = li.querySelector<HTMLElement>("[data-ms]")!;
+      const st = li.querySelector<HTMLElement>("[data-state]")!;
+      const bars = li.querySelector<HTMLElement>("[data-bars]")!;
+      bars.innerHTML = "";
+      st.textContent = "检测中…";
+      st.className = "text-xs font-semibold text-slate-500";
+      const ok: number[] = [];
+      for (let i = 0; i < 4; i++) {
+        const v = await probe(url);
+        const b = document.createElement("span");
+        b.className = `inline-block w-[3px] rounded-sm ${v === null ? "bg-red-400" : v < 150 ? "bg-emerald-500" : v < 300 ? "bg-amber-400" : "bg-red-400"}`;
+        b.style.height =
+          v === null
+            ? "100%"
+            : `${Math.max(25, Math.min(100, (v / 400) * 100))}%`;
+        bars.appendChild(b);
+        if (v !== null && i > 0) ok.push(v); // 第一次含 DNS 与握手，不计入
+        if (v === null && i === 0) break; // 首次就超时/失败，不再重复
+      }
+      const m = ok.length ? median(ok) : null;
+      conn[li.dataset.name!] = m;
+      if (m === null) {
+        msEl.textContent = "—";
+        st.textContent = "超时或无法连接";
+        st.className = "text-xs font-semibold text-red-600";
+      } else {
+        msEl.textContent = `${Math.round(m)} ms`;
+        st.textContent = m < 150 ? "可连接" : m < 300 ? "较慢" : "很慢";
+        st.className = `text-xs font-semibold ${m < 150 ? "text-emerald-600" : m < 300 ? "text-amber-600" : "text-red-600"}`;
+      }
+    }
+    let connRunning = false;
+    async function runConn() {
+      if (connRunning) return;
+      connRunning = true;
+      const btn = $<HTMLButtonElement>("[data-conn-start]");
+      btn.disabled = true;
+      btn.textContent = "检测中…";
+      const items = $$<HTMLElement>("[data-site]");
+      let i = 0;
+      await Promise.all(
+        Array.from({ length: 4 }, async () => {
+          while (i < items.length) await checkSite(items[i++]);
+        })
+      );
+      btn.disabled = false;
+      btn.textContent = "重新检测";
+      connRunning = false;
+    }
+    $<HTMLButtonElement>("[data-conn-start]").addEventListener(
+      "click",
+      runConn
+    );
+
+    // ---------- 主流程 ----------
+    let result: R | null = null;
+    let testedAt = new Date();
+    let running = false;
+    const startBtn = $<HTMLButtonElement>("[data-start]");
+    const after = $<HTMLElement>("[data-after]");
+    async function run() {
+      if (running) return;
+      running = true;
+      startBtn.disabled = true;
+      startBtn.textContent = "测速中…";
+      after.classList.add("hidden");
+      after.classList.remove("flex");
+      ["down", "up", "latency", "jitter", "loadedDown", "loadedUp"].forEach(k =>
+        set(k, "—")
+      );
+      $$<HTMLElement>("[data-score-v]").forEach(n => {
+        n.textContent = "测试中";
+        n.className = "mt-0.5 font-bold text-slate-400";
+      });
+      Object.keys(series).forEach(k => {
+        series[k] = [];
+        draw(k);
+      });
+      gauge(0);
+      testedAt = new Date();
+      try {
+        if (!meta.country) await loadMeta();
+        phase.textContent = "① 测空载延迟";
+        const { latency, jitter } = await idleLatency();
+        set("latency", fmt(latency));
+        set("jitter", fmt(jitter));
+        gauge(0);
+
+        phase.textContent = "② 测下载速度";
+        let stopPing = loadedPinger();
+        const d = await transfer("down", sizeOf("down"), 0.15, 0.6);
+        const loadedDown = stopPing();
+        set("down", fmt(d.mbps));
+        set("loadedDown", Number.isNaN(loadedDown) ? "—" : fmt(loadedDown));
+
+        phase.textContent = "③ 测上传速度";
+        stopPing = loadedPinger();
+        const u = await transfer("up", sizeOf("up"), 0.6, 0.95);
+        const loadedUp = stopPing();
+        set("up", fmt(u.mbps));
+        set("loadedUp", Number.isNaN(loadedUp) ? "—" : fmt(loadedUp));
+        gauge(d.mbps, "下载 Mbps");
+
+        result = {
+          down: d.mbps,
+          up: u.mbps,
+          latency,
+          jitter,
+          loadedDown,
+          loadedUp,
+        };
+        const sc = scores(result);
+        $$<HTMLElement>("[data-score]").forEach(li => {
+          const [label, cls] = LEVEL[sc[li.dataset.score!]];
+          const v = li.querySelector<HTMLElement>("[data-score-v]")!;
+          v.textContent = label;
+          v.className = `mt-0.5 font-bold ${cls}`;
+        });
+        progress(1);
+        phase.textContent = "测试完成";
+        $<HTMLElement>("[data-elapsed]").textContent =
+          `共用 ${Math.round((d.bytes + u.bytes) / 1e6)} MB`;
+        const pad = (n: number) => String(n).padStart(2, "0");
+        const at = `${testedAt.getFullYear()}-${pad(testedAt.getMonth() + 1)}-${pad(testedAt.getDate())}T${pad(testedAt.getHours())}:${pad(testedAt.getMinutes())}`;
+        $<HTMLAnchorElement>("[data-record]").href =
+          `/test-records/submit/?tool=cloudflare&down=${fmt(d.mbps)}&up=${fmt(u.mbps)}&latency=${fmt(latency)}&jitter=${fmt(jitter)}&at=${at}`;
+        after.classList.remove("hidden");
+        after.classList.add("flex");
+        runConn();
+      } catch {
+        phase.textContent =
+          "测速失败：请检查网络或代理设置后重试（部分浏览器插件会拦截测速请求）";
+        progress(0);
+      } finally {
+        running = false;
+        startBtn.disabled = false;
+        startBtn.textContent = "重新测速";
+      }
+    }
+    startBtn.addEventListener("click", run);
+
+    // ---------- 结果输出 ----------
+    const stamp = () => {
+      const p = (n: number) => String(n).padStart(2, "0");
+      return `${testedAt.getFullYear()}-${p(testedAt.getMonth() + 1)}-${p(testedAt.getDate())} ${p(testedAt.getHours())}:${p(testedAt.getMinutes())}`;
+    };
+    function summary() {
+      if (!result) return "";
+      const sc = scores(result);
+      const lines = [
+        `机场网速测试 · ${stamp()}`,
+        `出口：${regionName(meta.country)} ${meta.city ?? ""} ${meta.asOrganization ? `· ${meta.asOrganization}` : ""}（IP ${mask(meta.clientIp)}）`,
+        `测速节点：${meta.colo ?? "未知"}`,
+        `下载 ${fmt(result.down)} Mbps · 上传 ${fmt(result.up)} Mbps`,
+        `延迟 ${fmt(result.latency)} ms · 抖动 ${fmt(result.jitter)} ms`,
+        `满载延迟：下载时 ${fmt(result.loadedDown)} ms · 上传时 ${fmt(result.loadedUp)} ms`,
+        `场景评分：${Object.entries(sc)
+          .map(([k, v]) => `${SCORE_LABEL[k]} ${LEVEL[v][0]}`)
+          .join("、")}`,
+      ];
+      const c = $$<HTMLElement>("[data-site]")
+        .map(li => li.dataset.name!)
+        .filter(n => conn[n] !== undefined)
+        .map(n => [n, conn[n]] as [string, number | null]);
+      if (c.length)
+        lines.push(
+          `网站连通性：${c.map(([n, v]) => `${n} ${v === null ? "超时" : Math.round(v) + "ms"}`).join("、")}`
+        );
+      lines.push("测于 jichangshice.com.cn 机场网速测试");
+      return lines.join("\n");
+    }
+    $<HTMLButtonElement>("[data-copy]").addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(summary());
+        $<HTMLElement>("[data-after-msg]").textContent = "已复制";
+      } catch {
+        $<HTMLElement>("[data-after-msg]").textContent =
+          "复制失败，请手动选择文字";
+      }
+    });
+
+    /** 生成测速报告图（PNG，出口 IP 打码） */
+    function report() {
+      if (!result) return;
+      const W = 1080;
+      const order = $$<HTMLElement>("[data-site]").map(li => li.dataset.name!);
+      const sites = order
+        .filter(n => conn[n] !== undefined)
+        .map(n => [n, conn[n]] as [string, number | null]);
+      const H = 1180 + Math.ceil(sites.length / 3) * 74;
+      const cv = document.createElement("canvas");
+      cv.width = W;
+      cv.height = H;
+      const g = cv.getContext("2d")!;
+      const F = '"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif';
+      const bg = g.createLinearGradient(0, 0, 0, H);
+      bg.addColorStop(0, "#eaf2ff");
+      bg.addColorStop(0.35, "#ffffff");
+      bg.addColorStop(1, "#f5f8ff");
+      g.fillStyle = bg;
+      g.fillRect(0, 0, W, H);
+      const rr = (
+        x: number,
+        y: number,
+        w: number,
+        h: number,
+        r: number,
+        fill: string,
+        stroke?: string
+      ) => {
+        g.beginPath();
+        g.roundRect(x, y, w, h, r);
+        g.fillStyle = fill;
+        g.fill();
+        if (stroke) {
+          g.strokeStyle = stroke;
+          g.lineWidth = 2;
+          g.stroke();
+        }
+      };
+      const text = (
+        s: string,
+        x: number,
+        y: number,
+        size: number,
+        color = "#0f172a",
+        weight = 700,
+        align: CanvasTextAlign = "left"
+      ) => {
+        g.font = `${weight} ${size}px ${F}`;
+        g.fillStyle = color;
+        g.textAlign = align;
+        g.fillText(s, x, y);
+      };
+      // 标题
+      text(
+        "JICHANGSHICE.COM.CN · 机场测试",
+        W / 2,
+        78,
+        24,
+        "#3b6fd6",
+        600,
+        "center"
+      );
+      const tg = g.createLinearGradient(0, 100, 0, 200);
+      tg.addColorStop(0, "#3b8cff");
+      tg.addColorStop(1, "#0a4fd6");
+      g.font = `900 92px ${F}`;
+      g.fillStyle = tg;
+      g.textAlign = "center";
+      g.fillText("机场网速测试", W / 2, 190);
+      rr(W / 2 - 230, 222, 460, 56, 28, "#ffffff", "#bcd3ff");
+      text(`测试时间：${stamp()}`, W / 2, 260, 26, "#1e3a8a", 700, "center");
+      // 出口
+      rr(60, 310, W - 120, 160, 28, "#ffffff", "#dbe6fb");
+      text("出口", 100, 360, 22, "#64748b", 600);
+      text(
+        `${regionName(meta.country)}${meta.city ? ` · ${meta.city}` : ""}`,
+        100,
+        405,
+        34,
+        "#0f172a",
+        800
+      );
+      text(
+        `${meta.asOrganization ?? ""}${meta.asn ? `（AS${meta.asn}）` : ""}`,
+        100,
+        445,
+        22,
+        "#475569",
+        500
+      );
+      text("测速节点", W - 100, 360, 22, "#64748b", 600, "right");
+      text(
+        meta.colo
+          ? `${meta.colo}${COLO[meta.colo] ? ` · ${COLO[meta.colo]}` : ""}`
+          : "未知",
+        W - 100,
+        405,
+        34,
+        "#0f172a",
+        800,
+        "right"
+      );
+      text(
+        `IP ${mask(meta.clientIp)}`,
+        W - 100,
+        445,
+        22,
+        "#475569",
+        500,
+        "right"
+      );
+      // 指标
+      const m: [string, string, string, string][] = [
+        ["下载", fmt(result.down), "Mbps", "#0ea5e9"],
+        ["上传", fmt(result.up), "Mbps", "#10b981"],
+        ["延迟", fmt(result.latency), "ms", "#f59e0b"],
+        ["抖动", fmt(result.jitter), "ms", "#ec4899"],
+        ["下载时延迟", fmt(result.loadedDown), "ms", "#64748b"],
+        ["上传时延迟", fmt(result.loadedUp), "ms", "#64748b"],
+      ];
+      m.forEach(([l, v, u, c], i) => {
+        const x = 60 + (i % 3) * 330;
+        const y = 500 + Math.floor(i / 3) * 170;
+        rr(x, y, 300, 145, 26, "#ffffff", "#dbe6fb");
+        text(l, x + 28, y + 46, 22, "#64748b", 600);
+        g.font = `900 54px ${F}`;
+        g.fillStyle = c;
+        g.textAlign = "left";
+        g.fillText(v, x + 28, y + 112);
+        const w = g.measureText(v).width;
+        text(u, x + 36 + w, y + 112, 22, "#94a3b8", 600);
+      });
+      // 评分
+      const sc = scores(result);
+      text("使用场景评分", 60, 880, 28, "#0f172a", 800);
+      Object.entries(sc).forEach(([k, v], i) => {
+        const x = 60 + i * 247;
+        rr(x, 905, 225, 96, 22, "#f8fafc", "#e2e8f0");
+        text(SCORE_LABEL[k], x + 22, 943, 20, "#64748b", 600);
+        const col = { 4: "#059669", 3: "#0284c7", 2: "#d97706", 1: "#dc2626" }[
+          v
+        ];
+        text(LEVEL[v][0], x + 22, 984, 30, col, 800);
+      });
+      // 连通性
+      let y = 1050;
+      if (sites.length) {
+        text("网站连通性", 60, y, 28, "#0f172a", 800);
+        sites.forEach(([n, v], i) => {
+          const x = 60 + (i % 3) * 330;
+          const yy = y + 22 + Math.floor(i / 3) * 74;
+          rr(x, yy, 300, 60, 18, "#ffffff", "#e2e8f0");
+          text(n, x + 22, yy + 39, 22, "#0f172a", 700);
+          const col =
+            v === null
+              ? "#dc2626"
+              : v < 150
+                ? "#059669"
+                : v < 300
+                  ? "#d97706"
+                  : "#dc2626";
+          text(
+            v === null ? "超时" : `${Math.round(v)} ms`,
+            x + 278,
+            yy + 39,
+            22,
+            col,
+            800,
+            "right"
+          );
+        });
+        y += 22 + Math.ceil(sites.length / 3) * 74;
+      }
+      text(
+        "说明：单次网页测速，结果受本地宽带、时段与节点负载影响；浏览器无法测丢包。",
+        W / 2,
+        y + 50,
+        20,
+        "#64748b",
+        500,
+        "center"
+      );
+      text(
+        "jichangshice.com.cn · 2026 机场测试与机场推荐",
+        W / 2,
+        y + 86,
+        20,
+        "#3b6fd6",
+        600,
+        "center"
+      );
+      const a = document.createElement("a");
+      const p = (n: number) => String(n).padStart(2, "0");
+      a.download = `机场网速测试-${testedAt.getFullYear()}${p(testedAt.getMonth() + 1)}${p(testedAt.getDate())}-${p(testedAt.getHours())}${p(testedAt.getMinutes())}.png`;
+      a.href = cv.toDataURL("image/png");
+      a.click();
+      $<HTMLElement>("[data-after-msg]").textContent =
+        "报告图已生成（出口 IP 已打码）";
+    }
+    $<HTMLButtonElement>("[data-save]").addEventListener("click", report);
+  }
+</script>
