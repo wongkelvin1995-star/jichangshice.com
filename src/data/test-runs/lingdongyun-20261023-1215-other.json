@@ -1,0 +1,37 @@
+{
+  "id": "lingdongyun-20261023-1215-other",
+  "brandSlug": "lingdongyun",
+  "nodeRegion": "美国",
+  "nodeName": null,
+  "testedAt": "2026-10-23T12:15:00+08:00",
+  "downloadMbps": 16.83,
+  "uploadMbps": 14.04,
+  "latencyMs": 204.05,
+  "jitterMs": 3.39,
+  "packetLossPct": null,
+  "tool": "other",
+  "toolName": "网页测速（下载 50 MB / 上传 15 MB）",
+  "dataSource": "screenshot",
+  "evidenceUrl": null,
+  "evidenceFiles": [
+    {
+      "path": "/evidence/lingdongyun-us-2026-10-23/speedtest.webp",
+      "public": true,
+      "kind": "screenshot"
+    }
+  ],
+  "server": "SLC（Salt Lake City，美国）",
+  "isp": null,
+  "location": null,
+  "bandwidth": null,
+  "device": null,
+  "client": null,
+  "protocol": null,
+  "notes": "代理开启状态下测速，出口地区美国；满载延迟 下载时 267 ms、上传时 754.95 ms；测速网页质量评分：在线视频 差、在线游戏 差、视频会议 差。开始测试时间由站长提供。",
+  "importedAt": "2026-10-23T13:50:00+08:00",
+  "verification": {
+    "status": "verified",
+    "verifiedAt": "2026-10-23T13:50:00+08:00",
+    "notes": "已对照原始截图逐项核对下载、上传、延迟、抖动、测速服务器；出口 IP 已打码"
+  }
+}
