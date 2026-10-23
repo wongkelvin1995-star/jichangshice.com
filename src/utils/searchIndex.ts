@@ -230,7 +230,7 @@ export async function buildSearchIndex(): Promise<SearchEntry[]> {
     t: "机场测试档案：本站测试与公开测速参考",
     u: "/test-records/",
     c: "测试档案",
-    d: `本站测试 ${runs.length} 条（已核验）；公开测速参考 ${records.length} 批，逐条注明来源；页面提供在线测速表。`,
+    d: `本站测试 ${runs.length} 条（已核验）；公开测速参考 ${records.length} 批，逐条注明来源；另有机场网速测试工具。`,
     k: [
       "机场测试",
       "测速记录",
@@ -271,6 +271,29 @@ export async function buildSearchIndex(): Promise<SearchEntry[]> {
       })),
     });
   }
+
+  // 机场网速测试工具页
+  entries.push({
+    t: "机场网速测试：在线测速、延迟、满载延迟与网站连通性",
+    u: "/speedtest/",
+    c: "工具",
+    d: "开着代理测出口 IP、空载延迟与抖动、下载和上传速度、满载延迟和 15 个网站的连通性，可生成打码的测速报告图。",
+    k: [
+      "网速测试",
+      "机场测速",
+      "机场网速测试",
+      "测速",
+      "在线测速",
+      "节点测速",
+      "延迟",
+      "下载速度",
+      "上传速度",
+      "出口 IP",
+      "连通性",
+      "工具",
+    ],
+    s: [],
+  });
 
   // 机场工具箱：节点可用性检测（在测试方法页标题下方）
   entries.push({

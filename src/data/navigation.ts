@@ -16,6 +16,7 @@ export const FULL_NAV = [
   { href: "/compare/", label: "套餐比较" },
   { href: "/testing-methodology/", label: "测试方法" },
   { href: "/test-records/", label: "测试档案" },
+  { href: "/speedtest/", label: "网速测试" },
   { href: "/guides/", label: "新手教程" },
   { href: "/clients/", label: "客户端" },
   { href: "/routes/", label: "线路知识" },

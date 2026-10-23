@@ -468,6 +468,7 @@ const tile =
       asn?: number;
       asOrganization?: string;
       colo?: string;
+      coloCity?: string;
     };
     let meta: Meta = {};
     let showIp = false;
@@ -499,10 +500,21 @@ const tile =
       showIp = !showIp;
       renderIp();
     });
+    const coloName = () =>
+      (meta.colo && COLO[meta.colo]) || meta.coloCity || "";
     async function loadMeta() {
       try {
         const r = await fetch(`${BASE}/meta?r=${rnd()}`, { cache: "no-store" });
-        meta = await r.json();
+        const j = (await r.json()) as Omit<Meta, "colo"> & {
+          colo?: string | { iata?: string; city?: string };
+        };
+        // Cloudflare 现在把 colo 返回为对象 { iata, city, ... }，旧版为字符串
+        const c = j.colo;
+        meta = {
+          ...j,
+          colo: typeof c === "object" && c ? c.iata : c,
+          coloCity: typeof c === "object" && c ? c.city : undefined,
+        };
       } catch {
         meta = {};
       }
@@ -520,7 +532,7 @@ const tile =
       geo(
         "colo",
         meta.colo
-          ? `${meta.colo}${COLO[meta.colo] ? `（${COLO[meta.colo]}）` : ""}`
+          ? `${meta.colo}${coloName() ? `（${coloName()}）` : ""}`
           : "未知"
       );
       const dot = $<HTMLElement>("[data-proxy-dot]");
@@ -1098,7 +1110,7 @@ const tile =
       text("测速节点", W - 100, 360, 22, "#64748b", 600, "right");
       text(
         meta.colo
-          ? `${meta.colo}${COLO[meta.colo] ? ` · ${COLO[meta.colo]}` : ""}`
+          ? `${meta.colo}${coloName() ? ` · ${coloName()}` : ""}`
           : "未知",
         W - 100,
         405,

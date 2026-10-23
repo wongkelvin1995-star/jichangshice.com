@@ -42,7 +42,7 @@ const path = "/test-records/";
 
 <Layout
   title={`机场测试档案：在线测速与 ${withRecords.length} 家机场测速记录｜${config.site.title}`}
-  description={`机场测试档案：在线测速表一键测试当前网络的下载、上传、延迟和抖动；收录 ${withRecords.length} 家机场 ${records.length} 批测速记录，逐条写明测试时间、地点、工具、原始结果链接和数据局限。`}
+  description={`机场测试档案：本站实测图与节点核验、机场网速测试工具入口；收录 ${withRecords.length} 家机场 ${records.length} 批测速记录，逐条写明测试时间、地点、工具、原始结果链接和数据局限。`}
   canonicalPath={path}
   jsonLd={[breadcrumbJsonLd(crumbs, path)]}
 >
@@ -54,7 +54,7 @@ const path = "/test-records/";
           机场测试档案
         </h1>
         <p class="text-muted-foreground mt-3 max-w-3xl leading-relaxed">
-          用下方测速表测一测你当前的网络，并查看各机场的测速记录：测试时间、地点、工具和原始结果逐条列出，数值按原单位展示，没有记录的项目留空，不做推测。
+          查看各机场的实测图和测速记录（也可以用机场网速测试自己测一次）：测试时间、地点、工具和原始结果逐条列出，数值按原单位展示，没有记录的项目留空，不做推测。
         </p>
         <ul class="mt-5 grid max-w-2xl grid-cols-2 gap-3 sm:grid-cols-4">
           <li class="card p-3 text-center" data-stat="own">

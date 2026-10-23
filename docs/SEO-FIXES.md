@@ -18,6 +18,7 @@
 | 12 | 图标文件被附加元数据 | `public/favicon.svg`、`public/og-default.png` | 恢复原文件 | 432 B / 67 KB |
 | 13 | 部署说明写旧仓库 | `docs/deploy.md` | 改为 `wongkelvin1995-star/jichangshice.com` | — |
 | 14 | 机场实测图功能（数据与组件就绪，暂无已发布的图） | `src/data/test-photos.ts`、`src/components/TestPhoto.astro`、`src/components/TestPhotoNotice.astro`（新）；测试档案、品牌测速页、品牌页、首页 | 每张实测图必须附原始截图、数值逐项来自截图；灵动云美国、香港节点的图已撤下，等站长提供测试完成的完整截图后再发布 | 构建与全站检查通过 |
+| 15 | 旧测速表功能简单，没有出口 IP、满载延迟和连通性 | `src/components/SpeedLab.astro`、`src/components/SpeedTestIcon.astro`、`src/pages/speedtest.astro`（新）；删除 `src/components/SpeedMeter.astro`；首页首屏入口、测试档案入口、导航「网速测试」、站内搜索、测试方法页与节点检测工具的链接 | 新工具页 `/speedtest/`：出口 IP（默认打码）与代理检查、空载延迟/抖动、下载/上传、满载延迟、实时曲线、公开阈值的场景评分、15 个网站连通性、可选数据量、打码报告图；FAQPage 结构化数据与页面可见问答一致 | 本地模拟服务器完整跑通；线上实测 Cloudflare 测速接口（meta、下载、上传、连通性）可从本站域名跨域调用，并修正 colo 字段新格式 |
 
 ## 未改动（有意保留）
 

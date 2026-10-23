@@ -17,6 +17,7 @@
 - [ ] 页眉有 GitHub 图标；测试档案有「灵动云节点在线核验」
 - [ ] `/favicon.ico` 返回 200；`/search-index.json` 响应头有 `x-robots-tag: noindex`；页面响应头有 `strict-transport-security`
 - [ ] `/robots.txt`、`/sitemap-index.xml` 正常；随便输入一个不存在的地址返回 404
+- [ ] 打开 `/speedtest/`，开着代理点「开始测速」：出口 IP 地区正确、六项数字都有值、连通性 15 项都有结果、能保存报告图
 - [ ] GitHub Actions「IndexNow」成功，日志里的状态码为 200 或 202
 - [ ] 手机上搜索、比较、优惠码复制、个人中心各点一次
 
