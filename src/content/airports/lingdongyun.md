@@ -37,7 +37,7 @@ modDatetime: 2026-10-23T13:59:00+08:00
 
 ## 美国节点实测（2026-10-23）
 
-站长 12:15 开着代理，用 [IPCheck.ing](https://ipcheck.ing/) 的网速测试测了一次灵动云**美国节点**（出口在美国，测速服务器在盐湖城 SLC），原始截图附在[灵动云测速记录](/test-records/lingdongyun/#test-photos)。结果：
+站长 12:15 开着代理，用 IPCheck.ing 的网速测试测了一次灵动云**美国节点**（出口在美国，测速服务器在盐湖城 SLC），原始截图附在[灵动云测速记录](/test-records/lingdongyun/#test-photos)。结果：
 
 | 项目 | 结果 |
 |---|---|
