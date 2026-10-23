@@ -1,11 +1,11 @@
 ---
-title: 2026年机场测试完整指南：测速方法、节点延迟与稳定性分析
+title: 2026年机场测试完整指南：测哪些指标、节点延迟多少算正常
 shortTitle: 机场测试完整指南
 description: 机场测试要看哪些指标、用什么机场测速工具、节点延迟多少算正常、晚高峰为什么要单独测，以及如何判断机场线路是否稳定。适合第一次自己动手做机场测速的读者。
 category: methods
 pubDatetime: 2026-10-15T17:45:00+08:00
-modDatetime: 2026-10-16T11:40:00+08:00
-primaryKeyword: 机场测试
+modDatetime: 2026-10-23T11:30:00+08:00
+primaryKeyword: 机场测试指南
 related:
   - methods/metrics-speed-latency-loss
   - methods/speedtest-results-explained

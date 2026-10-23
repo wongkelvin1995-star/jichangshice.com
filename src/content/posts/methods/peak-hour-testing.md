@@ -1,10 +1,11 @@
 ---
-title: 晚高峰测试如何安排，单次测速有什么局限
+title: 晚高峰稳定性怎么测：测试时段安排与单次测速的局限
 shortTitle: 晚高峰测试怎么安排
 description: 机场晚高峰为什么会变慢？本文解释晚高峰拥堵发生在哪些环节，给出白天与晚高峰对照测试的安排方法、样本数量建议，以及单次测速结果能说明和不能说明的事情。
 category: methods
 pubDatetime: 2026-10-15T10:00:00+08:00
-primaryKeyword: 机场晚高峰测试
+primaryKeyword: 晚高峰稳定性
+modDatetime: 2026-10-23T11:30:00+08:00
 related:
   - methods/record-node-speed-test
   - methods/metrics-speed-latency-loss

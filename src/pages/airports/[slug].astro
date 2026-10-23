@@ -28,7 +28,7 @@ import {
   evidenceLabel,
   trafficSuffix,
 } from "@/utils/plans";
-import { fmtMoney, fmtGB } from "@/utils/format";
+import { fmtMoney, fmtGB, formatDate } from "@/utils/format";
 import { breadcrumbJsonLd, articleJsonLd } from "@/utils/jsonld";
 import config from "@/config";
 
@@ -179,7 +179,30 @@ const recordEvidence = records.reduce(
                       : "资料测评 · 暂无测速记录"
                 }</span
               >
-              <span class="chip num">最后核验 {observed ?? "—"}</span>
+              <span class="chip num">
+                {
+                  plans.every(x => x.currentVerified)
+                    ? "结算页核验"
+                    : "套餐资料整理"
+                }
+                {observed ?? "—"}
+              </span>
+              {
+                analysis && (
+                  <span class="chip num">
+                    测评更新{" "}
+                    <time
+                      datetime={(
+                        analysis.data.modDatetime ?? analysis.data.pubDatetime
+                      ).toISOString()}
+                    >
+                      {formatDate(
+                        analysis.data.modDatetime ?? analysis.data.pubDatetime
+                      )}
+                    </time>
+                  </span>
+                )
+              }
             </div>
             <div class="mt-4 flex items-start gap-4">
               <BrandAvatar name={p.name} />

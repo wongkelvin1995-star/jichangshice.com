@@ -17,16 +17,23 @@ export async function getStaticPaths() {
   const providers = await getProviders();
   const records = await getTestRecords();
   const runs = getVerifiedRuns();
-  return providers
+  const items = providers
     .map(p => ({
       p,
       rs: recordsOf(records, p.slug),
       own: runsOf(runs, p.slug),
     }))
-    .filter(x => x.rs.length > 0 || x.own.length > 0)
-    .map(x => ({ params: { slug: x.p.slug }, props: x }));
+    .filter(
+      x =>
+        x.rs.length > 0 || x.own.length > 0 || nodeChecksOf(x.p.slug).length > 0
+    );
+  const siblings = items.map(x => ({ slug: x.p.slug, name: x.p.name }));
+  return items.map(x => ({
+    params: { slug: x.p.slug },
+    props: { ...x, siblings },
+  }));
 }
-const { p, rs, own } = Astro.props;
+const { p, rs, own, siblings } = Astro.props;
 const checks = nodeChecksOf(p.slug);
 const verified = own.length + checks.length;
 const checkSummary = checks[0]
@@ -149,6 +156,25 @@ const hasPeak = rs.some(r =>
           >机场测试档案</a
         >。
       </p>
+      <nav aria-labelledby="other-records" class="card p-5">
+        <h2 id="other-records" class="font-bold">其他机场的测速记录</h2>
+        <ul class="mt-3 flex flex-wrap gap-2 text-sm">
+          {
+            siblings
+              .filter(s => s.slug !== p.slug)
+              .map(s => (
+                <li>
+                  <a
+                    href={`/test-records/${s.slug}/`}
+                    class="hover:border-accent/40 hover:text-accent-strong inline-block rounded-full border px-3 py-1"
+                  >
+                    {s.name}测速记录
+                  </a>
+                </li>
+              ))
+          }
+        </ul>
+      </nav>
     </div>
   </main>
 </Layout>

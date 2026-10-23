@@ -1,0 +1,53 @@
+name: IndexNow
+
+# 推送到 main 后：等 Cloudflare Pages 部署完成（线上 /deploy-id.txt 等于本次提交），
+# 再把 Sitemap 中 lastmod 晚于上一次提交时间的 URL 通知 IndexNow（Bing 等）。
+# 手动运行可选择 all（提交 Sitemap 全部 URL，用于首次提交）。
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "changed = 只提交上次提交后有更新的 URL；all = 全部 URL"
+        type: choice
+        options: [changed, all]
+        default: changed
+
+concurrency:
+  group: indexnow
+  cancel-in-progress: false
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Submit to IndexNow
+        env:
+          MODE: ${{ github.event.inputs.mode || 'changed' }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          if [ "$MODE" = "all" ]; then
+            node scripts/indexnow.mjs --wait-deploy "$GITHUB_SHA" --all
+            exit $?
+          fi
+          PREV="$BEFORE"
+          if [ -z "$PREV" ] || [ "$PREV" = "0000000000000000000000000000000000000000" ] || ! git cat-file -e "$PREV" 2>/dev/null; then
+            PREV=$(git rev-parse HEAD~1)
+          fi
+          SINCE=$(git show -s --format=%cI "$PREV")
+          echo "上一次提交 $PREV 时间 $SINCE"
+          node scripts/indexnow.mjs --wait-deploy "$GITHUB_SHA" --since "$SINCE"

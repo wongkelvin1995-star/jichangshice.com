@@ -3,6 +3,7 @@ title: 香港、日本、新加坡节点怎么选：AI、视频与办公需求�
 shortTitle: 香港日本新加坡节点怎么选
 description: 香港节点延迟最低，为什么用 ChatGPT 时反而不行？本文结合本站测速档案中的记录，对比香港、日本、新加坡节点在 AI、视频、办公三类用途上的差别，并给出按用途分配节点的建议。
 category: routes
+modDatetime: 2026-10-23T11:30:00+08:00
 pubDatetime: 2026-10-15T18:13:00+08:00
 primaryKeyword: 香港 日本 新加坡节点怎么选
 related:
@@ -28,7 +29,7 @@ related:
 
 **香港节点普遍不能用 ChatGPT**：在本站档案的 Speedtest 记录中，[全球云](/test-records/quanqiuyun/)、[光年梯](/test-records/guangnianti/)、[边缘节点](/test-records/edgenova/)三家的**所有香港记录**，ChatGPT 一栏都是“不可用”，而同时段的新加坡、日本多数是“流畅”。原因在于部分 AI 平台不向香港地区提供服务，这和线路快慢无关。
 
-**新加坡、台湾节点的 YouTube 可能异常**：[灵动云的 60 节点测速](/test-records/lingdongyun/)中，新加坡和台湾节点在 YouTube 被识别为中国大陆，香港、日本、美国节点正常。
+**新加坡、台湾节点的 YouTube 可能异常**：[灵动云的 60 节点公开测速参考](/test-records/lingdongyun/)中（数据与梯子云、暮光加速的公开资料重合，品牌归属未确认），新加坡和台湾节点在 YouTube 被识别为中国大陆，香港、日本、美国节点正常。
 
 **日本节点晚高峰波动较大**：全球云的日本节点白天多次在 450–840 Mbps，2026-07-28 晚高峰只有 17.48 Mbps；光年梯 10 月 8 日晚高峰日本节点视频“缓冲严重”。
 

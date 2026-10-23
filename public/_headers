@@ -1,0 +1,15 @@
+# Cloudflare Pages 响应头（https://developers.cloudflare.com/pages/configuration/headers/）
+/*
+  Strict-Transport-Security: max-age=31536000
+
+# 站内搜索索引与部署标记：可以访问，但不进入搜索结果
+/search-index.json
+  X-Robots-Tag: noindex
+/deploy-id.txt
+  X-Robots-Tag: noindex
+/c51aaf46ff4f886e1468286abf32ae35.txt
+  X-Robots-Tag: noindex
+
+# 带哈希的静态资源长期缓存
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable

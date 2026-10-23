@@ -1,6 +1,6 @@
 # 部署与搜索引擎提交说明
 
-> 本地构建与干净克隆后的构建均已验证通过。代码仓库：`wongkelvinhaha/jichangshice`（main 分支）。
+> 本地构建与干净克隆后的构建均已验证通过。代码仓库：`wongkelvin1995-star/jichangshice.com`（main 分支）。
 
 ## 1. 本地运行
 
@@ -17,7 +17,7 @@ pnpm run preview                 # 预览生产构建
 
 ## 2. Cloudflare Pages
 
-1. 代码已在 GitHub 仓库 `wongkelvinhaha/jichangshice`（不要推到旧站仓库）。
+1. 代码已在 GitHub 仓库 `wongkelvin1995-star/jichangshice.com`（不要推到旧站仓库）。
 2. Cloudflare 控制台 → Workers & Pages → 创建 → Pages → 连接该仓库。
 3. 构建设置：
    - 框架预设：Astro
