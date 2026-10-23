@@ -20,8 +20,8 @@ export default defineAstroPaperConfig({
   },
   // 本站 Telegram 入口；留空字符串则页眉和页脚自动隐藏 TG 图标
   telegramUrl: "https://t.me/+rXmeYjh4Yv5hNjM1",
-  // 本站 GitHub 入口；留空字符串则页眉自动隐藏 GitHub 图标
-  githubUrl: "https://github.com/wongkelvin1995-star/jichangshice.com",
+  // 本站 GitHub 入口（机场实测专题文章 Issue #1）；留空字符串则页眉自动隐藏 GitHub 图标
+  githubUrl: "https://github.com/wongkelvin1995-star/jichangshice.com/issues/1",
   posts: {
     perPage: 12,
     perIndex: 5,
