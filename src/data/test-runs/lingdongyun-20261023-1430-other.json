@@ -1,0 +1,48 @@
+{
+  "id": "lingdongyun-20261023-1430-other",
+  "brandSlug": "lingdongyun",
+  "nodeRegion": "美国",
+  "nodeName": null,
+  "testedAt": "2026-10-23T14:30:00+08:00",
+  "timeNote": "14:30 前开始（截图发送时间为上限）",
+  "downloadMbps": 18.25,
+  "uploadMbps": 15.52,
+  "latencyMs": 203.95,
+  "jitterMs": 11.98,
+  "packetLossPct": null,
+  "tool": "other",
+  "toolName": "IPCheck.ing 网速测试（下载 50 MB / 上传 15 MB）",
+  "dataSource": "screenshot",
+  "evidenceUrl": null,
+  "evidenceFiles": [
+    {
+      "path": "/evidence/lingdongyun-us-2026-10-23/speedtest.webp",
+      "public": true,
+      "kind": "screenshot"
+    },
+    {
+      "path": "/evidence/lingdongyun-us-2026-10-23/connectivity.webp",
+      "public": true,
+      "kind": "screenshot"
+    },
+    {
+      "path": "/evidence/lingdongyun-us-2026-10-23/ip-info.webp",
+      "public": true,
+      "kind": "screenshot"
+    }
+  ],
+  "server": "SLC（Salt Lake City，美国）",
+  "isp": null,
+  "location": "中国大陆 · 广东省广州市天河区",
+  "bandwidth": null,
+  "device": null,
+  "client": null,
+  "protocol": null,
+  "notes": "代理开启状态下测速。出口 IP 归属美国犹他州德雷珀（网络 Komi LLC，AS401243），与测速服务器 SLC 一致；满载延迟 下载时 276.8 ms、上传时 306.3 ms；IPCheck.ing 质量评分：在线视频 差、在线游戏 差、视频会议 差；15 个网站连通性均可连接但较慢（207–280 ms）。",
+  "importedAt": "2026-10-23T14:31:00+08:00",
+  "verification": {
+    "status": "verified",
+    "verifiedAt": "2026-10-23T14:31:00+08:00",
+    "notes": "已对照 3 张原始截图逐项核对下载、上传、延迟、抖动、测速服务器、出口 IP 归属与网站连通性；出口 IP 已打码"
+  }
+}

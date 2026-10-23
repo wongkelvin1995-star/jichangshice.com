@@ -41,6 +41,49 @@ export type TestPhoto = {
 
 export const TEST_PHOTOS: TestPhoto[] = [
   {
+    id: "lingdongyun-us-2026-10-23",
+    brandSlug: "lingdongyun",
+    date: "2026-10-23",
+    time: "14:30 前",
+    publishedAt: "2026-10-23T14:31:00+08:00",
+    src: "/images/tests/lingdongyun-us-2026-10-23.webp",
+    width: 1200,
+    height: 2191,
+    nodeRegion: "美国",
+    tool: "IPCheck.ing 网速测试（代理开启状态）",
+    server: "SLC（Salt Lake City，美国）",
+    downloadMbps: 18.25,
+    uploadMbps: 15.52,
+    latencyMs: 203.95,
+    jitterMs: 11.98,
+    packetLossPct: null,
+    extra: [
+      { label: "测试地点", value: "中国大陆 · 广东省广州市天河区" },
+      {
+        label: "出口 IP 归属",
+        value: "美国 犹他州德雷珀 · Komi LLC（AS401243），IP 已打码",
+      },
+      { label: "下载时延迟", value: "276.8 ms" },
+      { label: "上传时延迟", value: "306.3 ms" },
+      { label: "测试流量", value: "下载 50 MB · 上传 15 MB" },
+      {
+        label: "工具质量评分",
+        value: "在线视频 差 · 在线游戏 差 · 视频会议 差",
+      },
+      {
+        label: "网站连通性（15 个均可连接，较慢）",
+        value:
+          "Google 210 · YouTube 216 · Cloudflare 217 · Claude 213 · ChatGPT 207 · Spotify 215 · Twitch 211 · Disney+ 280 · HBO Max 239 · Apple TV+ 216 · Steam 236 · PlayStation 227 · Xbox 224 · Nintendo 219 · EA 225（ms）",
+      },
+    ],
+    evidence: [
+      "/evidence/lingdongyun-us-2026-10-23/speedtest.webp",
+      "/evidence/lingdongyun-us-2026-10-23/connectivity.webp",
+      "/evidence/lingdongyun-us-2026-10-23/ip-info.webp",
+    ],
+    note: "单次测试，测速流量经由代理；网站连通性只表示能连上及连接延迟，不代表流媒体或账号地区解锁；质量评分由 IPCheck.ing 自动给出。",
+  },
+  {
     id: "lingdongyun-hk-2026-10-23",
     brandSlug: "lingdongyun",
     date: "2026-10-23",
