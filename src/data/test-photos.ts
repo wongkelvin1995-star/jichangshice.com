@@ -41,6 +41,50 @@ export type TestPhoto = {
 
 export const TEST_PHOTOS: TestPhoto[] = [
   {
+    id: "lingdongyun-sg-2026-10-23",
+    brandSlug: "lingdongyun",
+    date: "2026-10-23",
+    time: "14:19 前",
+    publishedAt: "2026-10-23T14:21:00+08:00",
+    src: "/images/tests/lingdongyun-sg-2026-10-23.webp",
+    width: 1200,
+    height: 2191,
+    nodeRegion: "新加坡",
+    tool: "IPCheck.ing 网速测试（代理开启状态）",
+    server: "SIN（Singapore，新加坡）",
+    downloadMbps: 18.14,
+    uploadMbps: 13.93,
+    latencyMs: 26.33,
+    jitterMs: 9,
+    packetLossPct: null,
+    extra: [
+      { label: "测试地点", value: "中国大陆 · 广东省广州市天河区" },
+      {
+        label: "出口 IP 归属",
+        value:
+          "新加坡 South West · SOUTHEAST ASIA TELECOM（AS9664），IP 已打码",
+      },
+      { label: "下载时延迟", value: "131.2 ms" },
+      { label: "上传时延迟", value: "291.7 ms" },
+      { label: "测试流量", value: "下载 50 MB · 上传 15 MB" },
+      {
+        label: "工具质量评分",
+        value: "在线视频 较差 · 在线游戏 较差 · 视频会议 一般",
+      },
+      {
+        label: "网站连通性（15 个均可连接）",
+        value:
+          "Google 22 · YouTube 27 · Cloudflare 216 · Claude 48 · ChatGPT 44 · Spotify 113 · Twitch 21 · Disney+ 54 · HBO Max 53 · Apple TV+ 26 · Steam 49 · PlayStation 35 · Xbox 47 · Nintendo 24 · EA 53（ms）",
+      },
+    ],
+    evidence: [
+      "/evidence/lingdongyun-sg-2026-10-23/speedtest.webp",
+      "/evidence/lingdongyun-sg-2026-10-23/connectivity.webp",
+      "/evidence/lingdongyun-sg-2026-10-23/ip-info.webp",
+    ],
+    note: "单次测试，测速流量经由代理；网站连通性只表示能连上及连接延迟，不代表流媒体或账号地区解锁；质量评分由 IPCheck.ing 自动给出。",
+  },
+  {
     id: "lingdongyun-jp-2026-10-23",
     brandSlug: "lingdongyun",
     date: "2026-10-23",
