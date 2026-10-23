@@ -1,119 +1,133 @@
-<div align="center">
+# 机场实测｜2026 机场推荐、机场测速与节点测试记录
 
-# 机场测试｜2026 机场测试与机场推荐、套餐比较与测速记录
+[![机场实测：机场推荐、机场测速与节点测试记录](docs/assets/jichangshice-banner.jpg)](https://jichangshice.com.cn/)
 
-**[jichangshice.com.cn](https://jichangshice.com.cn)**
+**官网：<https://jichangshice.com.cn/>**
 
-把 34 家机场的套餐价格、每 GB 成本和测速记录放在同一口径下比较，<br>写清楚每条资料从哪里来、能说明什么，帮你按预算和用途选到合适的机场。
+机场实测（机场测试）是一个中文机场资料与测速记录网站。我们把各家机场的套餐价格、流量口径和测速结果放在同一套标准下整理，每条数据都写明来源和日期：本站亲自测的、对照结算页核验过的、来自公开资料的，分开标注，不混在一起。
 
-[🌐 访问网站](https://jichangshice.com.cn) · [⭐ 机场推荐](https://jichangshice.com.cn/recommendations/) · [📋 机场目录](https://jichangshice.com.cn/airports/) · [💰 套餐比较](https://jichangshice.com.cn/compare/) · [🎟️ 优惠码](https://jichangshice.com.cn/coupons/) · [📈 测速记录](https://jichangshice.com.cn/test-records/) · [✈️ Telegram](https://t.me/+rXmeYjh4Yv5hNjM1)
-
-</div>
+> 本仓库是官网源码。详细数据、完整表格和最新记录都在官网，这里只做介绍和方法摘要。
 
 ---
 
-## 关于机场测试
+## 关于机场实测
 
-**机场测试**是一个中文机场资料与测评博客，主题是：**机场测试、机场推荐、套餐比较、测速记录、Clash 订阅教程与故障排查**。
+选机场时最常遇到的问题，是不同来源的价格、流量和测速说法对不上。机场实测想做的是把这些资料摊开：
 
-- **34 家机场资料**：每家都有独立资料页，整理套餐价格、流量、付款周期、线路与协议说明。
-- **326 档套餐比较**：统一按“付款金额 + 付款周期”“流量 + 重置周期”记录，自动算出每 GB 月成本；年付显示总额和折算月均，一次性流量包不折算成月度额度。
-- **测速记录**：本站测速（陆续发布中）按固定模板记录测试时间、地点、运营商、带宽、客户端和节点；另收录 21 家机场的 37 批公开测速参考，逐条附来源链接。
-- **测试方法公开**：延迟、下载速度、丢包、晚高峰、AI 与流媒体解锁怎么测、单次结果能说明什么，全部写在 [测试方法](https://jichangshice.com.cn/testing-methodology/)。
-- **30 篇教程与 104 个常见问题**：覆盖新手入门、客户端设置、线路知识、故障排查和 AI 使用。
+- **写清来源**：每个价格标注“结算页核验”或“历史参考”，每条测速标注“本站实测”或“公开参考”。
+- **不编造数据**：没测过的项目写“未测”，不估算、不打分，也不按延迟排名。
+- **冲突两边都留**：不同来源记录不一致的套餐两边都保留，不计入最低价。
+- **编辑精选不是排名**：精选顺序由编辑安排，参考资料完整度和套餐结构，也考虑合作关系，不代表速度或稳定性高低。
 
-> 排列顺序为编辑精选顺序，不是测速排名。价格为“历史参考”的，以机场官网和结算页为准。
+## 测试项目
 
-## 编辑精选 5 家
+| 项目 | 记录什么 | 说明 |
+| --- | --- | --- |
+| 延迟与抖动 | 空载延迟中位数、波动 | 延迟低只说明响应快，不代表带宽大 |
+| 下载 / 上传速度 | 多连接平均速度（Mbps） | 受本地宽带、测速服务器位置影响 |
+| 满载延迟 | 下载时、上传时的延迟 | 反映看视频、开会时是否卡顿 |
+| 晚高峰 | 北京时间 20:00–23:00 与白天对比 | 单晚结果参考价值有限，需连续多天 |
+| 丢包 | 连续 20 次以上的比例 | 浏览器测不了，需用客户端或命令行 |
+| 出口 IP | 地区、网络 / ASN | 确认测速流量真的经过节点 |
+| AI 与流媒体 | 能否打开、登录、完成对话或播放 | 网站能连上 ≠ 账号地区可用，只对当次节点有效 |
 
-| No. | 机场 | 最低月付 | 线路 | AI | 流媒体 | 优惠码 |
-| :-: | ---- | -------- | ---- | -- | ------ | ------ |
-| 1 | [灵动云](https://jichangshice.com.cn/airports/lingdongyun/) | ¥20/月 · 100GB/月 | IPLC / 专线 | ChatGPT | Disney+ / Netflix / 主流流媒体 | `ldy88` |
-| 2 | [暮光加速](https://jichangshice.com.cn/airports/muguang/) | ¥20/月 · 120GB/月 | BGP / 专线 | ChatGPT | Disney+ / Netflix / 主流流媒体 | `mm88` |
-| 3 | [飞猫云](https://jichangshice.com.cn/airports/feimaoyun/) | ¥25/月 · 150GB/月 | IEPL | ChatGPT / Claude / Gemini | Disney+ / Netflix | `flycat888` |
-| 4 | [大佬云](https://jichangshice.com.cn/airports/dalaoyun/) | ¥19.99/月 · 100GB/30天 | IEPL / IPLC | ChatGPT | Disney+ / Netflix | `dly888` |
-| 5 | [微风网络](https://jichangshice.com.cn/airports/breezenet/) | ¥27/月 · 200GB/月 | IPLC / 专线 | ChatGPT / Claude / Gemini | Disney+ / Netflix / YouTube | `weifeng90` |
+## 公开资料
 
-线路、AI、流媒体为服务商资料中的说法，本站实测结果见各家资料页和 [测速记录](https://jichangshice.com.cn/test-records/)。
+| 内容 | 数量 | 入口 |
+| --- | --- | --- |
+| 机场资料页 | 34 家 | [机场目录](https://jichangshice.com.cn/airports/) |
+| 套餐档位 | 326 档（51 档已对照结算页核验） | [套餐比较](https://jichangshice.com.cn/compare/) |
+| 本站实测（已核验） | 5 条：灵动云 4 个节点测速 + 1 次节点在线核验 | [测试档案](https://jichangshice.com.cn/test-records/) |
+| 公开测速参考 | 37 批，涉及 21 家机场，逐条附来源链接 | [测试档案](https://jichangshice.com.cn/test-records/) |
+| 教程文章 | 30 篇 | [新手教程](https://jichangshice.com.cn/guides/) |
+| 常见问题 | 104 问 | [常见问题](https://jichangshice.com.cn/faq/) |
 
-## 全部 34 家机场 · 最低价套餐
+<sub>数量核对日期：2026-10-23。网站会持续更新，以官网显示为准。</sub>
 
-最低价取各家**价格与流量明确、按月重置的最便宜月付档**；每 GB 成本 = 月付价格 ÷ 每月流量。
+## 套餐比较
 
-| No. | 机场 | 最低价套餐 | 价格 | 流量 | 每 GB | 优惠码 | 价格来源 |
-| :-: | ---- | ---------- | ---- | ---- | ----: | ------ | -------- |
-| 1 | [灵动云](https://jichangshice.com.cn/airports/lingdongyun/) | 拂风 | **¥20/月** | 100GB/月 | ¥0.20 | `ldy88` | 历史参考 |
-| 2 | [暮光加速](https://jichangshice.com.cn/airports/muguang/) | 基础版 | **¥20/月** | 120GB/月 | ¥0.17 | `mm88` | 历史参考 |
-| 3 | [飞猫云](https://jichangshice.com.cn/airports/feimaoyun/) | 星耀版 | **¥25/月** | 150GB/月 | ¥0.17 | `flycat888` | 历史参考 |
-| 4 | [大佬云](https://jichangshice.com.cn/airports/dalaoyun/) | 初云·福利版 | **¥19.99/月** | 100GB/30天 | ¥0.20 | `dly888` | ✅ 结算页核验 |
-| 5 | [微风网络](https://jichangshice.com.cn/airports/breezenet/) | 乘风 Riding | **¥27/月** | 200GB/月 | ¥0.14 | `weifeng90` | 历史参考 |
-| 6 | [飞V](https://jichangshice.com.cn/airports/flyv/) | 入门方案 | **¥25/月** | 150GB/月 | ¥0.17 | `fly20` | 历史参考 |
-| 7 | [梯子云](https://jichangshice.com.cn/airports/laddercloud/) | 初阶网络·基础视界 | **¥25/月** | 125GB/月 | ¥0.20 | `tzy888` | 历史参考 |
-| 8 | [浪网](https://jichangshice.com.cn/airports/wavenet/) | 入门 | **¥30/月** | 150GB/月 | ¥0.20 | `lw888` | 历史参考 |
-| 9 | [隐形人](https://jichangshice.com.cn/airports/yinxingren/) | 白银纪元 | **¥24/月** | 144GB/月 | ¥0.17 | `yxr888` | 历史参考 |
-| 10 | [星岛梦](https://jichangshice.com.cn/airports/stardream/) | 超量150G | **¥25/月** | 150GB/月 | ¥0.17 | `nmw888` | 历史参考 |
-| 11 | [光速云](https://jichangshice.com.cn/airports/lightspeed/) | 极速版 | **¥17/月** | 110GB/月 | ¥0.15 | `GSY888` | 历史参考 |
-| 12 | [唯兔云](https://jichangshice.com.cn/airports/v2yun/) | 限时月付 | **¥14.9/月** | 100GB/月 | ¥0.15 | `rabbit` | 历史参考 |
-| 13 | [U1S1](https://jichangshice.com.cn/airports/u1s1/) | 套餐 1 | **¥20/月** | 120GB/月 | ¥0.17 | `U1S1888` | 历史参考 |
-| 14 | [极连云](https://jichangshice.com.cn/airports/jilianyun/) | 套餐 1 | **¥18/月** | 100GB/月 | ¥0.18 | `ji8888` | 历史参考 |
-| 15 | [全球云](https://jichangshice.com.cn/airports/quanqiuyun/) | 入门方案 | **¥20/月** | 120GB/月 | ¥0.17 | `qq88` | 历史参考 |
-| 16 | [光年梯](https://jichangshice.com.cn/airports/guangnianti/) | 套餐 1 | **¥18/月** | 110GB/月 | ¥0.16 | `GN888` | 历史参考 |
-| 17 | [Sogo云](https://jichangshice.com.cn/airports/sogoyun/) | 套餐 1 | **¥25/月** | 150GB/月 | ¥0.17 | `SOGO888` | 历史参考 |
-| 18 | [宇宙云](https://jichangshice.com.cn/airports/yuzhouyun/) | 行星基础版 | **¥25/月** | 160GB/月 | ¥0.16 | `YUZHOU553` | 历史参考 |
-| 19 | [二猫云](https://jichangshice.com.cn/airports/ermaoyun/) | 套餐 1 | **¥20/月** | 130GB/月 | ¥0.15 | `ermao888` | 历史参考 |
-| 20 | [一翻云](https://jichangshice.com.cn/airports/yifanyun/) | 套餐 1 | **¥20/月** | 150GB/月 | ¥0.13 | `yfy6666` | 历史参考 |
-| 21 | [边缘节点](https://jichangshice.com.cn/airports/edgenova/) | 限时体验月付小包 | **¥15/月** | 50GB/月 | ¥0.30 | `EDGE888` | 历史参考 |
-| 22 | [可信云](https://jichangshice.com.cn/airports/kexinyun/) | 轻量月付 | **¥9/月** | 45GB/月 | ¥0.20 | `KX888` | 历史参考 |
-| 23 | [速界](https://jichangshice.com.cn/airports/sujie/) | 套餐 1 | **¥15/月** | 50GB/月 | ¥0.30 | `SJ888` | 历史参考 |
-| 24 | [快狸](https://jichangshice.com.cn/airports/kuaili/) | 套餐 1 | **¥15/月** | 50GB/月 | ¥0.30 | `KL888` | 历史参考 |
-| 25 | [无忧](https://jichangshice.com.cn/airports/wuyou/) | 套餐 1 | **¥19/月** | 100GB/月 | ¥0.19 | `wuyou666` | 历史参考 |
-| 26 | [灵猫](https://jichangshice.com.cn/airports/lingmao/) | 月付 Small | **¥25/月** | 150GB/月 | ¥0.17 | `lmao888` | 历史参考 |
-| 27 | [闪跃](https://jichangshice.com.cn/airports/flashleap/) | 套餐 1 | **¥24/月** | 150GB/月 | ¥0.16 | `shanyue` | 历史参考 |
-| 28 | [飞为](https://jichangshice.com.cn/airports/firefly/) | Lite | **¥25/月** | 150GB/月 | ¥0.17 | `firefly` | 历史参考 |
-| 29 | [跨界](https://jichangshice.com.cn/airports/kuajie/) | 轻云 Lite | **¥20/月** | 120GB/月 | ¥0.17 | `kuajie` | 历史参考 |
-| 30 | [榴莲云](https://jichangshice.com.cn/airports/liulianyun/) | 轻享包 | **¥24/月** | 140GB/月 | ¥0.17 | `LLY888` | ✅ 结算页核验 |
-| 31 | [闪电云](https://jichangshice.com.cn/airports/shandianyun/) | 性价版 | **¥19.9/月** | 100GB/30天 | ¥0.20 | `SDY888` | ✅ 结算页核验 |
-| 32 | [环球云](https://jichangshice.com.cn/airports/huanqiuyun/) | 轻享 | **¥21/月** | 120GB/月 | ¥0.17 | `HQY888` | ✅ 结算页核验 |
-| 33 | [神行云](https://jichangshice.com.cn/airports/shenxingyun/) | 尝鲜包 | **¥23/月** | 150GB/月 | ¥0.15 | `SXY888` | ✅ 结算页核验 |
-| 34 | [云界云](https://jichangshice.com.cn/airports/yunjieyun/) | 轻云·基础版 | **¥22/月** | 150GB/月 | ¥0.15 | `YJY888` | ✅ 结算页核验 |
+套餐统一按“付款金额 + 付款周期”和“流量 + 重置周期”记录：
 
-**快速挑选**
+- 年付写“¥119/年”，另算折合月均，不会写成“¥119/月”。
+- 一次性流量包不折算成月度额度；价格为空不当作 0。
+- 每 GB 成本只对“按月重置流量、无来源冲突”的套餐计算。
 
-- 月付最便宜：[可信云](https://jichangshice.com.cn/airports/kexinyun/)（¥9/月）、[唯兔云](https://jichangshice.com.cn/airports/v2yun/)（¥14.9/月）、[边缘节点](https://jichangshice.com.cn/airports/edgenova/)（¥15/月）、[速界](https://jichangshice.com.cn/airports/sujie/)（¥15/月）、[快狸](https://jichangshice.com.cn/airports/kuaili/)（¥15/月）
-- 最低价套餐里每 GB 最便宜：[一翻云](https://jichangshice.com.cn/airports/yifanyun/)（¥0.13/GB）、[微风网络](https://jichangshice.com.cn/airports/breezenet/)（¥0.14/GB）、[云界云](https://jichangshice.com.cn/airports/yunjieyun/)（¥0.15/GB）、[唯兔云](https://jichangshice.com.cn/airports/v2yun/)（¥0.15/GB）、[神行云](https://jichangshice.com.cn/airports/shenxingyun/)（¥0.15/GB）
+**编辑精选 5 家 · 月付起步价**
 
-> 优惠码由站长提供，目前均为“待验证”，折扣幅度与适用套餐以结算页显示为准。标“✅ 结算页核验”的套餐（大佬云、榴莲云、闪电云、环球云、神行云、云界云）已对照结算页截图确认，其余为历史参考价。完整套餐、年付价格和筛选功能见 [套餐比较](https://jichangshice.com.cn/compare/)。
+| 机场 | 月付起步 | 价格来源 |
+| --- | --- | --- |
+| [灵动云](https://jichangshice.com.cn/airports/lingdongyun/) | ¥20/月 · 100GB/月 | 历史参考 |
+| [暮光加速](https://jichangshice.com.cn/airports/muguang/) | ¥20/月 · 120GB/月 | 历史参考 |
+| [飞猫云](https://jichangshice.com.cn/airports/feimaoyun/) | ¥25/月 · 150GB/月 | 历史参考 |
+| [大佬云](https://jichangshice.com.cn/airports/dalaoyun/) | ¥19.99/月 · 100GB/30天 | 结算页核验 |
+| [微风网络](https://jichangshice.com.cn/airports/breezenet/) | ¥27/月 · 200GB/月 | 历史参考 |
 
-## 网站栏目
+价格可能随时变化，付款前请以机场官网结算页为准。全部 34 家的最低价套餐表已归档在 [docs/airport-plans-archive.md](docs/airport-plans-archive.md)，最新数据见 [套餐比较](https://jichangshice.com.cn/compare/) 与 [机场推荐](https://jichangshice.com.cn/recommendations/)。
 
-| 栏目 | 内容 |
-| ---- | ---- |
-| [机场推荐](https://jichangshice.com.cn/recommendations/) | 按预算、用途挑选机场，编辑精选顺序 |
-| [机场目录](https://jichangshice.com.cn/airports/) | 34 家机场资料页 |
-| [套餐比较](https://jichangshice.com.cn/compare/) | 326 档套餐按价格、流量、周期筛选 |
-| [优惠码](https://jichangshice.com.cn/coupons/) | 各家优惠码与核验状态 |
-| [测速记录](https://jichangshice.com.cn/test-records/) | 本站测速与公开测速参考 |
-| [测试方法](https://jichangshice.com.cn/testing-methodology/) | 测速、延迟、丢包、晚高峰怎么测 |
-| [新手教程](https://jichangshice.com.cn/guides/) | 机场是什么、怎么选套餐、购买前核对什么、怎么判断跑路 |
-| [客户端](https://jichangshice.com.cn/clients/) | Clash 订阅导入，Windows、macOS、Android、iOS 设置 |
-| [线路知识](https://jichangshice.com.cn/routes/) | IPLC、IEPL、BGP、VLESS，香港 / 日本 / 新加坡节点 |
-| [故障排查](https://jichangshice.com.cn/troubleshooting/) | 订阅更新失败、节点超时、已连接但打不开网页 |
-| [AI 使用](https://jichangshice.com.cn/ai/) | ChatGPT、Claude、Gemini 访问测试与排查 |
-| [常见问题](https://jichangshice.com.cn/faq/) | 104 个常见问题 |
+## 测试方法
 
-## 本站测试原则
+一次可以复核的测速，至少要写下：测试时间、所在地与运营商、本地带宽、设备与客户端、节点、测速工具和服务器。本站测速的固定流程：
 
-1. **写清来源**：每条价格、测速都标注来源和日期；本站实测与公开参考分开显示。
-2. **不编造数据**：没有测过的不给分、不排名；价格为空不当 0。
-3. **来源冲突两边都保留**：不同来源记录不一致时如实标注，不计入最低价。
-4. **合作公开**：推广链接统一标注，合作说明见 [合作说明](https://jichangshice.com.cn/disclosure/)。
+1. 先确认订阅和客户端正常，测速流量确实经过代理（看出口 IP）。
+2. 测空载延迟、抖动，再测下载、上传和满载延迟。
+3. 逐个节点核对网站连通性、AI 与流媒体访问。
+4. 同一节点在晚高峰复测，和白天对照。
+5. 保留原始截图，打码出口 IP 和账号后随记录公开。
 
-## 联系
+完整说明见 [测试方法](https://jichangshice.com.cn/testing-methodology/)。也可以连上自己的节点，用官网的 [网速测试](https://jichangshice.com.cn/speedtest/) 工具测出口 IP、延迟、下载上传速度、满载延迟和 15 个常用网站的连通性。测速在浏览器中完成，页面不上传、不保存结果。
 
-- 网站：[https://jichangshice.com.cn](https://jichangshice.com.cn)
-- Telegram：[t.me/+rXmeYjh4Yv5hNjM1](https://t.me/+rXmeYjh4Yv5hNjM1)
-- 反馈与合作：[联系页面](https://jichangshice.com.cn/contact/)
+## 最近记录
+
+**灵动云 · 2026-10-23 下午（北京时间）**，测试地点广东广州，代理开启状态下用 IPCheck.ing 网速测试：
+
+| 节点 | 测试时间 | 下载 | 上传 | 延迟 | 抖动 |
+| --- | --- | ---: | ---: | ---: | ---: |
+| 日本 | 14:14 前 | 24.92 Mbps | 21.49 Mbps | 100 ms | 17.95 ms |
+| 新加坡 | 14:19 前 | 18.14 Mbps | 13.93 Mbps | 26.33 ms | 9 ms |
+| 香港 | 14:22 前 | 24.10 Mbps | 12.96 Mbps | 58.35 ms | 12.07 ms |
+| 美国 | 14:30 前 | 18.25 Mbps | 15.52 Mbps | 203.95 ms | 11.98 ms |
+
+这是同一天下午的单次测试，不是晚高峰数据，只说明测试当时的情况。原始截图、出口 IP 归属和网站连通性结果见 [灵动云测试记录](https://jichangshice.com.cn/test-records/lingdongyun/)。
+
+## 教程入口
+
+| 想解决的问题 | 文章 |
+| --- | --- |
+| 第一次接触机场 | [机场是什么？机场和 VPN 的区别、订阅链接与节点入门](https://jichangshice.com.cn/guides/what-is-airport/) |
+| 怎么选套餐 | [根据流量、预算和付款周期选择机场套餐](https://jichangshice.com.cn/guides/how-to-choose-plan/) |
+| 导入 Clash 订阅 | [Clash 订阅导入教程：Clash Verge Rev 与 Mihomo](https://jichangshice.com.cn/clients/clash-subscription-import/) |
+| 自己测机场 | [2026 年机场测试完整指南：测哪些指标、节点延迟多少算正常](https://jichangshice.com.cn/methods/airport-testing-guide/) |
+| 晚高峰怎么测 | [晚高峰稳定性怎么测：测试时段安排与单次测速的局限](https://jichangshice.com.cn/methods/peak-hour-testing/) |
+| 连不上怎么办 | [订阅更新失败与节点全部超时的排查路径](https://jichangshice.com.cn/troubleshooting/subscription-update-failed/) |
+| AI 访问 | [ChatGPT 能用但 Claude 不可用？节点地区、账号地区与 IP 风险排查](https://jichangshice.com.cn/ai/chatgpt-ok-claude-blocked/) |
+
+更多：[客户端](https://jichangshice.com.cn/clients/) · [线路知识](https://jichangshice.com.cn/routes/) · [故障排查](https://jichangshice.com.cn/troubleshooting/) · [AI 使用](https://jichangshice.com.cn/ai/)
+
+## 常见问题
+
+**机场目录和精选的顺序是排名吗？**
+不是。顺序是编辑安排，不代表测速结果或稳定性。比较速度请看测试档案里同一时段、同一环境的记录。
+
+**Clash 里的延迟数字为什么不等于下载速度？**
+客户端测的是经由节点访问测试网址的往返时间，只反映连通性和相对快慢；能不能看视频、下载，要用测速工具或实际下载来判断。
+
+**晚高峰测几次才有参考价值？**
+建议连续 7 天，每天 20:00–23:00 测 1–2 次，白天测几次作对照，用中位数判断，不看单次最高值。
+
+**月付和年付折算价能直接比吗？**
+不能。年付要一次付清，流量有时是全年总量而非每月额度。统一换算成每 GB 成本，并确认流量口径后再比。
+
+更多问题见 [常见问题](https://jichangshice.com.cn/faq/)。
 
 ---
+
+## 访问官网
+
+- 官网首页：<https://jichangshice.com.cn/>
+- 机场推荐：<https://jichangshice.com.cn/recommendations/>
+- 套餐比较：<https://jichangshice.com.cn/compare/>
+- 测试档案：<https://jichangshice.com.cn/test-records/>
+- 网速测试：<https://jichangshice.com.cn/speedtest/>
+- Telegram：<https://t.me/+rXmeYjh4Yv5hNjM1>
 
 <sub>本仓库为 jichangshice.com.cn 网站源码（Astro，基于 [AstroPaper](https://github.com/satnaing/astro-paper)，[MIT License](LICENSE)）。本地运行与部署见 [docs/deploy.md](docs/deploy.md)。</sub>
