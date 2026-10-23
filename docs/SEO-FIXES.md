@@ -17,7 +17,7 @@
 | 11 | 旧文件残留 | 删除 `src/content/home/airport-testing-guide.md`、`src/components/HeroDiagram.astro` | 都没有被引用 | 构建通过 |
 | 12 | 图标文件被附加元数据 | `public/favicon.svg`、`public/og-default.png` | 恢复原文件 | 432 B / 67 KB |
 | 13 | 部署说明写旧仓库 | `docs/deploy.md` | 改为 `wongkelvin1995-star/jichangshice.com` | — |
-| 14 | 灵动云美国节点真实测速（2026-10-23，站长代理测速截图）上线 | `src/data/test-photos.ts`、`src/components/TestPhoto.astro`、`src/components/TestPhotoNotice.astro`（新）；`public/images/tests/lingdongyun-us-2026-10-23.webp`、`public/evidence/lingdongyun-us-2026-10-23/speedtest.webp`（新，出口 IP 已打码）；测试档案、品牌测速页、品牌页、首页；`src/content/airports/lingdongyun.md` | 汇总图所有数值均来自截图（下载 16.83、上传 14.04 Mbps，延迟 204.05、抖动 3.39 ms，满载 267 / 754.95 ms）；未测项写「未测」；附 ImageObject 与 og:image；推荐页与合作说明改为「本站测速样本还很少」 | 截图逐项核对；构建与全站检查通过 |
+| 14 | 机场实测图功能（数据与组件就绪，暂无已发布的图） | `src/data/test-photos.ts`、`src/components/TestPhoto.astro`、`src/components/TestPhotoNotice.astro`（新）；测试档案、品牌测速页、品牌页、首页 | 每张实测图必须附原始截图、数值逐项来自截图；灵动云美国、香港节点的图已撤下，等站长提供测试完成的完整截图后再发布 | 构建与全站检查通过 |
 
 ## 未改动（有意保留）
 

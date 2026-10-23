@@ -39,38 +39,7 @@ export type TestPhoto = {
   note: string;
 };
 
-export const TEST_PHOTOS: TestPhoto[] = [
-  {
-    id: "lingdongyun-us-2026-10-23",
-    brandSlug: "lingdongyun",
-    date: "2026-10-23",
-    time: "12:15",
-    publishedAt: "2026-10-23T12:25:00+08:00",
-    src: "/images/tests/lingdongyun-us-2026-10-23.webp",
-    width: 1200,
-    height: 1742,
-    nodeRegion: "美国",
-    tool: "IPCheck.ing 网速测试（代理开启状态）",
-    server: "SLC（Salt Lake City，美国）",
-    downloadMbps: 16.83,
-    uploadMbps: 14.04,
-    latencyMs: 204.05,
-    jitterMs: 3.39,
-    packetLossPct: null,
-    extra: [
-      { label: "出口地区", value: "美国（出口 IP 已打码）" },
-      { label: "下载时延迟", value: "267 ms" },
-      { label: "上传时延迟", value: "754.95 ms" },
-      { label: "测试流量", value: "下载 50 MB · 上传 15 MB" },
-      {
-        label: "工具质量评分",
-        value: "在线视频 差 · 在线游戏 差 · 视频会议 差",
-      },
-    ],
-    evidence: ["/evidence/lingdongyun-us-2026-10-23/speedtest.webp"],
-    note: "单次测试，测速流量经由代理；质量评分由 IPCheck.ing 自动给出，不代表流媒体解锁情况。",
-  },
-];
+export const TEST_PHOTOS: TestPhoto[] = [];
 
 export const photosOf = (slug: string) =>
   TEST_PHOTOS.filter(p => p.brandSlug === slug);

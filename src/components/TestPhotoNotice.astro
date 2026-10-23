@@ -30,9 +30,9 @@ const pct = Math.round((done / total) * 100);
     </div>
   </div>
   <p class="mt-3 text-sm leading-relaxed">
-    {
-      latest ? `${latest}的实测图已经发布。` : ""
-    }其余机场正在排队实测，我们计划每天更新一张实测图，测完一家公布一家。还没测完的机场，页面只展示公开资料和测速参考，不会提前写出速度数字。
+    {latest ? `${latest}的实测图已经发布。` : ""}{
+      done > 0 ? "其余机场" : "各家机场"
+    }正在排队实测，我们计划每天更新一张实测图，测完一家公布一家。还没测完的机场，页面只展示公开资料和测速参考，不会提前写出速度数字。
   </p>
   <p class="text-muted-foreground mt-1.5 text-xs">
     想优先看到哪一家的实测？{
