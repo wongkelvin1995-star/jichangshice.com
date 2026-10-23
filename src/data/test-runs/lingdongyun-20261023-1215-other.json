@@ -10,7 +10,7 @@
   "jitterMs": 3.39,
   "packetLossPct": null,
   "tool": "other",
-  "toolName": "网页测速（下载 50 MB / 上传 15 MB）",
+  "toolName": "IPCheck.ing 网速测试（下载 50 MB / 上传 15 MB）",
   "dataSource": "screenshot",
   "evidenceUrl": null,
   "evidenceFiles": [

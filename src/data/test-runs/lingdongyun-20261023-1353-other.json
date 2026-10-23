@@ -1,0 +1,43 @@
+{
+  "id": "lingdongyun-20261023-1353-other",
+  "brandSlug": "lingdongyun",
+  "nodeRegion": "香港",
+  "nodeName": null,
+  "testedAt": "2026-10-23T13:53:00+08:00",
+  "timeNote": "13:53 前开始（截图发送时间为上限）",
+  "downloadMbps": 22.35,
+  "uploadMbps": 16.82,
+  "latencyMs": 52.39,
+  "jitterMs": 10.89,
+  "packetLossPct": null,
+  "tool": "other",
+  "toolName": "IPCheck.ing 网速测试（下载 50 MB / 上传 15 MB）",
+  "dataSource": "screenshot",
+  "evidenceUrl": null,
+  "evidenceFiles": [
+    {
+      "path": "/evidence/lingdongyun-hk-2026-10-23/speedtest.webp",
+      "public": true,
+      "kind": "screenshot"
+    },
+    {
+      "path": "/evidence/lingdongyun-hk-2026-10-23/connectivity.webp",
+      "public": true,
+      "kind": "screenshot"
+    }
+  ],
+  "server": "HKG（Hong Kong，中国香港）",
+  "isp": null,
+  "location": null,
+  "bandwidth": null,
+  "device": null,
+  "client": null,
+  "protocol": null,
+  "notes": "测试时间为 13:53 前（以截图发送时间为上限，确切时刻未记录）。代理开启状态下测速，出口地区中国香港；满载延迟 下载时 84.67 ms、上传时 439.72 ms；测速网页质量评分：在线视频 差、在线游戏 差、视频会议 较差；10 个网站连通性均可连接（51–164 ms）。",
+  "importedAt": "2026-10-23T13:58:00+08:00",
+  "verification": {
+    "status": "verified",
+    "verifiedAt": "2026-10-23T13:58:00+08:00",
+    "notes": "已对照原始截图逐项核对下载、上传、延迟、抖动、测速服务器与网站连通性；站长确认品牌为灵动云；出口 IP 已打码"
+  }
+}

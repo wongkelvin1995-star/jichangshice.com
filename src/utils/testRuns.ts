@@ -37,6 +37,8 @@ export const testRunSchema = z
     nodeName: z.string().nullable().default(null),
     /** ISO 8601，带时区偏移，如 2026-10-15T21:30:00+08:00 */
     testedAt: z.string().refine(v => !Number.isNaN(Date.parse(v)), "时间无效"),
+    /** 时间说明：确切时刻未记录时注明，例如「前」表示 testedAt 是上限 */
+    timeNote: z.string().nullable().default(null),
     downloadMbps: z.number().positive(),
     uploadMbps: z.number().positive(),
     latencyMs: z.number().positive(),

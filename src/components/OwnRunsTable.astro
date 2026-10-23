@@ -68,7 +68,14 @@ const hasJitter = runs.some(r => r.jitterMs !== null);
                 </span>
               )}
             </td>
-            <td class="num px-3 py-2 whitespace-nowrap">{runTime(r)}</td>
+            <td class="num px-3 py-2 whitespace-nowrap">
+              {runTime(r)}
+              {r.timeNote && (
+                <span class="text-muted-foreground block text-xs">
+                  {r.timeNote}
+                </span>
+              )}
+            </td>
             <td class="num px-3 py-2 text-end font-semibold">
               {fmtNum(r.downloadMbps)}
             </td>
