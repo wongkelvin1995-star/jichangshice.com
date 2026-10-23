@@ -6,6 +6,9 @@ import EntryLink from "@/components/EntryLink.astro";
 import TestRecordCard from "@/components/TestRecordCard.astro";
 import OwnRunsTable from "@/components/OwnRunsTable.astro";
 import NodeStatusChart from "@/components/NodeStatusChart.astro";
+import TestPhotoCard from "@/components/TestPhoto.astro";
+import TestPhotoNotice from "@/components/TestPhotoNotice.astro";
+import { photosOf } from "@/data/test-photos";
 import { nodeChecksOf } from "@/data/node-checks";
 import { getProviders } from "@/utils/plans";
 import { getTestRecords, recordsOf } from "@/utils/testRecords";
@@ -25,7 +28,10 @@ export async function getStaticPaths() {
     }))
     .filter(
       x =>
-        x.rs.length > 0 || x.own.length > 0 || nodeChecksOf(x.p.slug).length > 0
+        x.rs.length > 0 ||
+        x.own.length > 0 ||
+        nodeChecksOf(x.p.slug).length > 0 ||
+        photosOf(x.p.slug).length > 0
     );
   const siblings = items.map(x => ({ slug: x.p.slug, name: x.p.name }));
   return items.map(x => ({
@@ -35,6 +41,7 @@ export async function getStaticPaths() {
 }
 const { p, rs, own, siblings } = Astro.props;
 const checks = nodeChecksOf(p.slug);
+const photos = photosOf(p.slug);
 const verified = own.length + checks.length;
 const checkSummary = checks[0]
   ? `节点在线核验 ${checks[0].nodes.filter(n => n.status === "online").length}/${checks[0].nodes.length}`
@@ -62,10 +69,24 @@ const hasPeak = rs.some(r =>
 ---
 
 <Layout
-  title={`${p.name}测速记录：${verified ? `本站测试 ${verified} 条（已核验），` : ""}公开测速参考 ${rs.length} 批｜${config.site.title}`}
+  title={`${p.name}测速记录：${photos.length ? `机场实测图 ${photos.length} 张，` : ""}${verified ? `本站测试 ${verified} 条（已核验），` : ""}公开测速参考 ${rs.length} 批｜${config.site.title}`}
   description={`${p.name}机场测试档案（${range}）：${verified ? `本站测试 ${verified} 条已核验${checkSummary ? `（${checkSummary}）` : ""}，` : "暂无本站实测，"}公开测速参考 ${rs.length} 批${evidence ? `（含 ${evidence} 条 Speedtest 原始结果）` : ""}，注明来源、测试时段、工具与数据局限。`}
   canonicalPath={path}
-  jsonLd={[breadcrumbJsonLd(crumbs, path)]}
+  ogImage={photos[0]?.src}
+  jsonLd={[
+    breadcrumbJsonLd(crumbs, path),
+    ...photos.map(t => ({
+      "@context": "https://schema.org",
+      "@type": "ImageObject",
+      contentUrl: new URL(t.src, config.site.url).href,
+      name: `${p.name}机场实测图 · ${t.nodeRegion}节点（${t.date}）`,
+      caption: `${p.name} ${t.date} ${t.nodeRegion}节点：下载 ${t.downloadMbps} Mbps、上传 ${t.uploadMbps} Mbps、延迟 ${t.latencyMs} ms`,
+      width: t.width,
+      height: t.height,
+      datePublished: t.publishedAt,
+      creator: { "@type": "Organization", name: config.site.title },
+    })),
+  ]}
 >
   <main id="main-content" data-pagefind-body>
     <section class="hero-band relative border-b">
@@ -107,6 +128,20 @@ const hasPeak = rs.some(r =>
     </section>
 
     <div class="app-layout grid grid-cols-[minmax(0,1fr)] gap-6 pt-8">
+      {
+        photos.length > 0 && (
+          <section aria-labelledby="test-photos">
+            <h2 id="test-photos" class="section-title">
+              {p.name}机场实测图
+            </h2>
+            <div class="mt-4 grid grid-cols-[minmax(0,1fr)] gap-5">
+              {photos.map(t => (
+                <TestPhotoCard photo={t} brandName={p.name} />
+              ))}
+            </div>
+          </section>
+        )
+      }
       <section aria-labelledby="own-tests">
         <h2 id="own-tests" class="section-title">本站测试</h2>
         {

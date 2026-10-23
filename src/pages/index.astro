@@ -19,8 +19,12 @@ import { formatDate } from "@/utils/format";
 import { websiteJsonLd } from "@/utils/jsonld";
 import config from "@/config";
 import { NODE_CHECKS } from "@/data/node-checks";
+import { TEST_PHOTOS } from "@/data/test-photos";
 
 const providers = await getProviders();
+const latestPhoto = TEST_PHOTOS[0];
+const brandNameOf = (slug: string) =>
+  providers.find(p => p.slug === slug)?.name ?? slug;
 const plans = await getPlans();
 const posts = await getPublishedPosts();
 const records = await getTestRecords();
@@ -294,6 +298,38 @@ const homeFaq = [
           <p class="text-muted-foreground mt-4 text-sm leading-relaxed">
             本站实测与公开参考分开统计。公开参考逐条写明来源、测试时间、测试环境、工具和局限，不当作本站结论。测试档案页还提供在线测速表，可以直接测当前网络。
           </p>
+          {
+            latestPhoto && (
+              <a
+                href={`/test-records/${latestPhoto.brandSlug}/#test-photos`}
+                class="mt-4 flex items-center gap-3 rounded-xl border border-orange-200 bg-orange-50 p-3 hover:border-orange-300"
+              >
+                <img
+                  src={latestPhoto.src}
+                  alt={`${brandNameOf(latestPhoto.brandSlug)}机场实测图缩略图`}
+                  width="56"
+                  height="81"
+                  loading="lazy"
+                  decoding="async"
+                  class="h-[81px] w-14 flex-none rounded-md border border-orange-100 object-cover object-top"
+                />
+                <span class="min-w-0 text-sm">
+                  <span class="block text-xs font-bold text-orange-700">
+                    最新机场实测图
+                  </span>
+                  <span class="block font-bold">
+                    {brandNameOf(latestPhoto.brandSlug)} ·{" "}
+                    {latestPhoto.nodeRegion}节点（{latestPhoto.date}）
+                  </span>
+                  <span class="num text-muted-foreground block text-xs">
+                    下载 {latestPhoto.downloadMbps} Mbps · 上传{" "}
+                    {latestPhoto.uploadMbps} Mbps · 延迟 {latestPhoto.latencyMs}{" "}
+                    ms
+                  </span>
+                </span>
+              </a>
+            )
+          }
         </div>
         <div class="card p-5">
           <h3 class="font-bold">最近的公开测速参考</h3>

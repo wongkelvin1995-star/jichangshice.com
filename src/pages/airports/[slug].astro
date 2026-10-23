@@ -13,6 +13,8 @@ import { getTestRecords, recordsOf, recordWindow } from "@/utils/testRecords";
 import { getVerifiedRuns, runsOf } from "@/utils/testRuns";
 import OwnRunsTable from "@/components/OwnRunsTable.astro";
 import NodeStatusChart from "@/components/NodeStatusChart.astro";
+import TestPhotoCard from "@/components/TestPhoto.astro";
+import { TEST_PHOTOS, photosOf } from "@/data/test-photos";
 import { nodeChecksOf } from "@/data/node-checks";
 import {
   getProviders,
@@ -75,6 +77,7 @@ const {
 } = Astro.props;
 const path = `/airports/${p.slug}/`;
 const checks = nodeChecksOf(p.slug);
+const photos = photosOf(p.slug);
 const crumbs = [{ name: "机场目录", href: "/airports/" }, { name: p.name }];
 const Analysis = analysis ? (await render(analysis)).Content : null;
 
@@ -135,6 +138,7 @@ const recordEvidence = records.reduce(
   description={description}
   canonicalPath={path}
   noindex={noindex}
+  ogImage={photos[0]?.src}
   ogType={analysis ? "article" : "website"}
   jsonLd={[
     breadcrumbJsonLd(crumbs, path),
@@ -325,7 +329,8 @@ const recordEvidence = records.reduce(
             {
               (records.length > 0 ||
                 ownRuns.length > 0 ||
-                checks.length > 0) && (
+                checks.length > 0 ||
+                photos.length > 0) && (
                 <a
                   href={`/test-records/${p.slug}/`}
                   class="text-accent-strong text-sm font-semibold hover:underline"
@@ -335,6 +340,28 @@ const recordEvidence = records.reduce(
               )
             }
           </div>
+          {
+            photos.length > 0 ? (
+              <div class="mt-4 grid grid-cols-[minmax(0,1fr)] gap-4">
+                {photos.map(t => (
+                  <TestPhotoCard photo={t} brandName={p.name} />
+                ))}
+              </div>
+            ) : (
+              <p class="mt-3 rounded-lg border border-orange-200 bg-orange-50 px-3 py-2 text-sm text-orange-900">
+                <strong>实测图测试中：</strong>
+                {p.name}正在排队实测，测完会放在这里。已完成{" "}
+                {new Set(TEST_PHOTOS.map(t => t.brandSlug)).size} 家，进度见
+                <a
+                  href="/test-records/#test-photos"
+                  class="font-semibold underline underline-offset-2"
+                >
+                  机场测试档案
+                </a>
+                。
+              </p>
+            )
+          }
           {
             checks.map(c => (
               <div class="mt-4">

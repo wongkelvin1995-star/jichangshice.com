@@ -1,0 +1,53 @@
+---
+import config from "@/config";
+
+type Props = { done: number; total: number; latest?: string };
+const { done, total, latest } = Astro.props;
+const pct = Math.round((done / total) * 100);
+---
+
+<aside
+  class="card border-orange-200 bg-gradient-to-br from-orange-50 to-white p-5"
+  aria-label="实测图更新进度"
+>
+  <div class="flex flex-wrap items-baseline justify-between gap-2">
+    <p class="font-extrabold text-orange-800">实测图更新中</p>
+    <p class="num text-sm font-bold text-orange-700">
+      已发布 {done} / {total} 家
+    </p>
+  </div>
+  <div
+    class="mt-2 h-2 overflow-hidden rounded-full bg-orange-100"
+    role="progressbar"
+    aria-valuemin="0"
+    aria-valuemax={total}
+    aria-valuenow={done}
+  >
+    <div
+      class="h-full rounded-full bg-orange-500"
+      style={`width:${Math.max(pct, 3)}%`}
+    >
+    </div>
+  </div>
+  <p class="mt-3 text-sm leading-relaxed">
+    {
+      latest ? `${latest}的实测图已经发布。` : ""
+    }其余机场正在排队实测，我们计划每天更新一张实测图，测完一家公布一家。还没测完的机场，页面只展示公开资料和测速参考，不会提前写出速度数字。
+  </p>
+  <p class="text-muted-foreground mt-1.5 text-xs">
+    想优先看到哪一家的实测？{
+      config.telegramUrl ? (
+        <a
+          href={config.telegramUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-accent-strong font-semibold hover:underline"
+        >
+          到 TG 交流频道留言
+        </a>
+      ) : (
+        "欢迎留言告诉我们"
+      )
+    }。
+  </p>
+</aside>

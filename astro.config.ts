@@ -7,6 +7,7 @@ import { unified } from "@astrojs/markdown-remark";
 import rehypeCallouts from "rehype-callouts";
 import config from "./astro-paper.config";
 import { NODE_CHECKS } from "./src/data/node-checks";
+import { TEST_PHOTOS } from "./src/data/test-photos";
 import {
   rehypeExternalLinks,
   rehypeTableScroll,
@@ -55,7 +56,7 @@ walkMd(
 );
 walkMd(new URL("./src/content/pages/", import.meta.url), r => `/${r}/`);
 // 测试档案页：以本站核验记录真实发布到网站的时间作为 lastmod
-for (const c of NODE_CHECKS) {
+for (const c of [...NODE_CHECKS, ...TEST_PHOTOS]) {
   for (const u of [
     `${SITE}/test-records/`,
     `${SITE}/test-records/${c.brandSlug}/`,

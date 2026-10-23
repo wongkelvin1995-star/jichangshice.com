@@ -6,6 +6,9 @@ import { getProviders } from "@/utils/plans";
 import OwnRunsTable from "@/components/OwnRunsTable.astro";
 import SpeedMeter from "@/components/SpeedMeter.astro";
 import NodeStatusChart from "@/components/NodeStatusChart.astro";
+import TestPhotoCard from "@/components/TestPhoto.astro";
+import TestPhotoNotice from "@/components/TestPhotoNotice.astro";
+import { TEST_PHOTOS } from "@/data/test-photos";
 import { NODE_CHECKS, nodeChecksOf } from "@/data/node-checks";
 import { getTestRecords, recordsOf } from "@/utils/testRecords";
 import { getVerifiedRuns, runHour, runsOf } from "@/utils/testRuns";
@@ -82,7 +85,31 @@ const path = "/test-records/";
       </div>
     </section>
 
-    <section class="app-layout pt-10" aria-labelledby="own-tests">
+    <section class="app-layout pt-10" aria-labelledby="test-photos">
+      <h2 id="test-photos" class="section-title">机场实测图</h2>
+      <p class="text-muted-foreground mt-2 max-w-3xl text-sm leading-relaxed">
+        站长连上节点后实际测速的汇总图，每张都附原始测速截图和文字版数据。
+      </p>
+      <div class="mt-4 grid grid-cols-[minmax(0,1fr)] gap-5">
+        <TestPhotoNotice
+          done={new Set(TEST_PHOTOS.map(t => t.brandSlug)).size}
+          total={providers.length}
+          latest={TEST_PHOTOS[0]
+            ? brandNames[TEST_PHOTOS[0].brandSlug]
+            : undefined}
+        />
+        {
+          TEST_PHOTOS.map(t => (
+            <TestPhotoCard
+              photo={t}
+              brandName={brandNames[t.brandSlug] ?? t.brandSlug}
+            />
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="app-layout pt-12" aria-labelledby="own-tests">
       <div class="flex flex-wrap items-baseline justify-between gap-2">
         <h2 id="own-tests" class="section-title">本站测试</h2>
       </div>
