@@ -1,0 +1,68 @@
+---
+/**
+ * 机场网速测试页的灵动云邀请入口（上下两处）。
+ *
+ * - 链接统一走 EntryLink：rel="sponsored nofollow noopener noreferrer"、新窗口、data-entry，
+ *   构建后检查会核对这些属性。链接地址来自 providers.json，不在这里写死。
+ * - data-placement 让 Analytics 的 affiliate_click 事件能区分 speedtest-top / speedtest-bottom。
+ * - 文案只陈述“可以注册、价格以官网为准”，不承诺速度或稳定性提升：
+ *   本站自己测的灵动云结果并不突出，不能暗示“换成它就能解决网络问题”。
+ * - 带“推广”标识，并在下方一处链接到合作说明（返佣方式写在那里）。
+ * - 上方一处用描边按钮，避免和页面主操作“开始测速”抢视觉重心；下方一处用主按钮。
+ */
+import EntryLink from "./EntryLink.astro";
+
+type Props = {
+  variant: "top" | "bottom";
+  href: string | null;
+  brand: string;
+};
+const { variant, href, brand } = Astro.props;
+const isTop = variant === "top";
+const chip =
+  "bg-warn-soft text-warn mr-2 inline-flex items-center rounded-full px-2.5 py-0.5 align-middle text-xs font-semibold whitespace-nowrap";
+---
+
+{
+  href && isTop && (
+    <aside
+      class="card flex items-center gap-3 px-4 py-3 sm:gap-4 sm:px-5"
+      data-placement="speedtest-top"
+      aria-label={`${brand}邀请链接（推广）`}
+    >
+      <p class="min-w-0 flex-1 text-sm leading-snug sm:text-[0.95rem]">
+        <span class={chip}>推广</span>测出延迟高、速度慢或连不上？可以注册灵动云，价格以官网为准。
+      </p>
+      <EntryLink
+        href={href}
+        brand={brand}
+        label="立即注册"
+        class="btn btn-outline shrink-0 px-4 whitespace-nowrap"
+      />
+    </aside>
+  )
+}
+{
+  href && !isTop && (
+    <aside
+      class="card flex items-center gap-3 px-4 py-3 sm:gap-4 sm:px-5"
+      data-placement="speedtest-bottom"
+      aria-label={`${brand}邀请链接（推广）`}
+    >
+      <p class="text-muted-foreground min-w-0 flex-1 text-sm leading-snug">
+        <span class={chip}>推广</span>灵动云邀请链接，价格以官网为准，详见
+        <a
+          href="/disclosure/"
+          class="text-accent-strong underline-offset-2 hover:underline"
+          >合作说明</a
+        >。
+      </p>
+      <EntryLink
+        href={href}
+        brand={brand}
+        label="立即注册"
+        class="btn btn-primary shrink-0 px-4 whitespace-nowrap"
+      />
+    </aside>
+  )
+}

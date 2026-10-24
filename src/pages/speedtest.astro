@@ -2,10 +2,14 @@
 import Layout from "@/layouts/Layout.astro";
 import Breadcrumbs from "@/components/Breadcrumbs.astro";
 import SpeedLab from "@/components/SpeedLab.astro";
+import SpeedPromo from "@/components/SpeedPromo.astro";
+import { getProviders } from "@/utils/plans";
 import { breadcrumbJsonLd, faqJsonLd } from "@/utils/jsonld";
 import config from "@/config";
 
 const path = "/speedtest/";
+// 灵动云邀请入口取自 providers.json（含完整 #/?code= 邀请码），不在页面里写死
+const lingdong = (await getProviders()).find(p => p.slug === "lingdongyun");
 const crumbs = [
   { name: "机场测试档案", href: "/test-records/" },
   { name: "机场网速测试" },
@@ -60,7 +64,22 @@ const faq = [
     </section>
 
     <div class="app-layout pt-8">
-      <SpeedLab />
+      <SpeedPromo
+        variant="top"
+        href={lingdong?.entryUrl ?? null}
+        brand={lingdong?.name ?? "灵动云"}
+      />
+      <div class="mt-4">
+        <SpeedLab />
+      </div>
+    </div>
+
+    <div class="app-layout pt-6">
+      <SpeedPromo
+        variant="bottom"
+        href={lingdong?.entryUrl ?? null}
+        brand={lingdong?.name ?? "灵动云"}
+      />
     </div>
 
     <section class="app-layout app-prose pt-12" aria-labelledby="how">
