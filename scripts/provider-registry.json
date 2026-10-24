@@ -1,5 +1,5 @@
 {
-  "_note": "本站品牌注册表：slug、名称、别名、编辑排列(editorialOrder)、用户于2026-10-15提供的入口链接(entryUrl)。排列是编辑安排，不是实测排名。historyNames 用于匹配历史资料。 coupon 为站长 2026-10-15 提供的优惠码（34 家均有）；没有的填 null，不得自行编造。",
+  "_note": "本站品牌注册表：slug、名称、别名、编辑排列(editorialOrder)、用户于2026-10-15提供的入口链接(entryUrl)。排列是编辑安排，不是实测排名。historyNames 用于匹配历史资料。 coupon 为站长 2026-10-15 提供的优惠码（34 家均有）；其中灵动云的优惠码已于 2026-10-24 由站长更新为 ld888；没有的填 null，不得自行编造。",
   "providers": [
     {
       "slug": "lingdongyun",
@@ -16,9 +16,9 @@
         "灵动云"
       ],
       "entryUrl": "https://varnexa.lingdongaff.com/#/?code=HHoxxHGa",
-      "coupon": "ldy88",
+      "coupon": "ld888",
       "couponNote": "站长提供；折扣幅度与适用套餐以结算页显示为准",
-      "couponCheckedAt": "2026-10-15"
+      "couponCheckedAt": "2026-10-24"
     },
     {
       "slug": "muguang",

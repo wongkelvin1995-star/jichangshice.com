@@ -8,7 +8,7 @@
 
 | No. | 机场 | 最低价套餐 | 价格 | 流量 | 每 GB | 优惠码 | 价格来源 |
 | :-: | ---- | ---------- | ---- | ---- | ----: | ------ | -------- |
-| 1 | [灵动云](https://jichangshice.com.cn/airports/lingdongyun/) | 拂风 | **¥20/月** | 100GB/月 | ¥0.20 | `ldy88` | 历史参考 |
+| 1 | [灵动云](https://jichangshice.com.cn/airports/lingdongyun/) | 拂风 | **¥20/月** | 100GB/月 | ¥0.20 | `ld888` | 历史参考 |
 | 2 | [暮光加速](https://jichangshice.com.cn/airports/muguang/) | 基础版 | **¥20/月** | 120GB/月 | ¥0.17 | `mm88` | 历史参考 |
 | 3 | [飞猫云](https://jichangshice.com.cn/airports/feimaoyun/) | 星耀版 | **¥25/月** | 150GB/月 | ¥0.17 | `flycat888` | 历史参考 |
 | 4 | [大佬云](https://jichangshice.com.cn/airports/dalaoyun/) | 初云·福利版 | **¥19.99/月** | 100GB/30天 | ¥0.20 | `dly888` | ✅ 结算页核验 |
