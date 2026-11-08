@@ -67,7 +67,7 @@ const speedPart = data.runs.length
   ? `${statPhrase("speed", data.runs.length)}、`
   : "";
 const title = `${data.name}节点机场测速数据：${speedPart}${data.rows.length} 行公开测速参考｜${config.site.title}`;
-const description = `机场实测整理的${data.name}节点测速数据：${speedPart}${data.batches.length} 批公开测速参考中的 ${data.rows.length} 行（${data.brands.length} 家机场，${data.evidenceLinks} 条附 Speedtest 原始结果链接）。保留来源原文和单位，不换算、不求平均、不排名。`;
+const description = `机场实测整理的${data.name}节点测速数据：${speedPart}${data.batches.length} 批公开测速参考中的 ${data.rows.length} 行（${data.brands.length} 家机场，${data.evidenceLinks} 条附 Speedtest 原始结果链接）。保留来源原文和单位，不换算、不求平均、不排名；每批注明来源页面、测试地点、运营商、宽带和工具，来源没写的项目标注待验证。`;
 ---
 
 <Layout

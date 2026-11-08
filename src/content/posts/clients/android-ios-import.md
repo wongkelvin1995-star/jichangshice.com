@@ -1,7 +1,7 @@
 ---
 title: Android 与 iOS 导入机场订阅的差异
 shortTitle: Android 与 iOS 导入订阅
-description: 手机上使用机场，Android 和 iOS 在客户端获取、订阅格式、后台运行和省电设置上差别很大。本文分别说明两个系统的客户端选择、导入步骤与常见问题。
+description: 手机上使用机场，Android 和 iOS 在客户端获取、订阅格式、后台运行和省电设置上差别很大。本文分别说明两个系统的客户端选择、导入步骤与常见问题，并附两个系统共同的注意事项和问题速查表，导入失败、后台被杀或订阅不更新时可以按现象快速定位。
 category: clients
 pubDatetime: 2026-10-15T11:40:00+08:00
 primaryKeyword: 手机导入机场订阅

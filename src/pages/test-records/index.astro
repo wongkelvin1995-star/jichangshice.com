@@ -125,7 +125,7 @@ const nodeMatrix = NODE_CHECKS.map(c => ({
 const crumbs = [{ name: "机场实测档案" }];
 const path = "/test-records/";
 const title = `机场实测档案：机场测速数据、节点在线核验与公开测速参考｜${config.site.title}`;
-const description = `机场实测档案汇总 ${statPhrase("speed", stats.speed)}、${statPhrase("node", stats.node)}和 ${statPhrase("public", stats.public)}，可按品牌、地区、数据类型筛选；每条数据注明测试地点、运营商、宽带、日期、工具、服务器和原始证据，未验证的项目标注待验证。`;
+const description = `机场实测档案汇总 ${statPhrase("speed", stats.speed)}、${statPhrase("node", stats.node)}和 ${statPhrase("public", stats.public)}，可按品牌、地区、数据类型筛选；每条数据注明测试地点、运营商、宽带、日期、工具、服务器和原始证据，未验证的项目标注待验证；三类数据分开统计，不混合、不求平均、不排名。`;
 const SECTIONS = [
   ["filters", "筛选"],
   ["speed-tests", "速度实测"],

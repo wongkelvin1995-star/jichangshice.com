@@ -21,7 +21,7 @@ const observed = plans
   .sort();
 const crumbs = [{ name: "套餐比较" }];
 const path = "/compare/";
-const description = `机场套餐比较：${brands} 个机场共 ${plans.length} 档套餐的价格对照表，按品牌、预算、付款周期和每月流量筛选。年付总额与折算月均分开列出，一次性流量包单独标注。`;
+const description = `机场套餐比较：${brands} 个机场共 ${plans.length} 档套餐的价格对照表，按品牌、预算、付款周期和每月流量筛选。年付总额与折算月均分开列出，一次性流量包单独标注；数据来自各机场结算页截图和历史记录，来源不一致的记录会标出（可勾选隐藏），购买前请以官网结算页为准。`;
 // 页面是套餐价格表，对应 CollectionPage；条目只列出有独立资料页的品牌，不输出页面上没有的价格评分
 const listed = providers.filter(
   p => p.hasProfile && plans.some(pl => pl.providerId === p.slug)

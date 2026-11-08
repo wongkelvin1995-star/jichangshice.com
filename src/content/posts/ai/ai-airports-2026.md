@@ -1,7 +1,7 @@
 ---
 title: 2026 AI 机场推荐：ChatGPT、Claude、Gemini 分别怎样验证访问能力
 shortTitle: AI 机场推荐
-description: 选 AI 机场不能只看“全解锁”宣传。本文说明 ChatGPT、Claude、Gemini 对网络地区的要求，给出四级验证方法，并根据本站测试档案中的 AI 记录，列出哪些机场的哪些地区节点有可核对的 AI 访问结果。
+description: 选 AI 机场不能只看“全解锁”宣传。本文说明 ChatGPT、Claude、Gemini 对网络地区的要求，给出四级验证方法，并根据本站测试档案中的 AI 记录，列出哪些机场的哪些地区节点有可核对的 AI 访问结果；没有记录时，给出最短的自测路径，以及购买前可以问客服的问题。
 category: ai
 modDatetime: 2026-10-23T11:30:00+08:00
 pubDatetime: 2026-10-15T18:20:00+08:00

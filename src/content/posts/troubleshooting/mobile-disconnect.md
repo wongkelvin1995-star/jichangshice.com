@@ -1,7 +1,7 @@
 ---
 title: 手机切换 Wi-Fi 与 4G/5G 后断线、后台被关：Android 与 iOS 稳定连接设置
 shortTitle: 手机切网断线怎么办
-description: 手机从 Wi-Fi 切到移动数据后代理断开、过一会儿才恢复，或者锁屏后客户端被系统关闭？本文解释切网断线的原因，分别给出 Android 与 iOS 上保持连接稳定的设置，以及几种常见现象的处理方法。
+description: 手机从 Wi-Fi 切到移动数据后代理断开、过一会儿才恢复，或者锁屏后客户端被系统关闭？本文解释切网断线的原因，分别给出 Android 与 iOS 上保持连接稳定的设置，以及几种常见现象的处理方法；移动数据下想省流量、担心流量和隐私时的设置也一并说明。
 category: troubleshooting
 pubDatetime: 2026-10-15T18:17:00+08:00
 primaryKeyword: 手机 切换网络 代理断线

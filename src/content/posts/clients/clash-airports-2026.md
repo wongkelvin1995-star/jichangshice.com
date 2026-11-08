@@ -1,7 +1,7 @@
 ---
 title: 2026 Clash 机场推荐：订阅格式、客户端兼容性与节点更新机制怎么判断
 shortTitle: Clash 机场推荐
-description: 什么样的机场适合 Clash？本文说明 Clash 订阅格式、Mihomo 内核对 VLESS 等协议的支持、专属客户端与通用订阅的区别，并按本站资料把 34 家机场分为支持通用订阅、仅专属客户端、资料矛盾三类。
+description: 什么样的机场适合 Clash？本文说明 Clash 订阅格式、Mihomo 内核对 VLESS 等协议的支持、专属客户端与通用订阅的区别，并按本站资料把 34 家机场分为支持通用订阅、仅专属客户端、资料矛盾三类；另有导入后要检查的五件事，以及手机端的 Clash 系客户端。
 category: clients
 pubDatetime: 2026-10-15T18:12:00+08:00
 primaryKeyword: Clash 机场推荐

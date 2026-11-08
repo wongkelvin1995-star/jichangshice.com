@@ -71,7 +71,7 @@ const guideHeadings = guide
 const latest = posts.filter(p => p !== guide).slice(0, 6);
 const year = new Date().getFullYear();
 
-const homeDescription = `机场实测（也称机场测试）公开机场测速数据：${statPhrase("speed", stats.speed)}、${statPhrase("node", stats.node)}、${statPhrase("public", stats.public)}，每条写明测试地点、工具和原始证据；附在线机场测速工具，并整理 ${providers.length} 家机场的套餐价格与每 GB 成本。`;
+const homeDescription = `机场实测（也称机场测试）公开机场测速数据：${statPhrase("speed", stats.speed)}、${statPhrase("node", stats.node)}、${statPhrase("public", stats.public)}，每条写明测试地点、工具和原始证据；附在线机场测速工具，并整理 ${providers.length} 家机场的套餐价格与每 GB 成本；还有测试方法、新手教程、客户端配置和故障排查指南。`;
 
 const tools = [
   {

@@ -1,7 +1,7 @@
 ---
 title: Windows 首次配置机场客户端与常见连接问题
 shortTitle: Windows 首次配置
-description: Windows 上第一次使用机场：选择 Clash Verge Rev 或 v2rayN、下载安装、导入订阅、开启系统代理，以及系统代理与 TUN 模式的区别和常见连接问题的处理方法。
+description: Windows 上第一次使用机场：选择 Clash Verge Rev 或 v2rayN、下载安装、导入订阅、开启系统代理，以及系统代理与 TUN 模式的区别和常见连接问题的处理方法；另附 v2rayN 的简要步骤和常见疑问，并在文末给出下一步的建议。
 category: clients
 pubDatetime: 2026-10-15T11:00:00+08:00
 primaryKeyword: Windows 机场客户端教程

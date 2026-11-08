@@ -1,7 +1,7 @@
 ---
 title: 机场测速教程：HTTP 延迟、单线程下行与 Speedtest 结果分别怎么理解
 shortTitle: 测速结果怎么理解
-description: 机场测速时客户端延迟、单线程下载和 Speedtest 多线程结果为什么差这么多？本文解释三种常见测速各自测了什么，给出 MB/s 与 Mbps 换算、测速前的检查清单，以及怎样从三个数字判断节点是否够用。
+description: 机场测速时客户端延迟、单线程下载和 Speedtest 多线程结果为什么差这么多？本文解释三种常见测速各自测了什么，给出 MB/s 与 Mbps 换算、测速前的检查清单，以及怎样从三个数字判断节点是否够用，并说明测速时 Speedtest 服务器该怎么选。
 category: methods
 pubDatetime: 2026-10-15T18:10:00+08:00
 primaryKeyword: 机场测速教程

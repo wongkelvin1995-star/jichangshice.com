@@ -75,7 +75,12 @@ for (const f of htmlFiles) {
   const desc = (html.match(/<meta name="description" content="([^"]*)"/) ?? [])[1];
   if (!title) err(path, "缺少 <title>");
   if (!desc) err(path, "缺少 meta description");
-  else if (desc.length < 40) warns.push(`${path}: description 偏短（${desc.length} 字符）`);
+  else if (!noindex) {
+    // 只提示、不拦截构建：必应的 SEO 建议会把过短的描述列为“描述太短”，过长则会在搜索结果里被截断。
+    const descLen = [...desc.replace(/&(#\d+|#x[0-9a-f]+|[a-z]+);/gi, "x")].length;
+    if (descLen < 120 || descLen > 160)
+      warns.push(`${path}: description ${descLen} 字符，建议 120–160 字`);
+  }
   if (!noindex) {
     if (titles.has(title)) err(path, `title 与 ${titles.get(title)} 重复`);
     titles.set(title, path);

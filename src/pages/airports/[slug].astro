@@ -122,9 +122,26 @@ const similar = allProviders
 
 const title =
   analysis?.data.title ?? `${p.name}机场测评：套餐价格、线路资料与购买前须知`;
-const description =
+const baseDescription =
   analysis?.data.description ??
   `${p.name}机场资料整理：共 ${plans.length} 档套餐${plans.every(x => x.currentVerified) ? `（${observed} 结算页核验）` : ""}，付款周期包括${cycles.join("、")}${priceRange ? `，月付 ¥${priceRange[0]}–¥${priceRange[1]}` : ""}。附流量口径说明${conflicts.length ? "、来源不一致的记录" : ""}与购买前核对清单。`;
+// 人工撰写的描述不足 120 字时，补上本品牌真实的套餐数和资料日期（口径与页面正文一致）
+const descFacts = `共 ${plans.length} 档套餐${
+  observed
+    ? plans.every(x => x.currentVerified)
+      ? `，${observed} 结算页核验`
+      : `，历史参考，最后整理于 ${observed}`
+    : ""
+}`;
+const descTails = [`${descFacts}，价格与流量以官网结算页为准`, descFacts];
+const description =
+  baseDescription.length >= 120
+    ? baseDescription
+    : `${baseDescription.replace(/。$/, "")}；${
+        descTails.find(
+          t => baseDescription.replace(/。$/, "").length + t.length + 2 <= 160
+        ) ?? descFacts
+      }。`;
 // 没有人工分析的品牌页不进入索引（与 astro.config.ts 的 Sitemap 规则一致）
 const noindex = !analysis;
 const records = recordsOf(await getTestRecords(), p.slug);

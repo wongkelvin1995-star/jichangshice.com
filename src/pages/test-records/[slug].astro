@@ -18,7 +18,7 @@ import { getProviders } from "@/utils/plans";
 import { getTestRecords, recordsOf } from "@/utils/testRecords";
 import { getVerifiedRuns, runsOf } from "@/utils/testRuns";
 import { brandStatsText, isBrandTopic } from "@/utils/testStats";
-import { collectRegions } from "@/utils/testRegions";
+import { collectRegions, regionsOfRecord, REGIONS } from "@/utils/testRegions";
 import { nodeCheckFields, runFields } from "@/utils/dataCompleteness";
 import { breadcrumbJsonLd } from "@/utils/jsonld";
 import config from "@/config";
@@ -74,6 +74,41 @@ const hasPeak = rs.some(r =>
     w?.includes("晚高峰")
   )
 );
+// meta description：只写页面里真实存在的数字（行数、地区、证据链接数），
+// 没有本站自己的速度实测时如实写明；超过 158 字时按顺序去掉次要信息。
+const rowCount = rs.reduce((n, r) => n + r.data.rows.length, 0);
+const regionSet = new Set(rs.flatMap(r => regionsOfRecord(r)));
+const regionNames = REGIONS.filter(r => regionSet.has(r.slug)).map(r => r.name);
+const descCore = `${p.name}测速记录（${range}）：${statsText ?? "暂无测速记录"}`;
+const descRows = rowCount ? `，共 ${rowCount} 行公开节点数据` : "";
+const descRegions = regionNames.length
+  ? `，涉及${regionNames.join("、")}节点`
+  : "";
+const descPeak = hasPeak ? "，含晚高峰时段记录" : "";
+const descEvidence = evidence
+  ? `；其中 ${evidence} 条附 Speedtest 原始结果链接`
+  : "";
+const descOwn = own.length
+  ? ""
+  : "本站尚未对该品牌做自己的速度实测，数据均来自公开测速参考。";
+const descTailFull =
+  "注明测试地点、运营商、宽带、工具、服务器与数据局限，未验证的项目标注待验证；三类数据分开统计，不求平均、不排名。";
+const descTailShort =
+  "注明测试地点、运营商、宽带、工具、服务器与数据局限，未验证的项目标注待验证。";
+const buildDesc = (extra: string[], tail: string) =>
+  `${descCore}${extra.join("")}。${descOwn}${tail}`;
+let description = buildDesc(
+  [descRows, descRegions, descPeak, descEvidence],
+  descTailFull
+);
+if (description.length > 158)
+  description = buildDesc(
+    [descRows, descRegions, descPeak, descEvidence],
+    descTailShort
+  );
+if (description.length > 158)
+  description = buildDesc([descRows, descEvidence], descTailShort);
+
 // 这个品牌出现在哪些地区专题页
 const regionLinks = collectRegions(allRecords).filter(
   r =>
@@ -94,7 +129,7 @@ const nodeMatrix = checks.map(c => ({
 
 <Layout
   title={`${p.name}测速记录：${statsText ?? "暂无测速记录"}｜${config.site.title}`}
-  description={`${p.name}测速记录（${range}）：${statsText ?? "暂无测速记录"}${evidence ? `，其中公开测速参考有 ${evidence} 条附 Speedtest 原始结果链接` : ""}。注明测试地点、运营商、宽带、工具、服务器与数据局限，未验证的项目标注待验证。`}
+  description={description}
   canonicalPath={path}
   ogImage={photos[0]?.src}
   ogImageAlt={photos[0]

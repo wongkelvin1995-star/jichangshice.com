@@ -20,7 +20,7 @@ const crumbs = [{ name: "文章归档" }];
 
 <Layout
   title={`文章归档：全部 ${posts.length} 篇文章｜${config.site.title}`}
-  description={`机场实测全部 ${posts.length} 篇文章，按发布月份排列，涵盖测试方法、新手教程、客户端配置、线路知识和故障排查。`}
+  description={`机场实测全部 ${posts.length} 篇文章按发布月份从新到旧排列，涵盖测试方法、新手教程、客户端配置、线路知识、故障排查和 AI 使用六个栏目；每篇都标注发布日期和所属栏目，可以按月份回顾站内更新，也可以点击栏目标签进入对应栏目，按主题系统地阅读同一类教程。`}
   canonicalPath="/archives/"
   jsonLd={[breadcrumbJsonLd(crumbs, "/archives/")]}
 >

@@ -1,7 +1,7 @@
 ---
 title: macOS 安装机场客户端和订阅导入步骤
 shortTitle: macOS 安装与导入
-description: 在 Mac 上使用机场：按芯片类型选择 Clash Verge Rev 或 FlClash 安装包，处理“无法打开”和权限提示，导入订阅、开启系统代理，并排查 macOS 上常见的代理冲突。
+description: 在 Mac 上使用机场：按芯片类型选择 Clash Verge Rev 或 FlClash 安装包，处理“无法打开”和权限提示，导入订阅、开启系统代理，并排查 macOS 上常见的代理冲突；先教你确认 Mac 用的是什么芯片，文末附卸载时的注意事项和常见疑问。
 category: clients
 pubDatetime: 2026-10-15T11:20:00+08:00
 primaryKeyword: macOS Clash 教程

@@ -1,7 +1,7 @@
 ---
 title: AI 与流媒体测试应记录哪些具体操作
 shortTitle: AI 与流媒体怎么测
-description: 机场宣传的“解锁 ChatGPT、Netflix”该怎么验证？本文把检查拆成打开网页、登录、完成任务、播放内容等具体操作，说明每一步记录什么，以及网络连通与账号地区资格的区别。
+description: 机场宣传的“解锁 ChatGPT、Netflix”该怎么验证？本文把检查拆成打开网页、登录、完成任务、播放内容等具体操作，说明每一步记录什么，以及网络连通与账号地区资格的区别；并给出一次检查的记录格式，教你读懂宣传说法，不把“能打开”当成“能用”。
 category: methods
 pubDatetime: 2026-10-15T10:20:00+08:00
 primaryKeyword: 机场 AI 流媒体测试

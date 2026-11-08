@@ -1,7 +1,7 @@
 ---
 title: ChatGPT 能用但 Claude 不可用？节点地区、账号地区与 IP 风险排查
 shortTitle: ChatGPT 能用 Claude 不能用
-description: 同一个节点 ChatGPT 正常、Claude 却提示地区不支持，或者 Gemini 网页能用、API 报错？本文解释各 AI 平台地区政策不同的原因，按节点地区、账号地区、IP 类型、浏览器环境的顺序给出排查步骤。
+description: 同一个节点 ChatGPT 正常、Claude 却提示地区不支持，或者 Gemini 网页能用、API 报错？本文解释各 AI 平台地区政策不同的原因，按节点地区、账号地区、IP 类型、浏览器环境的顺序给出排查步骤；并说明怎样区分网络限制和账号限制、API 的额外检查，以及排查时该记下哪些信息。
 category: ai
 pubDatetime: 2026-10-15T18:21:00+08:00
 primaryKeyword: Claude 不可用 排查

@@ -1,7 +1,7 @@
 ---
 title: Clash 订阅导入教程：Clash Verge Rev 与 Mihomo 导入前要核对什么
 shortTitle: Clash 订阅导入教程
-description: Clash 订阅导入失败，多半是订阅格式、客户端内核或链接本身的问题。本文说明 Clash、Mihomo 与 Clash Verge Rev、FlClash 的关系，导入前要核对的五件事和导入后的检查步骤。
+description: Clash 订阅导入失败，多半是订阅格式、客户端内核或链接本身的问题。本文说明 Clash、Mihomo 与 Clash Verge Rev、FlClash 的关系，导入前要核对的五件事和导入后的检查步骤；附完整导入步骤（以 Clash Verge Rev 为例）和订阅链接的安全提醒。
 category: clients
 pubDatetime: 2026-10-15T10:40:00+08:00
 primaryKeyword: Clash 订阅导入

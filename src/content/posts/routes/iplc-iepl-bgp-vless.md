@@ -1,7 +1,7 @@
 ---
 title: IPLC 和 IEPL 区别是什么？BGP、中转与 VLESS 一次讲清
 shortTitle: IPLC、IEPL、BGP 与 VLESS
-description: 机场介绍里的 IPLC、IEPL、BGP、中转、直连和 VLESS、Trojan 不是同一层面的概念。本文分清“线路”和“协议”，解释每个词描述的是什么，以及读宣传时哪些说法需要自己验证。
+description: 机场介绍里的 IPLC、IEPL、BGP、中转、直连和 VLESS、Trojan 不是同一层面的概念。本文分清“线路”和“协议”，解释每个词描述的是什么，以及读宣传时哪些说法需要自己验证；文末说明本站怎样在测试记录里标注线路与协议信息，并回答专线节点是否一定比直连快、原生 IP 和住宅 IP 是不是一回事。
 category: routes
 pubDatetime: 2026-10-15T12:10:00+08:00
 primaryKeyword: IPLC IEPL 区别
