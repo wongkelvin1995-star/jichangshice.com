@@ -43,8 +43,8 @@ const faq = [
 ---
 
 <Layout
-  title={`机场网速测试：在线测速、延迟、满载延迟与网站连通性｜${config.site.title}`}
-  description="机场网速测试工具：开着代理一键测出口 IP 归属、空载延迟与抖动、下载和上传速度、满载延迟，以及 Google、YouTube、ChatGPT、Netflix 等 15 个网站的连通性，并可生成打码的测速报告图。"
+  title={`机场测速｜机场网速测试：延迟、下载上传、满载延迟与网站连通性｜${config.site.title}`}
+  description="机场测速与机场网速测试工具：开着代理一键测出口 IP 归属、空载延迟与抖动、下载和上传速度、满载延迟，以及 Google、YouTube、ChatGPT、Netflix 等 15 个网站的连通性，并可生成打码的测速报告图。"
   canonicalPath={path}
   jsonLd={[breadcrumbJsonLd(crumbs, path), faqJsonLd(faq)]}
 >
@@ -53,10 +53,10 @@ const faq = [
       <div class="app-layout relative py-8 sm:py-10">
         <Breadcrumbs items={crumbs} />
         <h1 class="text-[1.8rem] font-black tracking-tight sm:text-[2.4rem]">
-          机场网速测试
+          机场测速：在线机场网速测试
         </h1>
         <p class="text-muted-foreground mt-3 max-w-3xl leading-relaxed">
-          连上机场节点后点「开始测速」：先看出口 IP
+          这是一个在线机场测速工具：连上机场节点后点「开始测速」，先看出口 IP
           是否在你选的地区，再测延迟、下载、上传和满载延迟，最后检测常用网站能不能连上。测完可以保存一张出口
           IP 已打码的测速报告图。
         </p>

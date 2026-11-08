@@ -24,8 +24,8 @@ const path = "/compare/";
 ---
 
 <Layout
-  title={`机场套餐价格比较：月付、年付与流量包对照表｜${config.site.title}`}
-  description={`${brands} 个机场共 ${plans.length} 档套餐的价格比较表，按品牌、预算、付款周期和每月流量筛选。年付总额与折算月均分开列出，一次性流量包单独标注。`}
+  title={`机场套餐比较：月付、年付与流量包价格对照表｜${config.site.title}`}
+  description={`机场套餐比较：${brands} 个机场共 ${plans.length} 档套餐的价格对照表，按品牌、预算、付款周期和每月流量筛选。年付总额与折算月均分开列出，一次性流量包单独标注。`}
   canonicalPath={path}
   jsonLd={[breadcrumbJsonLd(crumbs, path)]}
 >
@@ -35,7 +35,7 @@ const path = "/compare/";
         <Breadcrumbs items={crumbs} />
         <div class="max-w-3xl">
           <h1 class="text-[1.8rem] font-black tracking-tight sm:text-[2.4rem]">
-            机场套餐价格比较
+            机场套餐比较与价格对照
           </h1>
           <p class="text-muted-foreground mt-3 leading-relaxed">
             表中整理了 {brands} 个机场的 {plans.length} 档套餐，一档一行。资料整理于

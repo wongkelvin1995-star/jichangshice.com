@@ -9,9 +9,9 @@ export default defineAstroPaperConfig({
     url: "https://jichangshice.com.cn",
     title: "机场测试",
     // 首页 <title>：品牌 + 核心主题
-    homeTitle: "机场测试｜2026 机场测试与机场推荐、套餐比较与测速记录",
+    homeTitle: "机场测试｜2026 机场测速、机场推荐、套餐比较与机场实测记录",
     description:
-      "机场测试整理 34 家机场的套餐价格与每 GB 成本，按编辑精选顺序推荐机场，公开测速记录与测试方法，并提供 Clash 订阅导入教程和故障排查指南。",
+      "机场测试（机场实测）整理 34 家机场的套餐价格与每 GB 成本，提供在线机场测速工具，按编辑精选顺序推荐机场，公开测速记录与测试方法，并提供 Clash 订阅导入教程和故障排查指南。",
     author: "机场测试编辑部",
     ogImage: "og-default.png",
     lang: "zh-CN",
