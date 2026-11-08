@@ -5,17 +5,36 @@ import Layout from "./Layout.astro";
 import Breadcrumbs from "@/components/Breadcrumbs.astro";
 import Toc from "@/components/Toc.astro";
 import { formatDate } from "@/utils/format";
-import { breadcrumbJsonLd } from "@/utils/jsonld";
+import { breadcrumbJsonLd, webPageJsonLd } from "@/utils/jsonld";
 import config from "@/config";
 
-type Props = { id: string; crumbName: string; titleTag?: string };
-const { id, crumbName, titleTag } = Astro.props;
+type Props = {
+  id: string;
+  crumbName: string;
+  titleTag?: string;
+  /** 需要输出页面类型结构化数据时指定（关于页 AboutPage、联系页 ContactPage、其余说明页 WebPage） */
+  pageType?: "WebPage" | "AboutPage" | "ContactPage";
+};
+const { id, crumbName, titleTag, pageType } = Astro.props;
 const entry = await getEntry("pages", id);
 if (!entry) throw new Error(`缺少页面内容：src/content/pages/${id}.md`);
 const { Content, headings } = await render(entry);
 const path = `/${id}/`;
 const crumbs = [{ name: crumbName }];
-const jsonLd: Record<string, unknown>[] = [breadcrumbJsonLd(crumbs, path)];
+const jsonLd: Record<string, unknown>[] = [
+  breadcrumbJsonLd(crumbs, path),
+  ...(pageType
+    ? [
+        webPageJsonLd({
+          type: pageType,
+          name: entry.data.title,
+          description: entry.data.description,
+          path,
+          modified: entry.data.updated,
+        }),
+      ]
+    : []),
+];
 ---
 
 <Layout

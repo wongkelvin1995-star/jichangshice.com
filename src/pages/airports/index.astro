@@ -24,13 +24,13 @@ const crumbs = [{ name: "机场目录" }];
 const path = "/airports/";
 const withProfile = providers.filter(p => p.hasProfile);
 const featured = withProfile.slice(0, FEATURED_COUNT);
-const rest = withProfile.slice(5);
+const rest = withProfile.slice(FEATURED_COUNT);
 const listingOnly = providers.filter(p => !p.hasProfile);
 ---
 
 <Layout
   title={`机场目录：${providers.length} 个机场品牌资料、价格与测评入口｜${config.site.title}`}
-  description={`机场测试收录的 ${providers.length} 个机场品牌目录，包括灵动云、暮光加速、飞猫云、大佬云、微风网络等，每个品牌汇总历史套餐、月付起步价、线路资料与购买前须知。`}
+  description={`机场实测收录的 ${providers.length} 个机场品牌目录，包括灵动云、暮光加速、微风网络、飞猫云、大佬云等，每个品牌汇总历史套餐、月付起步价、线路资料与购买前须知。`}
   canonicalPath={path}
   jsonLd={[
     breadcrumbJsonLd(crumbs, path),
@@ -48,9 +48,12 @@ const listingOnly = providers.filter(p => !p.hasProfile);
           机场目录
         </h1>
         <p class="text-muted-foreground mt-3 max-w-3xl leading-relaxed">
-          收录 {providers.length} 个机场品牌，其中 {withProfile.length}
-          个有历史套餐资料和独立资料页。顺序为编辑安排，<strong
-            class="text-foreground">不是测速或稳定性排名</strong
+          收录 {providers.length} 个机场品牌，{
+            withProfile.length === providers.length
+              ? "每个品牌都有历史套餐资料和独立资料页"
+              : `其中 ${withProfile.length} 个有历史套餐资料和独立资料页`
+          }。顺序为编辑安排，<strong class="text-foreground"
+            >不是测速或稳定性排名</strong
           >；本站发布可复核的测试记录后，会另行给出基于数据的比较。
         </p>
         <div class="mt-5 flex flex-wrap gap-2">
@@ -64,7 +67,9 @@ const listingOnly = providers.filter(p => !p.hasProfile);
 
     <section class="app-layout pt-10" aria-labelledby="picks">
       <p class="eyebrow">编辑精选</p>
-      <h2 id="picks" class="section-title mt-1.5">前 5 家机场资料</h2>
+      <h2 id="picks" class="section-title mt-1.5">
+        编辑精选的前 {FEATURED_COUNT} 家机场资料
+      </h2>
       <div class="mt-5 grid gap-5">
         {
           featured.map((p, i) => (
@@ -86,7 +91,7 @@ const listingOnly = providers.filter(p => !p.hasProfile);
             return (
               <li
                 class="card flex flex-col p-4"
-                data-placement={`directory-${i + 6}`}
+                data-placement={`directory-${i + FEATURED_COUNT + 1}`}
               >
                 <div class="flex items-center gap-3">
                   <BrandAvatar name={p.name} size="sm" />

@@ -6,7 +6,8 @@ const { done, total, latest } = Astro.props;
 const pct = Math.round((done / total) * 100);
 ---
 
-<aside
+<div
+  role="group"
   class="card border-orange-200 bg-gradient-to-br from-orange-50 to-white p-5"
   aria-label="实测图更新进度"
 >
@@ -19,6 +20,7 @@ const pct = Math.round((done / total) * 100);
   <div
     class="mt-2 h-2 overflow-hidden rounded-full bg-orange-100"
     role="progressbar"
+    aria-label={`实测图发布进度：已发布 ${done} 家，共 ${total} 家`}
     aria-valuemin="0"
     aria-valuemax={total}
     aria-valuenow={done}
@@ -50,4 +52,4 @@ const pct = Math.round((done / total) * 100);
       )
     }。
   </p>
-</aside>
+</div>

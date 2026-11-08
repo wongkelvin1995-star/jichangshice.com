@@ -7,16 +7,21 @@ import { defineAstroPaperConfig } from "./src/types/config";
 export default defineAstroPaperConfig({
   site: {
     url: "https://jichangshice.com.cn",
-    title: "机场测试",
-    // 首页 <title>：品牌 + 核心主题
-    homeTitle: "机场测试｜2026 机场测速、机场推荐、套餐比较与机场实测记录",
+    // 主品牌名：机场实测。“机场测试”是读者常用的搜索说法，作为相关搜索词保留（见 altNames 与各页正文）
+    title: "机场实测",
+    altNames: ["机场测试"],
+    // 首页 <title>：品牌 + 首页最先展示的内容（测速数据、测试档案、在线测速）
+    homeTitle: "机场实测｜2026 机场测速数据、测试档案与在线测速工具",
+    // 不写具体数量：数量会变化，首页 description 另按真实统计生成
     description:
-      "机场测试（机场实测）整理 34 家机场的套餐价格与每 GB 成本，提供在线机场测速工具，按编辑精选顺序推荐机场，公开测速记录与测试方法，并提供 Clash 订阅导入教程和故障排查指南。",
-    author: "机场测试编辑部",
+      "机场实测（也称机场测试）公开机场测速数据与测试档案，注明每条数据的测试地点、运营商、工具和原始证据；提供在线机场测速工具，并整理各家机场的套餐价格、每 GB 成本与编辑精选资料。",
+    author: "机场实测编辑部",
     ogImage: "og-default.png",
     lang: "zh-CN",
     timezone: "Asia/Shanghai",
     dir: "ltr",
+    // 只放真实存在的官方页面
+    sameAs: ["https://github.com/wongkelvin1995-star/jichangshice.com"],
   },
   // 本站 Telegram 入口；留空字符串则页眉和页脚自动隐藏 TG 图标
   telegramUrl: "https://t.me/+rXmeYjh4Yv5hNjM1",

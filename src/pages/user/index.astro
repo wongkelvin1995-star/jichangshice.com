@@ -72,8 +72,8 @@ const emptyBox =
 ---
 
 <Layout
-  title="个人中心 - 机场测试"
-  description="机场测试个人中心：管理收藏的机场、浏览记录和比较清单，设置浏览偏好。"
+  title="个人中心 - 机场实测"
+  description="机场实测个人中心：管理收藏的机场、浏览记录和比较清单，设置浏览偏好。"
   canonicalPath="/user/"
   noindex
 >
@@ -148,7 +148,7 @@ const emptyBox =
                 aria-selected={i === 0 ? "true" : "false"}
                 tabindex={i === 0 ? 0 : -1}
                 data-tab={t.id}
-                class="text-muted-foreground hover:bg-accent-soft hover:text-accent-strong aria-selected:bg-accent aria-selected:hover:bg-accent flex items-center justify-center gap-3 rounded-lg px-1 py-2.5 text-[0.8125rem] font-semibold whitespace-nowrap aria-selected:text-white sm:text-sm lg:w-full lg:justify-between lg:px-3.5"
+                class="text-muted-foreground hover:bg-accent-soft hover:text-accent-strong aria-selected:bg-accent-strong aria-selected:hover:bg-accent-strong flex items-center justify-center gap-3 rounded-lg px-1 py-2.5 text-[0.8125rem] font-semibold whitespace-nowrap aria-selected:text-white sm:text-sm lg:w-full lg:justify-between lg:px-3.5"
               >
                 {t.label}
                 {t.count && (
@@ -465,7 +465,7 @@ const emptyBox =
             </div>
           </div>
           <div class="mt-3 flex flex-wrap gap-2 border-t pt-3">
-            <a href="${esc(i.url)}" class="${btn} bg-accent text-white hover:bg-accent-strong">查看详情</a>
+            <a href="${esc(i.url)}" class="${btn} bg-accent-strong text-white hover:bg-accent">查看详情</a>
             <button type="button" class="${btn} text-muted-foreground border hover:border-red-300 hover:text-red-600" data-act="unfav" data-slug="${esc(f.slug)}" aria-label="取消收藏：${esc(i.name)}">取消收藏</button>
           </div>
         </li>`;

@@ -10,6 +10,11 @@
  *  - JSON-LD 可解析
  *  - Sitemap 只含可索引页面，且所有可索引页面都在 Sitemap 中
  *  - robots.txt 指向正确的 Sitemap；没有残留旧域名
+ *  - 测试数据口径：首页与测试档案的“速度实测 / 节点在线状态核验 / 公开测速参考”数字一致，
+ *    且等于档案表格行数和各品牌页之和；不得再出现“本站测试 N 条”的合并口径
+ *  - 站名统一为“机场实测”；“编辑精选 No.n”只用于前几名；品牌头像不得重复品牌首字
+ *  - 可横向滚动的表格容器必须可聚焦并有名称；进度条要有名称；图片要有 alt
+ *  - 站内链接的 #锚点在目标页面上真实存在；各页面 JSON-LD 的类型与页面内容相符（无评分/评价类）
  */
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { join, relative, sep } from "node:path";
@@ -56,6 +61,7 @@ function resolves(urlPath) {
 
 const titles = new Map();
 const descs = new Map();
+const crossAnchors = [];
 const indexable = new Set();
 const textOf = s => s.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
 
@@ -95,8 +101,10 @@ for (const f of htmlFiles) {
     if (href === undefined) continue;
     if (href.startsWith("/") && !href.startsWith("//")) {
       if (!resolves(href)) err(path, `站内链接无效 ${href}`);
+      else crossAnchors.push([path, href]);
     } else if (href.startsWith(SITE)) {
       if (!resolves(href.slice(SITE.length) || "/")) err(path, `站内链接无效 ${href}`);
+      else crossAnchors.push([path, href.slice(SITE.length) || "/"]);
     } else if (href.startsWith("#")) {
       const id = decodeURIComponent(href.slice(1));
       if (id && !html.includes(`id="${id}"`)) err(path, `锚点不存在 ${href}`);
@@ -136,6 +144,208 @@ for (const p of indexable) if (p !== "/404.html" && !smUrls.has(SITE + p)) err("
 const robots = existsSync(join(DIST, "robots.txt")) ? readFileSync(join(DIST, "robots.txt"), "utf8") : "";
 if (!robots.includes(`Sitemap: ${SITE}/sitemap-index.xml`)) err("robots.txt", "Sitemap 地址不正确");
 if (/Disallow:\s*\/\s*$/m.test(robots)) err("robots.txt", "禁止了全站抓取");
+
+// ---- 其他页面上的锚点：/path/#id 的 id 必须在目标页面真实存在 ----
+const pageHtml = new Map();
+const htmlOfPath = p => {
+  const clean = decodeURI(p.split("#")[0].split("?")[0]);
+  if (!pageHtml.has(clean)) {
+    const f = clean.endsWith("/") ? join(DIST, clean, "index.html") : join(DIST, clean);
+    pageHtml.set(clean, existsSync(f) && statSync(f).isFile() ? readFileSync(f, "utf8") : null);
+  }
+  return pageHtml.get(clean);
+};
+const seenAnchor = new Set();
+// 用户中心的标签页由脚本根据 URL 的 # 切换，页面里没有同名 id，所以改为对照页面源码里登记的标签名
+const userTabs = [
+  ...readFileSync(new URL("../src/pages/user/index.astro", import.meta.url), "utf8").matchAll(/\{ id: "(\w+)", label:/g),
+].map(m => m[1]);
+for (const [from, href] of crossAnchors) {
+  const [target, frag] = href.split("#");
+  if (!frag || target === from) continue;
+  const id = decodeURIComponent(frag);
+  if (!id || id.startsWith(":~:")) continue;
+  if (target === "/user/") {
+    if (!userTabs.includes(id)) err(from, `用户中心没有标签“${id}”：${href}`);
+    continue;
+  }
+  const key = `${target}#${id}`;
+  if (seenAnchor.has(key)) continue;
+  seenAnchor.add(key);
+  const html = htmlOfPath(target);
+  if (html !== null && !html.includes(`id="${id}"`)) err(from, `链接的锚点在目标页面不存在 ${href}`);
+}
+
+// ---- 测试数据口径：三类数据分开统计，全站数字一致 ----
+const statsOf = html =>
+  Object.fromEntries(
+    [...html.matchAll(/data-stat="(speed|node|public)"[\s\S]*?data-stat-value[^>]*>\s*(\d+)\s*</g)].map(m => [m[1], Number(m[2])])
+  );
+const archiveHtml = htmlOfPath("/test-records/");
+const homeHtml = htmlOfPath("/");
+const statLabel = { speed: "条速度实测", node: "条节点在线状态核验", public: "批公开测速参考" };
+let statInfo = "";
+if (!archiveHtml || !homeHtml) {
+  err("stats", "缺少首页或 /test-records/ 页面，无法核对测试数据口径");
+} else {
+  const A = statsOf(archiveHtml);
+  const H = statsOf(homeHtml);
+  for (const k of Object.keys(statLabel)) {
+    if (A[k] === undefined) err("/test-records/", `缺少统计卡片 data-stat="${k}"`);
+    if (H[k] === undefined) err("/", `缺少统计卡片 data-stat="${k}"`);
+    if (A[k] !== undefined && H[k] !== undefined && A[k] !== H[k])
+      err("/", `${statLabel[k]}数量 ${H[k]} 与测试档案的 ${A[k]} 不一致`);
+  }
+  // 表格/卡片行数 = 统计数字
+  for (const k of Object.keys(statLabel)) {
+    const n = [...archiveHtml.matchAll(new RegExp(`data-filter-item="row"[^>]*?data-kind="${k}"`, "g"))].length;
+    if (A[k] !== undefined && n !== A[k]) err("/test-records/", `${statLabel[k]}统计为 ${A[k]}，但页面实际列出 ${n} 行`);
+  }
+  // 各品牌记录页之和 = 统计数字（三类各自相加，不混合）
+  const sum = { speed: 0, node: 0, public: 0 };
+  const brandRe = /^\/test-records\/(?!region\/|submit\/)[^/]+\/$/;
+  for (const p of indexable) {
+    if (!brandRe.test(p)) continue;
+    const html = htmlOfPath(p) ?? "";
+    sum.speed += Number((html.match(/速度实测（(\d+) 条）/) ?? [])[1] ?? 0);
+    sum.node += Number((html.match(/节点在线状态核验（(\d+) 条）/) ?? [])[1] ?? 0);
+    sum.public += Number((html.match(/公开测速参考（(\d+) 批）/) ?? [])[1] ?? 0);
+  }
+  for (const k of Object.keys(statLabel))
+    if (A[k] !== undefined && sum[k] !== A[k]) err("/test-records/", `各品牌记录页的${statLabel[k]}合计 ${sum[k]}，与统计 ${A[k]} 不一致`);
+  // 全站汇总处写出的数字都必须等于统计：首页全文、测试档案的 meta description。
+  // 品牌、地区各自的数字口径不同（例如某品牌“1 条速度实测”），已由上面的“行数 = 统计”“品牌页合计 = 统计”保证，这里不逐句核对。
+  const metaDescOf = h => (h.match(/<meta name="description" content="([^"]*)"/) ?? [])[1] ?? "";
+  for (const [path, html] of [["/", homeHtml], ["/test-records/", metaDescOf(archiveHtml)]]) {
+    for (const k of Object.keys(statLabel)) {
+      const unit = k === "public" ? "批" : "条";
+      const label = statLabel[k].slice(1);
+      for (const m of html.matchAll(new RegExp(`(\\d+) ?${unit}${label}`, "g")))
+        if (A[k] !== undefined && Number(m[1]) !== A[k]) err(path, `写的是“${m[0]}”，统计应为 ${A[k]}`);
+    }
+  }
+  statInfo = `测试数据口径：${A.speed} 条速度实测 / ${A.node} 条节点在线状态核验 / ${A.public} 批公开测速参考（首页、档案表格、品牌页合计一致）。`;
+}
+
+// ---- 站名、编号、头像、可访问性等规则（逐页） ----
+const cfgSrc = readFileSync(new URL("../astro-paper.config.ts", import.meta.url), "utf8");
+const SITE_TITLE = (cfgSrc.match(/^\s*title:\s*"([^"]+)"/m) ?? [])[1] ?? "";
+const FEATURED = Number(
+  (readFileSync(new URL("../src/data/editorial-order.ts", import.meta.url), "utf8").match(/FEATURED_COUNT\s*=\s*(\d+)/) ?? [])[1] ?? 5
+);
+const typesOf = obj => {
+  const out = [];
+  const visit = v => {
+    if (Array.isArray(v)) v.forEach(visit);
+    else if (v && typeof v === "object") {
+      if (v["@type"]) out.push(...[].concat(v["@type"]));
+      Object.values(v).forEach(visit);
+    }
+  };
+  visit(obj);
+  return out;
+};
+const EXPECT_TYPES = {
+  "/": ["WebSite", "Organization"],
+  "/speedtest/": ["WebApplication", "FAQPage"],
+  "/test-records/": ["CollectionPage"],
+  "/compare/": ["CollectionPage"],
+  "/testing-methodology/": ["WebPage"],
+  "/about/": ["AboutPage"],
+  "/contact/": ["ContactPage"],
+};
+const FORBIDDEN_TYPES = ["Review", "AggregateRating", "Rating", "Product", "Recipe", "Event", "JobPosting"];
+const RANK_WORDS = /最快|第一名|排名第一|速度冠军|平均速度|平均下载/;
+for (const f of htmlFiles) {
+  const path = pathOf(f);
+  const html = readFileSync(f, "utf8");
+  const noindex = /<meta name="robots" content="noindex/.test(html);
+
+  if (html.includes("机场测试档案")) err(path, "仍使用旧名称“机场测试档案”，应为“机场实测档案”");
+  if (/本站测试 ?\d+ ?条/.test(html)) err(path, "出现合并口径“本站测试 N 条”，应分开写速度实测 / 节点在线状态核验 / 公开测速参考");
+  for (const m of html.matchAll(/编辑精选 No\.(\d+)/g))
+    if (Number(m[1]) > FEATURED) err(path, `“${m[0]}”超出编辑精选范围（前 ${FEATURED} 名），应写“目录第 n 位”`);
+
+  // 品牌头像只放图标，不放文字（避免与旁边品牌名的首字重复）
+  for (const m of html.matchAll(/<span aria-hidden="true" class="[^"]*\bsize-(?:8|11|14)\b[^"]*"[^>]*>([\s\S]*?)<\/span>/g)) {
+    const inner = m[1].replace(/<svg[\s\S]*?<\/svg>/g, "").replace(/\s+/g, "");
+    if (inner) err(path, `品牌头像里有文字“${inner.slice(0, 6)}”，会造成品牌首字重复`);
+  }
+
+  // 可横向滚动的容器必须可聚焦、有名称
+  for (const m of html.matchAll(/<div\b[^>]*\btable-scroll\b[^>]*>/g)) {
+    const tag = m[0];
+    if (!/tabindex="0"/.test(tag) || !/role="region"/.test(tag) || !/aria-label="[^"]+"/.test(tag))
+      err(path, `表格滚动容器缺少 tabindex/role/aria-label：${tag.slice(0, 80)}`);
+  }
+  // 同一页内可聚焦的表格区域（role="region"）名称不能重复，读屏软件的地标列表里才分得清；表头单元格不能是空的
+  const regionNames = [...html.matchAll(/<div\b[^>]*\brole="region"[^>]*>/g)]
+    .map(m => (m[0].match(/aria-label="([^"]*)"/) ?? [])[1])
+    .filter(Boolean);
+  const dupRegions = [...new Set(regionNames.filter((n, i) => regionNames.indexOf(n) !== i))];
+  if (dupRegions.length) err(path, `表格区域名称重复：${dupRegions.join("、").slice(0, 90)}`);
+  if (/<th\b[^>]*>\s*<\/th>/.test(html)) err(path, "存在空白的表头单元格 <th></th>");
+  for (const m of html.matchAll(/<div\b[^>]*role="progressbar"[^>]*>/g))
+    if (!/aria-label="[^"]+"/.test(m[0])) err(path, "进度条缺少 aria-label");
+  for (const m of html.matchAll(/<img\b[^>]*>/g))
+    if (!/\balt=/.test(m[0])) err(path, `图片缺少 alt：${m[0].slice(0, 80)}`);
+  // 复选框要有名称：自带 aria-label / aria-labelledby，或被 <label> 包住（含可见文字）
+  for (const m of html.matchAll(/<input\b[^>]*type="checkbox"[^>]*>/g)) {
+    if (/aria-label="[^"]+"|aria-labelledby=/.test(m[0])) continue;
+    const before = html.slice(0, m.index);
+    const wrapped = before.lastIndexOf("<label") > before.lastIndexOf("</label>");
+    const idMatch = m[0].match(/\bid="([^"]+)"/);
+    const labelled = idMatch && html.includes(`for="${idMatch[1]}"`);
+    if (!wrapped && !labelled) err(path, `复选框没有名称：${m[0].slice(0, 80)}`);
+  }
+
+  // 标题以站名结尾（首页、404 除外）
+  if (!noindex && path !== "/" && path !== "/404.html" && SITE_TITLE) {
+    const title = (html.match(/<title>([^<]*)<\/title>/) ?? [])[1] ?? "";
+    if (!title.endsWith(`｜${SITE_TITLE}`)) warns.push(`${path}: <title> 没有以“｜${SITE_TITLE}”结尾`);
+  }
+
+  // 结构化数据：类型必须与页面内容相符，不输出评分/评价类
+  const types = [];
+  for (const m of html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) {
+    try {
+      types.push(...typesOf(JSON.parse(m[1])));
+    } catch {
+      /* 解析错误已在前面报告 */
+    }
+  }
+  for (const t of types) if (FORBIDDEN_TYPES.includes(t)) err(path, `JSON-LD 使用了页面上没有的类型 ${t}`);
+  for (const t of EXPECT_TYPES[path] ?? []) if (!types.includes(t)) err(path, `JSON-LD 缺少 ${t}`);
+  if (/^\/test-records\/region\/[^/]+\/$/.test(path) && !types.includes("CollectionPage")) err(path, "地区专题页缺少 CollectionPage");
+
+  // 测速档案与地区专题页只列数据，不出现排名/平均式结论
+  if (/^\/test-records\//.test(path) && !/^\/test-records\/submit\//.test(path)) {
+    // 记录备注（data-record-note）是对来源数据的说明，例如“来源页给出的平均速度超过 1000 Mbps，与标称环境矛盾，本站未收录”，
+    // 不是本站自己给出排名或平均值，所以不在此检查范围内。
+    const t = html
+      .replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/g, "")
+      .replace(/<p\b[^>]*data-record-note[^>]*>[\s\S]*?<\/p>/g, " ")
+      .replace(/<[^>]+>/g, " ");
+    const m = t.match(RANK_WORDS);
+    if (m) err(path, `测速档案页出现排名/平均式用语“${m[0]}”`);
+  }
+}
+
+// ---- Sitemap lastmod：格式有效、不在未来；地区专题页都在 Sitemap 且有 lastmod ----
+for (const f of smFiles) {
+  const xml = readFileSync(f, "utf8");
+  for (const m of xml.matchAll(/<url>([\s\S]*?)<\/url>/g)) {
+    const loc = (m[1].match(/<loc>([^<]+)<\/loc>/) ?? [])[1];
+    const lm = (m[1].match(/<lastmod>([^<]+)<\/lastmod>/) ?? [])[1];
+    if (lm) {
+      const t = Date.parse(lm);
+      if (Number.isNaN(t)) err("sitemap", `lastmod 无法解析 ${loc} ${lm}`);
+      else if (t > Date.now() + 5 * 60_000) err("sitemap", `lastmod 晚于当前时间 ${loc} ${lm}`);
+    } else if (/\/test-records\//.test(loc)) err("sitemap", `测试档案相关页面缺少 lastmod ${loc}`);
+  }
+}
+for (const p of indexable)
+  if (/^\/test-records\/region\//.test(p) && !smUrls.has(SITE + p)) err("sitemap", `地区专题页未收录 ${p}`);
 
 // 文章字数（参考，不是硬性要求）
 const articleRe = /^\/(methods|guides|clients|routes|troubleshooting|ai)\/[^/]+\/$/;
@@ -191,6 +401,7 @@ if (!existsSync(idxFile)) {
 
 console.log(`检查页面 ${htmlFiles.length} 个，可索引 ${indexable.size} 个，Sitemap ${smUrls.size} 条。`);
 if (idxInfo) console.log(idxInfo);
+if (statInfo) console.log(statInfo);
 if (counts.length) {
   console.log("\n文章正文字数（汉字+标点+英文词，编辑参考，非排名门槛）：");
   for (const [p, n] of counts.sort((a, b) => a[1] - b[1])) console.log(`  ${String(n).padStart(5)}  ${p}`);

@@ -8,9 +8,13 @@ import rehypeCallouts from "rehype-callouts";
 import config from "./astro-paper.config";
 import { NODE_CHECKS } from "./src/data/node-checks";
 import { TEST_PHOTOS } from "./src/data/test-photos";
+import { regionKey } from "./src/data/regions";
+import { revisionOf } from "./src/data/page-dates";
+import { regionOf as nodeRegionOf } from "./src/data/node-checks";
 import {
   rehypeExternalLinks,
   rehypeTableScroll,
+  rehypeTaskLabels,
 } from "./src/utils/rehypeExternalLinks";
 
 /**
@@ -25,7 +29,8 @@ const indexedAirports = new Set(
 
 /**
  * Sitemap lastmod：取内容文件 frontmatter 中真实的修改/发布日期（modDatetime > pubDatetime > updated），
- * 不使用构建当天。没有对应内容文件的页面不输出 lastmod。
+ * 不使用构建当天。没有对应内容文件的页面，只在 src/data/page-dates.ts 登记了真实修改日期、
+ * 或页面所用数据有真实日期（来源核对日、核验/实测图发布时间）时才输出 lastmod，否则不输出。
  */
 const SITE = config.site.url.replace(/\/$/, "");
 const lastmod = new Map<string, string>();
@@ -67,6 +72,56 @@ for (const c of [...NODE_CHECKS, ...TEST_PHOTOS]) {
     )
       lastmod.set(u, c.publishedAt);
 }
+// 公开测速参考：以本站核对来源页面的日期（sourceCheckedAt）作为相关页面的 lastmod
+const bump = (url: string, date: string) => {
+  const cur = lastmod.get(url);
+  if (!cur || Date.parse(date) > Date.parse(cur)) lastmod.set(url, date);
+};
+const publicRecords = JSON.parse(
+  readFileSync(
+    new URL("./src/data/test-records.json", import.meta.url),
+    "utf-8"
+  )
+) as {
+  brandSlug: string;
+  sourceCheckedAt: string;
+  rows: { node?: string | null; region?: string | null }[];
+}[];
+for (const r of publicRecords) {
+  bump(`${SITE}/test-records/`, r.sourceCheckedAt);
+  bump(`${SITE}/test-records/${r.brandSlug}/`, r.sourceCheckedAt);
+  for (const row of r.rows) {
+    const k = regionKey(row.node ?? row.region);
+    if (k) bump(`${SITE}/test-records/region/${k}/`, r.sourceCheckedAt);
+  }
+}
+// 地区专题页同时包含该地区的实测图与节点核验，取它们真实的发布时间
+for (const t of TEST_PHOTOS) {
+  const k = regionKey(t.nodeRegion);
+  if (k) bump(`${SITE}/test-records/region/${k}/`, t.publishedAt);
+}
+for (const c of NODE_CHECKS) {
+  for (const k of new Set(c.nodes.map(n => regionKey(nodeRegionOf(n.name)))))
+    if (k) bump(`${SITE}/test-records/region/${k}/`, c.publishedAt);
+}
+// 没有内容文件的页面：取 src/data/page-dates.ts 登记的真实修改日期（与数据日期比，取较晚的）
+const withRevision = (url: string) => {
+  const rev = revisionOf(url.replace(SITE, ""));
+  const cur = lastmod.get(url);
+  if (rev && (!cur || Date.parse(rev) > Date.parse(cur))) return rev;
+  return cur ?? null;
+};
+for (const p of [
+  "/",
+  "/test-records/",
+  "/speedtest/",
+  "/compare/",
+  "/recommendations/",
+  "/airports/",
+]) {
+  const d = withRevision(`${SITE}${p}`);
+  if (d) lastmod.set(`${SITE}${p}`, d);
+}
 // 首页汇总最新文章与资料：lastmod 取全站内容中最新的真实日期
 const homeDate = [...lastmod.values()]
   .sort((a, b) => Date.parse(a) - Date.parse(b))
@@ -88,7 +143,7 @@ export default defineConfig({
     mdx(),
     sitemap({
       serialize: item => {
-        const d = lastmod.get(item.url);
+        const d = withRevision(item.url);
         if (d) item.lastmod = new Date(d).toISOString();
         return item;
       },
@@ -103,7 +158,12 @@ export default defineConfig({
   markdown: {
     processor: unified({
       remarkPlugins: [],
-      rehypePlugins: [rehypeCallouts, rehypeExternalLinks, rehypeTableScroll],
+      rehypePlugins: [
+        rehypeCallouts,
+        rehypeExternalLinks,
+        rehypeTableScroll,
+        rehypeTaskLabels,
+      ],
     }),
     shikiConfig: {
       theme: "github-light",

@@ -1,5 +1,6 @@
 ---
 import type { TestPhoto } from "@/data/test-photos";
+import { photoVariants, toSrcset } from "@/utils/photoVariants";
 
 type Props = {
   photo: TestPhoto;
@@ -8,6 +9,8 @@ type Props = {
 };
 const { photo: t, brandName, headingLevel = "h3" } = Astro.props;
 const H = headingLevel;
+// 大图只用 ≥480 宽的副本（168 宽的只给首页缩略图用）
+const variants = photoVariants(t.src, t.width).filter(v => v.w >= 480);
 const alt = `${brandName}机场实测图：${t.date} ${t.nodeRegion}节点，下载 ${t.downloadMbps} Mbps、上传 ${t.uploadMbps} Mbps、延迟 ${t.latencyMs} ms`;
 const rows: [string, string][] = [
   ["测试日期", t.time ? `${t.date} ${t.time}` : t.date],
@@ -36,6 +39,8 @@ const rows: [string, string][] = [
   >
     <img
       src={t.src}
+      srcset={variants.length > 1 ? toSrcset(variants) : undefined}
+      sizes="(min-width: 768px) 300px, calc(100vw - 4.5rem)"
       alt={alt}
       width={t.width}
       height={t.height}

@@ -1,0 +1,495 @@
+---
+/**
+ * 地区专题页：把某个节点地区（香港、日本、新加坡、美国）在三类测试数据里的内容放在一起。
+ *
+ * 只做归类和列出：保留来源写的原文和单位，不换算、不求平均、不排名；
+ * 三类数据（速度实测 / 节点在线状态核验 / 公开测速参考）分区展示，不合并。
+ * 只有资料达到门槛的地区才会生成页面（见 src/utils/testRegions.ts 的 REGION_PAGE_MIN）。
+ */
+import Layout from "@/layouts/Layout.astro";
+import Breadcrumbs from "@/components/Breadcrumbs.astro";
+import BrandAvatar from "@/components/BrandAvatar.astro";
+import OwnRunsTable from "@/components/OwnRunsTable.astro";
+import { getProviders } from "@/utils/plans";
+import { getTestRecords } from "@/utils/testRecords";
+import { collectRegions, REGION_PAGE_MIN } from "@/utils/testRegions";
+import { publicRecordFields } from "@/utils/dataCompleteness";
+import { statPhrase } from "@/utils/testStats";
+import { breadcrumbJsonLd, collectionPageJsonLd } from "@/utils/jsonld";
+import config from "@/config";
+
+export async function getStaticPaths() {
+  const records = await getTestRecords();
+  const pages = collectRegions(records).filter(r => r.hasPage);
+  const siblings = pages.map(r => ({ slug: r.slug, name: r.name }));
+  return pages.map(r => ({
+    params: { region: r.slug },
+    props: { slug: r.slug, siblings },
+  }));
+}
+
+const { slug, siblings } = Astro.props;
+const providers = await getProviders();
+const records = await getTestRecords();
+const data = collectRegions(records).find(r => r.slug === slug)!;
+const brandNames = Object.fromEntries(providers.map(p => [p.slug, p.name]));
+const nameOf = (s: string) => brandNames[s] ?? s;
+const order = new Map(providers.map((p, i) => [p.slug, i]));
+
+// 每批记录的测试环境（地点、运营商、宽带、工具）：来源没写的标「待验证」
+const envOf = new Map(data.batches.map(b => [b.id, publicRecordFields(b)]));
+const envField = (batchId: string, key: string) =>
+  envOf.get(batchId)!.find(f => f.key === key)!;
+
+const groups = [...data.brands]
+  .sort((a, b) => (order.get(a) ?? 999) - (order.get(b) ?? 999))
+  .map(b => {
+    const rows = data.rows
+      .filter(r => r.record.data.brandSlug === b)
+      .sort((x, y) =>
+        y.record.data.recordedAt.localeCompare(x.record.data.recordedAt)
+      );
+    return {
+      slug: b,
+      name: nameOf(b),
+      rows,
+      batches: new Set(rows.map(r => r.record.id)).size,
+      links: rows.filter(r => r.row.evidenceUrl).length,
+    };
+  });
+
+const path = `/test-records/region/${slug}/`;
+const crumbs = [
+  { name: "机场实测档案", href: "/test-records/" },
+  { name: `${data.name}节点测速数据` },
+];
+const speedPart = data.runs.length
+  ? `${statPhrase("speed", data.runs.length)}、`
+  : "";
+const title = `${data.name}节点机场测速数据：${speedPart}${data.rows.length} 行公开测速参考｜${config.site.title}`;
+const description = `机场实测整理的${data.name}节点测速数据：${speedPart}${data.batches.length} 批公开测速参考中的 ${data.rows.length} 行（${data.brands.length} 家机场，${data.evidenceLinks} 条附 Speedtest 原始结果链接）。保留来源原文和单位，不换算、不求平均、不排名。`;
+---
+
+<Layout
+  title={title}
+  description={description}
+  canonicalPath={path}
+  jsonLd={[
+    breadcrumbJsonLd(crumbs, path),
+    collectionPageJsonLd({
+      name: `${data.name}节点机场测速数据`,
+      description,
+      path,
+      items: groups.map(g => ({
+        name: `${g.name}测速记录`,
+        url: `/test-records/${g.slug}/`,
+      })),
+    }),
+  ]}
+>
+  <main id="main-content" data-pagefind-body>
+    <section class="hero-band relative border-b">
+      <div class="app-layout relative py-8 sm:py-10">
+        <Breadcrumbs items={crumbs} />
+        <h1 class="text-[1.8rem] font-black tracking-tight sm:text-[2.4rem]">
+          {data.name}节点机场测速数据
+        </h1>
+        <p class="text-muted-foreground mt-3 max-w-3xl leading-relaxed">
+          这一页把机场实测档案里标明为{data.name}节点的数据放在一起：{
+            data.runs.length > 0
+              ? `${statPhrase("speed", data.runs.length)}（本站自己测并核验）、`
+              : ""
+          }{
+            data.nodeChecks.length > 0
+              ? `${statPhrase("node", data.nodeChecks.length)}（只说明节点在线，不是速度）、`
+              : ""
+          }以及 {data.batches.length} 批公开测速参考里的 {data.rows.length} 行（他人发布，本站只核对来源页面）。数字保留来源的原文和单位，<strong
+            class="text-foreground">不换算、不求平均、不排名</strong
+          >，不同批次之间也不能直接比较快慢。
+        </p>
+        <ul class="mt-5 grid max-w-3xl grid-cols-2 gap-3 sm:grid-cols-4">
+          <li class="card p-3 text-center" data-region-stat="rows">
+            <p class="num text-accent-strong text-xl font-extrabold">
+              {data.rows.length}
+            </p>
+            <p class="text-muted-foreground text-xs">
+              公开测速参考的{data.name}节点行
+            </p>
+          </li>
+          <li class="card p-3 text-center" data-region-stat="batches">
+            <p class="num text-accent-strong text-xl font-extrabold">
+              {data.batches.length}
+            </p>
+            <p class="text-muted-foreground text-xs">涉及的公开测速参考批次</p>
+          </li>
+          <li class="card p-3 text-center" data-region-stat="brands">
+            <p class="num text-accent-strong text-xl font-extrabold">
+              {data.brands.length}
+            </p>
+            <p class="text-muted-foreground text-xs">涉及的机场</p>
+          </li>
+          <li class="card p-3 text-center" data-region-stat="evidence">
+            <p class="num text-accent-strong text-xl font-extrabold">
+              {data.evidenceLinks}
+            </p>
+            <p class="text-muted-foreground text-xs">Speedtest 原始结果链接</p>
+          </li>
+        </ul>
+        <p class="text-muted-foreground mt-3 max-w-3xl text-xs leading-relaxed">
+          本页收录条件：公开测速参考至少 {REGION_PAGE_MIN.rows} 行、涉及 {
+            REGION_PAGE_MIN.brands
+          } 家以上机场、并有 {REGION_PAGE_MIN.evidenceLinks} 条以上可点开核对的原始结果链接。
+        </p>
+      </div>
+    </section>
+
+    <div class="app-layout grid grid-cols-[minmax(0,1fr)] gap-10 pt-10">
+      <!-- 速度实测 -->
+      <section aria-labelledby="speed-title">
+        <h2 id="speed-title" class="section-title">
+          速度实测（{data.runs.length} 条）
+        </h2>
+        {
+          data.runs.length > 0 ? (
+            <>
+              <p class="text-muted-foreground mt-2 mb-4 max-w-3xl text-sm leading-relaxed">
+                本站连上{data.name}节点实际测速，每条附原始截图（出口 IP
+                已打码）。数量很少，只能说明那一刻的情况，不能代表这个地区的整体速度。
+              </p>
+              <OwnRunsTable
+                runs={data.runs}
+                brandNames={brandNames}
+                caption={`${data.name}节点速度实测记录（已核验）`}
+              />
+            </>
+          ) : (
+            <p class="text-muted-foreground mt-2 text-sm leading-relaxed">
+              暂无本站在{data.name}节点的速度实测。本站不会用估算值代替。
+            </p>
+          )
+        }
+      </section>
+
+      <!-- 节点在线状态核验 -->
+      <section aria-labelledby="node-title">
+        <h2 id="node-title" class="section-title">
+          节点在线状态核验（{data.nodeChecks.length} 条）
+        </h2>
+        {
+          data.nodeChecks.length > 0 ? (
+            <>
+              <p class="text-muted-foreground mt-2 mb-4 max-w-3xl text-sm leading-relaxed">
+                对照服务商用户面板「节点状态」页截图核对{data.name}
+                节点在检查时刻是否在线。
+                <strong class="text-foreground">它不是速度测试</strong>
+                ，只说明节点当时能连接。
+              </p>
+              <div
+                class="table-scroll card"
+                tabindex="0"
+                role="region"
+                aria-label={`${data.name}节点在线状态核验（表格可横向滑动）`}
+              >
+                <table class="w-full min-w-[560px] text-sm">
+                  <caption class="sr-only">{data.name}节点在线状态核验</caption>
+                  <thead class="bg-muted/50 text-muted-foreground text-xs">
+                    <tr>
+                      <th scope="col" class="px-3 py-2 text-start">
+                        机场
+                      </th>
+                      <th scope="col" class="px-3 py-2 text-start">
+                        检查时间
+                      </th>
+                      <th scope="col" class="px-3 py-2 text-end">
+                        截图里的{data.name}节点
+                      </th>
+                      <th scope="col" class="px-3 py-2 text-end">
+                        其中在线
+                      </th>
+                      <th scope="col" class="px-3 py-2 text-end">
+                        截图未出现
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.nodeChecks.map(c => (
+                      <tr class="border-t align-top">
+                        <th
+                          scope="row"
+                          class="px-3 py-2 text-start font-semibold"
+                        >
+                          <a
+                            href={`/test-records/${c.brandSlug}/`}
+                            class="hover:text-accent-strong"
+                          >
+                            {nameOf(c.brandSlug)}
+                          </a>
+                        </th>
+                        <td class="num px-3 py-2 whitespace-nowrap">
+                          {c.date} {c.from}–{c.to}（北京时间）
+                        </td>
+                        <td class="num px-3 py-2 text-end">{c.total} 个</td>
+                        <td class="num px-3 py-2 text-end">{c.online} 个</td>
+                        <td class="num px-3 py-2 text-end">
+                          {c.notShown} 个
+                          <span class="text-muted-foreground block text-xs">
+                            不推定状态
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          ) : (
+            <p class="text-muted-foreground mt-2 text-sm leading-relaxed">
+              暂无{data.name}节点的在线状态核验。
+            </p>
+          )
+        }
+      </section>
+
+      <!-- 公开测速参考 -->
+      <section aria-labelledby="public-title">
+        <h2 id="public-title" class="section-title">
+          公开测速参考（{data.rows.length} 行 · {data.batches.length} 批）
+        </h2>
+        <p class="text-muted-foreground mt-2 max-w-3xl text-sm leading-relaxed">
+          他人公开发布的测速记录，<strong class="text-foreground"
+            >不是本站实测</strong
+          >。下面按机场（编辑顺序，不是测速排名）列出每一行，时间、测试端、运营商、工具和单位以来源为准；来源没写的项目标「待验证」。有
+          Speedtest 结果链接的行可以点开核对。
+        </p>
+        <div class="mt-5 grid grid-cols-[minmax(0,1fr)] gap-6">
+          {
+            groups.map(g => (
+              <article
+                class="card overflow-hidden"
+                id={`brand-${g.slug}`}
+                data-region-brand={g.slug}
+              >
+                <header class="flex flex-wrap items-center justify-between gap-2 border-b px-4 py-3">
+                  <h3 class="flex items-center gap-2.5 font-extrabold">
+                    <BrandAvatar name={g.name} size="sm" />
+                    {g.name}
+                    <span class="text-muted-foreground text-xs font-normal">
+                      {g.rows.length} 行 · {g.batches} 批
+                      {g.links > 0 && ` · ${g.links} 条原始结果链接`}
+                    </span>
+                  </h3>
+                  <a
+                    href={`/test-records/${g.slug}/`}
+                    class="text-accent-strong text-xs font-semibold hover:underline"
+                  >
+                    {g.name}全部测速记录 →
+                  </a>
+                </header>
+                <div
+                  class="table-scroll"
+                  tabindex="0"
+                  role="region"
+                  aria-label={`${g.name}的${data.name}节点公开测速参考（表格可横向滑动）`}
+                >
+                  <table class="w-full min-w-[860px] text-sm">
+                    <caption class="sr-only">
+                      {g.name}在{data.name}
+                      节点的公开测速参考，数值和单位保留来源原文
+                    </caption>
+                    <thead class="bg-muted/50 text-muted-foreground text-xs">
+                      <tr>
+                        <th scope="col" class="px-3 py-2 text-start">
+                          来源与测试环境
+                        </th>
+                        <th scope="col" class="px-3 py-2 text-start">
+                          节点（来源原文）
+                        </th>
+                        <th scope="col" class="px-3 py-2 text-start">
+                          时段
+                        </th>
+                        <th scope="col" class="px-3 py-2 text-start">
+                          延迟
+                        </th>
+                        <th scope="col" class="px-3 py-2 text-start">
+                          下载
+                        </th>
+                        <th scope="col" class="px-3 py-2 text-start">
+                          上传
+                        </th>
+                        <th scope="col" class="px-3 py-2 text-start">
+                          单位
+                        </th>
+                        <th scope="col" class="px-3 py-2 text-start">
+                          原始结果
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {g.rows.map(({ record, row, label }) => {
+                        const d = record.data;
+                        const loc = envField(record.id, "location");
+                        const car = envField(record.id, "carrier");
+                        const bwf = envField(record.id, "bandwidth");
+                        const tool = envField(record.id, "tool");
+                        return (
+                          <tr class="border-t align-top">
+                            <td class="px-3 py-2 text-xs leading-relaxed">
+                              <a
+                                href={`/test-records/${d.brandSlug}/#${record.id}`}
+                                class="text-accent-strong font-semibold hover:underline"
+                              >
+                                {d.sourceName}
+                              </a>
+                              <span class="num text-muted-foreground block">
+                                {d.recordedAt}
+                                {d.time && ` ${d.time}`}
+                                {d.sourceType === "vendor_claim" &&
+                                  " · 服务商自述，非独立测试"}
+                              </span>
+                              <span class="text-muted-foreground block">
+                                {loc.status === "pending" ? (
+                                  <span class="status-pending">地点待验证</span>
+                                ) : (
+                                  loc.value
+                                )}
+                                {" · "}
+                                {car.status === "pending" ? (
+                                  <span class="status-pending">
+                                    运营商待验证
+                                  </span>
+                                ) : (
+                                  car.value
+                                )}
+                                {" · "}
+                                {bwf.status === "pending" ? (
+                                  <span class="status-pending">宽带待验证</span>
+                                ) : (
+                                  bwf.value
+                                )}
+                              </span>
+                              <span class="text-muted-foreground block">
+                                工具：
+                                {tool.status === "pending" ? (
+                                  <span class="status-pending">待验证</span>
+                                ) : (
+                                  tool.value
+                                )}
+                              </span>
+                            </td>
+                            <td class="px-3 py-2 font-semibold whitespace-nowrap">
+                              {label}
+                              {(row.note || row.ai || row.media) && (
+                                <span class="text-muted-foreground block max-w-[16rem] text-xs font-normal whitespace-normal">
+                                  {row.note}
+                                  {row.ai && ` AI：${row.ai}`}
+                                  {row.media && ` 视频：${row.media}`}
+                                </span>
+                              )}
+                            </td>
+                            <td class="px-3 py-2 text-xs">
+                              {row.time ?? "—"}
+                              {(row.window ?? d.window) && (
+                                <span class="text-muted-foreground block">
+                                  {row.window ?? d.window}
+                                </span>
+                              )}
+                            </td>
+                            <td class="num px-3 py-2">
+                              {row.latency ?? "—"}
+                              {d.latencyMethod && (
+                                <span class="text-muted-foreground block max-w-[10rem] text-xs">
+                                  {d.latencyMethod}
+                                </span>
+                              )}
+                            </td>
+                            <td class="num px-3 py-2">{row.download ?? "—"}</td>
+                            <td class="num px-3 py-2">{row.upload ?? "—"}</td>
+                            <td class="px-3 py-2 text-xs">{d.unit}</td>
+                            <td class="px-3 py-2 text-xs whitespace-nowrap">
+                              {row.evidenceUrl ? (
+                                <a
+                                  href={row.evidenceUrl}
+                                  target="_blank"
+                                  rel="nofollow noopener noreferrer"
+                                  class="text-accent-strong underline underline-offset-2"
+                                >
+                                  Speedtest 结果
+                                </a>
+                              ) : (
+                                <span class="text-muted-foreground">
+                                  未附链接
+                                </span>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </article>
+            ))
+          }
+        </div>
+      </section>
+
+      <section class="app-prose max-w-read" aria-labelledby="how-title">
+        <h2 id="how-title">读{data.name}节点数据时要注意</h2>
+        <ul>
+          <li>
+            <strong>不同批次不能直接比。</strong
+            >测试端的城市、运营商、宽带、时间和工具各不相同；有的来源用
+            MB/s，有的用 Mbps（1 MB/s 约等于 8
+            Mbps）。本页不换算，也不据此给机场排名。
+          </li>
+          <li>
+            <strong>先看时段。</strong>白天的结果通常比 20:00–23:00
+            晚高峰好看，见<a href="/methods/peak-hour-testing/"
+              >晚高峰测试怎样安排</a
+            >。
+          </li>
+          <li>
+            <strong>你的结果会不同。</strong
+            >换成你的运营商和城市，速度可能明显不同；想自己测一次，用<a
+              href="/speedtest/">机场网速测试</a
+            >，记录方法见<a href="/methods/record-node-speed-test/"
+              >怎样记录一次可复核的节点测速</a
+            >。
+          </li>
+        </ul>
+        <p>
+          完整的数据口径见<a href="/testing-methodology/">测试方法</a
+          >，所有数据见<a href="/test-records/">机场实测档案</a>。
+        </p>
+      </section>
+
+      <nav aria-labelledby="other-regions" class="card p-5">
+        <h2 id="other-regions" class="font-bold">其他地区专题</h2>
+        <ul class="mt-3 flex flex-wrap gap-2 text-sm">
+          {
+            siblings
+              .filter(s => s.slug !== slug)
+              .map(s => (
+                <li>
+                  <a
+                    href={`/test-records/region/${s.slug}/`}
+                    class="hover:border-accent/40 hover:text-accent-strong inline-block rounded-full border px-3 py-1"
+                  >
+                    {s.name}节点测速数据
+                  </a>
+                </li>
+              ))
+          }
+          <li>
+            <a
+              href="/test-records/"
+              class="hover:border-accent/40 hover:text-accent-strong inline-block rounded-full border px-3 py-1"
+            >
+              机场实测档案（全部数据与筛选）
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </main>
+</Layout>

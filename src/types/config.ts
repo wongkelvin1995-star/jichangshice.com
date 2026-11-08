@@ -5,6 +5,10 @@ interface SiteConfig {
   title: string;
   /** <title> used on the home page only */
   homeTitle?: string;
+  /** 相关搜索词 / 曾用名（输出到 WebSite 与 Organization 的 alternateName），例如 ["机场测试"] */
+  altNames?: string[];
+  /** 站点在其他平台的官方主页（输出到 Organization 的 sameAs；只放真实存在的页面） */
+  sameAs?: string[];
   /** Short description used in SEO meta and RSS feed */
   description: string;
   /** Default post author name */
@@ -121,7 +125,10 @@ type ResolvedSiteConfig = Required<
     | "ogImage"
   >
 > &
-  Pick<SiteConfig, "profile" | "googleVerification" | "homeTitle">;
+  Pick<
+    SiteConfig,
+    "profile" | "googleVerification" | "homeTitle" | "altNames" | "sameAs"
+  >;
 
 export interface ResolvedAstroPaperConfig {
   site: ResolvedSiteConfig;

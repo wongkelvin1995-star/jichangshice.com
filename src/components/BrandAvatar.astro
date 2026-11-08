@@ -1,5 +1,10 @@
 ---
-/** 品牌文字头像（渐变圆角方块）；不使用品牌官方 Logo */
+/**
+ * 品牌头像（渐变圆角方块 + 飞机图标）；不使用品牌官方 Logo。
+ * 不再显示品牌名的首字：旁边的品牌名本来就是以同一个字开头，
+ * 头像里再放一遍会读成“灵灵动云”（页面文字提取、搜索摘要里也会重复）。
+ * 颜色由品牌名哈希得出，同一品牌在各页面颜色一致。
+ */
 type Props = { name: string; size?: "sm" | "md" | "lg" };
 const { name, size = "md" } = Astro.props;
 const palette = [
@@ -15,21 +20,32 @@ const palette = [
 let h = 0;
 for (const ch of name) h = (h * 31 + ch.codePointAt(0)!) >>> 0;
 const [a, b] = palette[h % palette.length];
-const char = [...name][0].toUpperCase();
 const cls = {
-  sm: "size-8 rounded-lg text-sm",
-  md: "size-11 rounded-xl text-lg",
-  lg: "size-14 rounded-2xl text-2xl",
+  sm: "size-8 rounded-lg",
+  md: "size-11 rounded-xl",
+  lg: "size-14 rounded-2xl",
 }[size];
+const icon = { sm: 16, md: 22, lg: 28 }[size];
 ---
 
 <span
   aria-hidden="true"
   class:list={[
-    "inline-flex shrink-0 items-center justify-center font-black text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.35)]",
+    "inline-flex shrink-0 items-center justify-center text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.35)]",
     cls,
   ]}
   style={{ background: `linear-gradient(150deg, ${a}, ${b})` }}
 >
-  {char}
+  <svg
+    width={icon}
+    height={icon}
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <path
+      d="M12 2.5c.9 0 1.6.7 1.6 1.6v5.2l7.4 4.4v2.1l-7.4-2.2v4.2l2 1.5v1.7L12 19.8 8.4 21v-1.7l2-1.5v-4.2L3 15.8v-2.1l7.4-4.4V4.1c0-.9.7-1.6 1.6-1.6Z"
+    ></path>
+  </svg>
 </span>

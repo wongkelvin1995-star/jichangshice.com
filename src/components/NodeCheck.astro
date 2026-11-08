@@ -91,7 +91,12 @@ const field =
 
     <div class="hidden" data-result-wrap>
       <div class="grid grid-cols-3 gap-2 text-center" data-summary></div>
-      <div class="table-scroll mt-3 rounded-xl border bg-white">
+      <div
+        class="table-scroll mt-3 rounded-xl border bg-white"
+        tabindex="0"
+        role="region"
+        aria-label="节点检测结果（表格可横向滑动）"
+      >
         <table class="w-full min-w-[520px] text-sm">
           <caption class="sr-only">节点检测结果</caption>
           <thead class="bg-muted/50 text-muted-foreground text-xs">
@@ -115,9 +120,9 @@ const field =
       ping），只能说明服务器有没有响应，<b>不代表代理能用，也不代表实际速度</b
       >。检测前请先<b>关闭代理</b>，否则测到的是代理出口到节点的耗时。延迟
       <span class="text-signal font-semibold">100ms 以下</span>为优秀，<span
-        class="font-semibold text-amber-600">100–200ms</span
-      > 良好，<span class="font-semibold text-orange-600">200–300ms</span>
-      可用，<span class="font-semibold text-red-600">300ms 以上或超时</span
+        class="font-semibold text-amber-700">100–200ms</span
+      > 良好，<span class="font-semibold text-orange-700">200–300ms</span>
+      可用，<span class="font-semibold text-red-700">300ms 以上或超时</span
       >体验较差。速度请连上节点后用<a
         href="/speedtest/"
         class="underline underline-offset-2">机场网速测试</a
@@ -247,13 +252,13 @@ const field =
       ms < 100
         ? "text-signal"
         : ms < 200
-          ? "text-amber-600"
+          ? "text-amber-700"
           : ms < 300
-            ? "text-orange-600"
-            : "text-red-600";
+            ? "text-orange-700"
+            : "text-red-700";
     const STATE: Record<Res["state"], string> = {
       ok: '<span class="text-signal">有响应</span>',
-      timeout: '<span class="text-red-600">超时</span>',
+      timeout: '<span class="text-red-700">超时</span>',
       blocked:
         '<span class="text-muted-foreground">浏览器禁止此端口，无法检测</span>',
       error: '<span class="text-muted-foreground">立即被拒绝，无法判断</span>',

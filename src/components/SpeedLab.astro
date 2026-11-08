@@ -330,7 +330,7 @@ const tile =
             data-score={k}
           >
             <p class="text-muted-foreground text-xs">{label}</p>
-            <p class="mt-0.5 font-bold text-slate-400" data-score-v>
+            <p class="mt-0.5 font-bold text-slate-500" data-score-v>
               未测
             </p>
           </li>
@@ -373,7 +373,7 @@ const tile =
               </span>
             </div>
             <div class="mt-1.5 flex items-center justify-between gap-2">
-              <span class="text-xs font-semibold text-slate-400" data-state>
+              <span class="text-xs font-semibold text-slate-500" data-state>
                 未检测
               </span>
               <span
@@ -775,7 +775,7 @@ const tile =
     const LEVEL = {
       4: ["优秀", "text-emerald-600"],
       3: ["良好", "text-sky-600"],
-      2: ["一般", "text-amber-600"],
+      2: ["一般", "text-amber-700"],
       1: ["较差", "text-red-600"],
     } as const;
     function scores(r: R) {
@@ -907,7 +907,7 @@ const tile =
       );
       $$<HTMLElement>("[data-score-v]").forEach(n => {
         n.textContent = "测试中";
-        n.className = "mt-0.5 font-bold text-slate-400";
+        n.className = "mt-0.5 font-bold text-slate-500";
       });
       Object.keys(series).forEach(k => {
         series[k] = [];
@@ -1071,7 +1071,7 @@ const tile =
       };
       // 标题
       text(
-        "JICHANGSHICE.COM.CN · 机场测试",
+        "JICHANGSHICE.COM.CN · 机场实测",
         W / 2,
         78,
         24,
@@ -1200,7 +1200,7 @@ const tile =
         "center"
       );
       text(
-        "jichangshice.com.cn · 2026 机场测试与机场推荐",
+        "jichangshice.com.cn · 机场实测 · 2026 机场测速数据",
         W / 2,
         y + 86,
         20,

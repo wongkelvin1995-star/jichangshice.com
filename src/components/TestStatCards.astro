@@ -1,0 +1,49 @@
+---
+/**
+ * 三类测试数据的统计卡片（首页、测试档案共用，数字全部来自 src/utils/testStats.ts）。
+ * 三类数据口径不同，分开展示、不相加：速度实测（条）、节点在线状态核验（条）、公开测速参考（批）。
+ */
+import { STAT_KINDS, type StatKind, type TestStats } from "@/utils/testStats";
+
+type Props = {
+  stats: Pick<TestStats, StatKind>;
+  class?: string;
+};
+const { stats, class: className } = Astro.props;
+const kinds = ["speed", "node", "public"] as const;
+---
+
+<dl
+  class:list={["grid gap-3 sm:grid-cols-3", className]}
+  aria-label="三类测试数据统计"
+  data-test-stats
+>
+  {
+    kinds.map(k => (
+      <div class="card p-4" data-stat={k}>
+        <dt class="text-muted-foreground text-xs font-semibold">
+          {STAT_KINDS[k].label}
+        </dt>
+        <dd class="mt-1">
+          <>
+            <span
+              class:list={[
+                "num text-3xl font-extrabold",
+                k === "public" ? "text-accent-strong" : "text-signal",
+              ]}
+              data-stat-value
+            >
+              {stats[k]}
+            </span>
+            <span class="text-muted-foreground ms-1 text-sm">
+              {STAT_KINDS[k].unit}
+            </span>
+          </>
+        </dd>
+        <dd class="text-muted-foreground mt-1 text-xs leading-relaxed">
+          {STAT_KINDS[k].hint}
+        </dd>
+      </div>
+    ))
+  }
+</dl>

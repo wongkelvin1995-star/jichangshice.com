@@ -1,41 +1,65 @@
 ---
 /**
- * 首页结构：首屏 → 编辑精选 → 套餐比较 / 机场搜索 / 优惠码入口 → 测速档案（含测试指南摘要）
- *          → 最新文章 → 新手教程 → 常见问题。
- * 精选家数与顺序来自 src/data/editorial-order.ts；价格来自统一的套餐数据（plan-snapshots.json）。
+ * 首页结构：首屏（机场实测 + 在线测速入口）→ 测速数据与测试档案（三类数据分开统计）
+ *          → 编辑精选（放在测速数据之后，顺序是编辑安排，不是测速排名）→ 比较 / 搜索 / 优惠码入口
+ *          → 测试指南摘要 → 最新文章 → 新手教程 → 常见问题。
+ * 精选家数与顺序来自 src/data/editorial-order.ts；价格来自统一的套餐数据（plan-snapshots.json）；
+ * 测试数据的数量统一由 src/utils/testStats.ts 提供。
  */
 import Layout from "@/layouts/Layout.astro";
 import BrandCard from "@/components/BrandCard.astro";
 import HeroArt from "@/components/HeroArt.astro";
 import SpeedTestIcon from "@/components/SpeedTestIcon.astro";
+import TestStatCards from "@/components/TestStatCards.astro";
 import { render } from "astro:content";
 import { getProviders, getPlans } from "@/utils/plans";
 import { getPublishedPosts, postUrl } from "@/utils/posts";
-import { getTestRecords, recordsOf, recordWindow } from "@/utils/testRecords";
+import { getTestRecords, recordWindow } from "@/utils/testRecords";
 import { getVerifiedRuns } from "@/utils/testRuns";
+import { computeTestStats, statPhrase } from "@/utils/testStats";
+import { collectRegions } from "@/utils/testRegions";
+import { runFields, summarize } from "@/utils/dataCompleteness";
 import { CATEGORIES } from "@/data/categories";
 import { USE_CASES } from "@/data/editorial";
 import { FEATURED_COUNT } from "@/data/editorial-order";
 import { formatDate } from "@/utils/format";
 import { websiteJsonLd } from "@/utils/jsonld";
 import config from "@/config";
-import { NODE_CHECKS } from "@/data/node-checks";
 import { TEST_PHOTOS } from "@/data/test-photos";
+import { photoVariants, toSrcset } from "@/utils/photoVariants";
 
 const providers = await getProviders();
 const latestPhoto = TEST_PHOTOS[0];
+// 首页缩略图只显示 56 像素宽：用小尺寸副本（≤480 宽），没有副本时退回原图
+const thumb = latestPhoto
+  ? (() => {
+      const all = photoVariants(latestPhoto.src, latestPhoto.width);
+      const small = all.filter(v => v.w <= 480);
+      return small.length > 0 ? small : all;
+    })()
+  : [];
 const brandNameOf = (slug: string) =>
   providers.find(p => p.slug === slug)?.name ?? slug;
 const plans = await getPlans();
 const posts = await getPublishedPosts();
 const records = await getTestRecords();
 const ownRuns = getVerifiedRuns();
+const stats = computeTestStats(records);
+const regions = collectRegions(records).filter(r => r.hasPage);
+
+// 最新一张实测图对应的核验记录：用来显示“资料完整度”，缺的项目标「待验证」
+const latestRun = latestPhoto
+  ? ownRuns.find(
+      r =>
+        r.brandSlug === latestPhoto.brandSlug &&
+        r.testedAt.startsWith(latestPhoto.date) &&
+        r.nodeRegion === latestPhoto.nodeRegion
+    )
+  : undefined;
+const latestFields = latestRun ? summarize(runFields(latestRun)) : null;
 
 const featured = providers.filter(p => p.hasProfile).slice(0, FEATURED_COUNT);
 const withCoupon = providers.filter(p => p.coupon).length;
-const testedBrands = providers.filter(
-  p => recordsOf(records, p.slug).length > 0
-).length;
 const latestRecords = records.slice(0, 4);
 const nameOf = Object.fromEntries(providers.map(p => [p.slug, p.name]));
 
@@ -46,6 +70,8 @@ const guideHeadings = guide
   : [];
 const latest = posts.filter(p => p !== guide).slice(0, 6);
 const year = new Date().getFullYear();
+
+const homeDescription = `机场实测（也称机场测试）公开机场测速数据：${statPhrase("speed", stats.speed)}、${statPhrase("node", stats.node)}、${statPhrase("public", stats.public)}，每条写明测试地点、工具和原始证据；附在线机场测速工具，并整理 ${providers.length} 家机场的套餐价格与每 GB 成本。`;
 
 const tools = [
   {
@@ -101,12 +127,12 @@ const homeFaq = [
   },
   {
     q: "编辑精选的顺序是排名吗？",
-    a: "不是。顺序是编辑安排，不代表测速结果或稳定性排名。只有在发布可复核的本站测试记录后，才会给出基于数据的比较。",
+    a: `不是。顺序是编辑安排（现为${featured.map(p => p.name).join("、")}），不代表测速结果或稳定性排名。测速数据在上面的测试档案里单独列出，不同批次之间也不能直接比较快慢。`,
     href: "/disclosure/",
   },
   {
     q: "测试档案里的数据都是本站测的吗？",
-    a: `不是。「本站测试」只统计本站自己测得并核验的记录（目前 ${ownRuns.length + NODE_CHECKS.length} 条，含节点在线核验）；其余是公开发布的测速参考，每条都写明来源、时间、环境和局限。`,
+    a: `不是，档案分三类、分开统计：${statPhrase("speed", stats.speed)}和 ${statPhrase("node", stats.node)}是本站自己做并核验的（节点核验只说明节点在线，不代表速度）；${statPhrase("public", stats.public)}是他人公开发布的数据，本站只核对来源页面，逐条写明时间、环境和局限。缺少的信息标「待验证」，不估算。`,
     href: "/test-records/",
   },
 ];
@@ -114,55 +140,58 @@ const homeFaq = [
 
 <Layout
   title={config.site.homeTitle ?? config.site.title}
-  description={config.site.description}
+  description={homeDescription}
   canonicalPath="/"
   jsonLd={[websiteJsonLd()]}
 >
   <main id="main-content" data-pagefind-body>
-    <!-- 01 首屏 -->
+    <!-- 01 首屏：机场实测 + 测试档案 / 在线测速入口 -->
     <section class="hero-sky relative overflow-hidden">
       <div
         class="app-layout relative grid items-center gap-8 pt-8 pb-8 sm:pt-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:pt-14 lg:pb-10"
       >
         <div class="min-w-0">
           <p
-            class="border-accent/20 text-accent-strong inline-flex items-center gap-2 rounded-full border bg-white/80 px-3 py-1 text-xs font-semibold sm:text-sm"
+            class="border-accent/20 text-accent-strong inline-flex flex-wrap items-center gap-x-2 gap-y-0.5 rounded-2xl border bg-white/80 px-3 py-1 text-xs font-semibold sm:text-sm"
           >
-            {providers.length} 家机场资料 · 测试方法公开
+            <span>{statPhrase("speed", stats.speed)}</span>
+            <span aria-hidden="true">·</span>
+            <span>{statPhrase("node", stats.node)}</span>
+            <span aria-hidden="true">·</span>
+            <span>{statPhrase("public", stats.public)}</span>
           </p>
           <h1
             class="mt-4 text-[2rem] leading-[1.15] font-black tracking-tight sm:text-[3.2rem]"
           >
-            {year} 机场测试与<span class="text-gradient whitespace-nowrap"
-              >机场推荐</span
-            >
+            机场实测：<span class="text-gradient">{year} 机场测速数据</span
+            >与测试档案
           </h1>
           <p
             class="text-foreground/75 mt-4 max-w-xl text-base leading-relaxed sm:text-[1.08rem]"
           >
-            把 {providers.length} 家机场的套餐价格、每 GB 成本和测速记录放在同一口径下比较，写清楚每条资料从哪里来、能说明什么，帮你按预算和用途选到合适的机场。
+            机场实测（也称机场测试）把测速数据按来源分三类公开：本站速度实测、节点在线状态核验、他人公开的测速参考。每条写明测试地点、运营商、宽带、工具和原始证据，缺少的项目标「待验证」，不编造数字。
           </p>
           <nav
             class="mt-6 grid grid-cols-3 gap-2 sm:gap-3"
             aria-label="主要入口"
           >
             <a
-              href="/airports/"
+              href="/test-records/"
               class="btn btn-primary h-12 px-2 text-sm sm:text-base"
             >
+              测试档案
+            </a>
+            <a
+              href="/speedtest/"
+              class="btn btn-outline h-12 bg-white/80 px-2 text-sm sm:text-base"
+            >
+              在线测速
+            </a>
+            <a
+              href="/airports/"
+              class="btn btn-outline h-12 bg-white/80 px-2 text-sm sm:text-base"
+            >
               机场目录
-            </a>
-            <a
-              href="/compare/"
-              class="btn btn-outline h-12 bg-white/80 px-2 text-sm sm:text-base"
-            >
-              套餐比较
-            </a>
-            <a
-              href="/test-records/"
-              class="btn btn-outline h-12 bg-white/80 px-2 text-sm sm:text-base"
-            >
-              测速记录
             </a>
           </nav>
           <a
@@ -171,7 +200,7 @@ const homeFaq = [
           >
             <SpeedTestIcon size={40} />
             <span class="min-w-0 flex-1">
-              <span class="block font-extrabold">网速测试</span>
+              <span class="block font-extrabold">机场网速测试</span>
               <span
                 class="text-muted-foreground block truncate text-xs sm:text-sm"
               >
@@ -191,14 +220,140 @@ const homeFaq = [
       </div>
     </section>
 
-    <!-- 02 编辑精选 -->
+    <!-- 02 测速数据与测试档案：三类数据分开统计，不合并 -->
+    <section class="app-layout pt-8 sm:pt-12" aria-labelledby="records">
+      <div class="flex flex-wrap items-end justify-between gap-2">
+        <div>
+          <p class="eyebrow">测速数据 · 测试档案</p>
+          <h2 id="records" class="section-title mt-1">
+            机场测速数据与测试档案
+          </h2>
+        </div>
+        <a
+          href="/test-records/"
+          class="text-accent-strong text-sm font-semibold whitespace-nowrap hover:underline"
+          >进入测试档案 →</a
+        >
+      </div>
+      <p class="text-muted-foreground mt-1.5 max-w-3xl text-sm leading-relaxed">
+        三类数据口径不同，分开统计、不相加。公开测速参考不是本站实测，逐条写明来源、测试时间、环境、工具和局限。
+      </p>
+      <TestStatCards stats={stats} class="mt-4" />
+
+      <div class="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
+        <div class="card p-5">
+          <h3 class="font-bold">最新速度实测</h3>
+          {
+            latestPhoto ? (
+              <a
+                href={`/test-records/${latestPhoto.brandSlug}/#test-photos`}
+                class="mt-3 flex items-center gap-3 rounded-xl border border-orange-200 bg-orange-50 p-3 hover:border-orange-300"
+              >
+                <img
+                  src={thumb[0].url}
+                  srcset={thumb.length > 1 ? toSrcset(thumb) : undefined}
+                  sizes="56px"
+                  alt={`${brandNameOf(latestPhoto.brandSlug)}${latestPhoto.nodeRegion}节点速度实测图缩略图`}
+                  width="56"
+                  height="102"
+                  loading="lazy"
+                  decoding="async"
+                  class="h-[102px] w-14 flex-none rounded-md border border-orange-100 object-cover object-top"
+                />
+                <span class="min-w-0 text-sm">
+                  <span class="block font-bold">
+                    {brandNameOf(latestPhoto.brandSlug)} ·{" "}
+                    {latestPhoto.nodeRegion}节点（{latestPhoto.date}）
+                  </span>
+                  <span class="num text-muted-foreground mt-0.5 block text-xs">
+                    下载 {latestPhoto.downloadMbps} Mbps · 上传{" "}
+                    {latestPhoto.uploadMbps} Mbps · 延迟 {latestPhoto.latencyMs}{" "}
+                    ms
+                  </span>
+                  {latestFields && (
+                    <span class="mt-1 block text-xs">
+                      资料完整度 {latestFields.ok}/{latestFields.total} 项
+                      {latestFields.pendingLabels.length > 0 && (
+                        <>
+                          ，<span class="status-pending">待验证</span>：
+                          {latestFields.pendingLabels.join("、")}
+                        </>
+                      )}
+                    </span>
+                  )}
+                </span>
+              </a>
+            ) : (
+              <p class="text-muted-foreground mt-2 text-sm">暂无速度实测。</p>
+            )
+          }
+          <p class="text-muted-foreground mt-3 text-xs leading-relaxed">
+            单次测试，不是晚高峰数据；原始截图、出口 IP
+            归属（已打码）和网站连通性见详情页。
+          </p>
+          {
+            regions.length > 0 && (
+              <>
+                <h3 class="mt-4 text-sm font-bold">按地区看测速记录</h3>
+                <ul class="mt-2 flex flex-wrap gap-2 text-sm">
+                  {regions.map(r => (
+                    <li>
+                      <a
+                        href={`/test-records/region/${r.slug}/`}
+                        class="hover:border-accent/40 hover:text-accent-strong inline-block rounded-full border px-3 py-1"
+                      >
+                        {r.name}节点
+                        <span class="text-muted-foreground num ms-1 text-xs">
+                          {r.brands.length} 个品牌
+                        </span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )
+          }
+        </div>
+        <div class="card p-5">
+          <h3 class="font-bold">最近的公开测速参考</h3>
+          <ul class="mt-2 divide-y text-sm">
+            {
+              latestRecords.map(r => (
+                <li class="flex items-center justify-between gap-3 py-2.5">
+                  <a
+                    href={`/test-records/${r.data.brandSlug}/#${r.id}`}
+                    class="hover:text-accent-strong min-w-0 font-semibold"
+                  >
+                    {nameOf[r.data.brandSlug] ?? r.data.brandSlug}
+                    <span class="text-muted-foreground ms-1 font-normal">
+                      {r.data.rows.length} 组数据
+                    </span>
+                  </a>
+                  <span class="text-muted-foreground num shrink-0 text-xs">
+                    {r.data.recordedAt}
+                    {recordWindow(r) ? ` · ${recordWindow(r)}` : ""}
+                  </span>
+                </li>
+              ))
+            }
+          </ul>
+          <p class="text-muted-foreground mt-3 text-xs leading-relaxed">
+            以上为他人公开发布的数据，不是本站实测；测试档案支持按品牌、地区和数据类型筛选。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 编辑精选（放在测速数据之后；顺序是编辑安排，不是测速排名） -->
     <section class="app-layout pt-8 sm:pt-12" aria-labelledby="picks">
       <div class="flex flex-wrap items-end justify-between gap-2">
         <div>
-          <p class="eyebrow">编辑精选 · {featured.length} 家</p>
+          <p class="eyebrow">编辑精选 · {featured.length} 家 · 编辑顺序</p>
           <h2 id="picks" class="section-title mt-1">精选机场与关键套餐资料</h2>
           <p class="text-muted-foreground mt-1.5 text-sm leading-relaxed">
-            按编辑精选顺序排列，不是测速排名。起步价与每 GB
+            按编辑安排的顺序排列，<strong class="text-foreground"
+              >不是测速排名</strong
+            >；测速数据见上方测试档案。起步价与每 GB
             成本取最便宜的月付档；“结算页核验”与“历史参考”分开标注，线路、AI、流媒体为服务商资料中的说法。
           </p>
         </div>
@@ -217,7 +372,7 @@ const homeFaq = [
       </div>
     </section>
 
-    <!-- 03 实用功能 -->
+    <!-- 04 实用功能 -->
     <section class="app-layout pt-10 sm:pt-14" aria-labelledby="tools">
       <h2 id="tools" class="section-title">比较、搜索与优惠码</h2>
       <div class="mt-4 grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-3">
@@ -283,100 +438,8 @@ const homeFaq = [
       </div>
     </section>
 
-    <!-- 04 测速档案 -->
-    <section class="app-layout pt-10 sm:pt-14" aria-labelledby="records">
-      <div class="flex flex-wrap items-end justify-between gap-2">
-        <h2 id="records" class="section-title">测速档案</h2>
-        <a
-          href="/test-records/"
-          class="text-accent-strong text-sm font-semibold whitespace-nowrap hover:underline"
-          >进入测试档案 →</a
-        >
-      </div>
-      <div class="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
-        <div class="card p-5">
-          <dl class="grid grid-cols-3 gap-2 text-center">
-            <div>
-              <dt class="text-muted-foreground text-xs">本站测试（已核验）</dt>
-              <dd class="num text-signal mt-1 text-2xl font-extrabold">
-                {ownRuns.length + NODE_CHECKS.length}
-              </dd>
-            </div>
-            <div>
-              <dt class="text-muted-foreground text-xs">公开测速参考</dt>
-              <dd class="num text-accent-strong mt-1 text-2xl font-extrabold">
-                {records.length}
-              </dd>
-            </div>
-            <div>
-              <dt class="text-muted-foreground text-xs">有记录的机场</dt>
-              <dd class="num text-accent-strong mt-1 text-2xl font-extrabold">
-                {testedBrands}
-              </dd>
-            </div>
-          </dl>
-          <p class="text-muted-foreground mt-4 text-sm leading-relaxed">
-            本站实测与公开参考分开统计。公开参考逐条写明来源、测试时间、测试环境、工具和局限，不当作本站结论。测试档案页还提供在线测速表，可以直接测当前网络。
-          </p>
-          {
-            latestPhoto && (
-              <a
-                href={`/test-records/${latestPhoto.brandSlug}/#test-photos`}
-                class="mt-4 flex items-center gap-3 rounded-xl border border-orange-200 bg-orange-50 p-3 hover:border-orange-300"
-              >
-                <img
-                  src={latestPhoto.src}
-                  alt={`${brandNameOf(latestPhoto.brandSlug)}机场实测图缩略图`}
-                  width="56"
-                  height="81"
-                  loading="lazy"
-                  decoding="async"
-                  class="h-[81px] w-14 flex-none rounded-md border border-orange-100 object-cover object-top"
-                />
-                <span class="min-w-0 text-sm">
-                  <span class="block text-xs font-bold text-orange-700">
-                    最新机场实测图
-                  </span>
-                  <span class="block font-bold">
-                    {brandNameOf(latestPhoto.brandSlug)} ·{" "}
-                    {latestPhoto.nodeRegion}节点（{latestPhoto.date}）
-                  </span>
-                  <span class="num text-muted-foreground block text-xs">
-                    下载 {latestPhoto.downloadMbps} Mbps · 上传{" "}
-                    {latestPhoto.uploadMbps} Mbps · 延迟 {latestPhoto.latencyMs}{" "}
-                    ms
-                  </span>
-                </span>
-              </a>
-            )
-          }
-        </div>
-        <div class="card p-5">
-          <h3 class="font-bold">最近的公开测速参考</h3>
-          <ul class="mt-2 divide-y text-sm">
-            {
-              latestRecords.map(r => (
-                <li class="flex items-center justify-between gap-3 py-2.5">
-                  <a
-                    href={`/test-records/${r.data.brandSlug}/#${r.id}`}
-                    class="hover:text-accent-strong min-w-0 font-semibold"
-                  >
-                    {nameOf[r.data.brandSlug] ?? r.data.brandSlug}
-                    <span class="text-muted-foreground ms-1 font-normal">
-                      {r.data.rows.length} 组数据
-                    </span>
-                  </a>
-                  <span class="text-muted-foreground num shrink-0 text-xs">
-                    {r.data.recordedAt}
-                    {recordWindow(r) ? ` · ${recordWindow(r)}` : ""}
-                  </span>
-                </li>
-              ))
-            }
-          </ul>
-        </div>
-      </div>
-
+    <!-- 05 测试指南摘要 -->
+    <section class="app-layout pt-10 sm:pt-14" aria-label="机场测试指南">
       {
         guide && (
           <article class="card mt-4 p-5 sm:p-7" aria-labelledby="guide-summary">
@@ -418,7 +481,7 @@ const homeFaq = [
       }
     </section>
 
-    <!-- 05 最新文章（直接列出标题与摘要） -->
+    <!-- 06 最新文章（直接列出标题与摘要） -->
     <section class="app-layout pt-10 sm:pt-14" aria-labelledby="latest">
       <div class="flex flex-wrap items-end justify-between gap-2">
         <h2 id="latest" class="section-title">最新文章</h2>
@@ -462,7 +525,7 @@ const homeFaq = [
       </ul>
     </section>
 
-    <!-- 06 新手教程 -->
+    <!-- 07 新手教程 -->
     <section class="app-layout pt-10 sm:pt-14" aria-labelledby="beginner">
       <h2 id="beginner" class="section-title">新手教程：五步选出合适的套餐</h2>
       <p class="text-muted-foreground mt-1.5 text-sm leading-relaxed">
@@ -502,7 +565,7 @@ const homeFaq = [
       </ul>
     </section>
 
-    <!-- 07 常见问题 -->
+    <!-- 08 常见问题 -->
     <section class="app-layout pt-10 sm:pt-14" aria-labelledby="home-faq">
       <div class="flex flex-wrap items-end justify-between gap-2">
         <h2 id="home-faq" class="section-title">常见问题</h2>
@@ -521,7 +584,7 @@ const homeFaq = [
                 {f.a}{" "}
                 <a
                   href={f.href}
-                  class="text-accent-strong whitespace-nowrap hover:underline"
+                  class="text-accent-strong font-semibold whitespace-nowrap underline underline-offset-2"
                 >
                   详细说明 →
                 </a>

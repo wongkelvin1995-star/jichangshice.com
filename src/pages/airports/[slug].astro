@@ -16,6 +16,8 @@ import NodeStatusChart from "@/components/NodeStatusChart.astro";
 import TestPhotoCard from "@/components/TestPhoto.astro";
 import { TEST_PHOTOS, photosOf } from "@/data/test-photos";
 import { nodeChecksOf } from "@/data/node-checks";
+import { brandStatsText } from "@/utils/testStats";
+import { publicRecordFields } from "@/utils/dataCompleteness";
 import {
   getProviders,
   getPlans,
@@ -131,6 +133,11 @@ const recordEvidence = records.reduce(
   (n, r) => n + r.data.rows.filter(x => x.evidenceUrl).length,
   0
 );
+// 三类数据分开统计，不合并成“本站测试 N 条”
+const statLine = brandStatsText(
+  { speed: ownRuns.length, node: checks.length, public: records.length },
+  { sep: " · " }
+);
 ---
 
 <Layout
@@ -139,6 +146,12 @@ const recordEvidence = records.reduce(
   canonicalPath={path}
   noindex={noindex}
   ogImage={photos[0]?.src}
+  ogImageAlt={photos[0]
+    ? `${p.name}机场实测图：${photos[0].date} ${photos[0].nodeRegion}节点测速汇总`
+    : undefined}
+  ogImageSize={photos[0]
+    ? { width: photos[0].width, height: photos[0].height }
+    : undefined}
   ogType={analysis ? "article" : "website"}
   jsonLd={[
     breadcrumbJsonLd(crumbs, path),
@@ -172,16 +185,16 @@ const recordEvidence = records.reduce(
                   featuredTop
                     ? "bg-gold-soft text-gold"
                     : "bg-muted text-muted-foreground",
-                ]}>编辑精选 No.{rank}</span
-              >
-              <span class="chip"
+                ]}
+                title={featuredTop
+                  ? "编辑精选，顺序是编辑安排，不是测速排名"
+                  : "机场目录顺序，不是测速排名"}
                 >{
-                  ownRuns.length + checks.length
-                    ? `本站测试 ${ownRuns.length + checks.length} 条（已核验）`
-                    : records.length
-                      ? `公开测速参考 ${records.length} 批`
-                      : "资料测评 · 暂无测速记录"
+                  featuredTop ? `编辑精选 No.${rank}` : `目录第 ${rank} 位`
                 }</span
+              >
+              <span class="chip rounded-2xl! leading-snug whitespace-normal!"
+                >{statLine ?? "资料测评 · 暂无测速记录"}</span
               >
               <span class="chip num">
                 {
@@ -255,7 +268,7 @@ const recordEvidence = records.reduce(
             </dl>
           </div>
 
-          <aside class="card p-5" data-placement="provider-summary">
+          <div class="card p-5" data-placement="provider-summary">
             {
               start ? (
                 <>
@@ -306,7 +319,7 @@ const recordEvidence = records.reduce(
                 class="underline underline-offset-2">合作说明</a
               >。价格、流量与优惠以当前结算页为准。
             </p>
-          </aside>
+          </div>
         </div>
       </div>
     </section>
@@ -353,44 +366,48 @@ const recordEvidence = records.reduce(
                 {p.name}正在排队实测，测完会放在这里。已完成{" "}
                 {new Set(TEST_PHOTOS.map(t => t.brandSlug)).size} 家，进度见
                 <a
-                  href="/test-records/#test-photos"
+                  href="/test-records/#speed-tests"
                   class="font-semibold underline underline-offset-2"
                 >
-                  机场测试档案
+                  机场实测档案
                 </a>
                 。
               </p>
             )
           }
           {
-            checks.map(c => (
-              <div class="mt-4">
-                <NodeStatusChart check={c} brandName={p.name} />
-              </div>
-            ))
-          }
-          {
             ownRuns.length > 0 && (
               <div class="mt-4">
                 <h3 class="mb-2 text-sm font-bold">
-                  本站测试（{ownRuns.length} 条，已核验）
+                  速度实测（{ownRuns.length} 条，已核验）
                 </h3>
                 <OwnRunsTable
                   runs={ownRuns.slice(0, 6)}
-                  caption={`${p.name}本站测试记录`}
+                  caption={`${p.name}速度实测记录`}
                 />
               </div>
             )
           }
           {
+            checks.map(c => (
+              <div class="mt-6">
+                <NodeStatusChart
+                  check={c}
+                  brandName={p.name}
+                  headingLevel="h3"
+                />
+              </div>
+            ))
+          }
+          {
             records.length > 0 ? (
               <>
-                {ownRuns.length + checks.length > 0 && (
-                  <h3 class="mt-6 text-sm font-bold">公开测速参考</h3>
-                )}
+                <h3 class="mt-6 text-sm font-bold">
+                  公开测速参考（{records.length} 批）
+                </h3>
                 <p class="text-muted-foreground mt-2 text-sm leading-relaxed">
-                  {ownRuns.length + checks.length === 0 && "暂无本站测试。"}
-                  公开测速参考共 {records.length} 批，逐条注明来源
+                  {ownRuns.length === 0 && "暂无本站速度实测。"}
+                  他人公开发布，本站只核对来源页面，不是本站实测；逐条注明来源
                   {recordEvidence > 0 &&
                     `，其中 ${recordEvidence} 条附 Speedtest 原始结果链接`}
                   。不同批次的工具、测试端和单位不同，不能横向比较。
@@ -407,18 +424,23 @@ const recordEvidence = records.reduce(
                         {recordWindow(r) ? `（${recordWindow(r)}）` : ""}
                       </a>
                       <p class="text-muted-foreground mt-0.5 text-xs">
-                        {[
-                          r.data.carrier,
-                          r.data.bandwidthMbps &&
-                            (r.data.bandwidthMbps >= 1000
-                              ? `${r.data.bandwidthMbps / 1000}Gbps`
-                              : `${r.data.bandwidthMbps}M`),
-                          r.data.tool,
-                          `${r.data.rows.length} 组数据`,
-                          r.data.sourceName,
-                        ]
-                          .filter(Boolean)
-                          .join(" · ")}
+                        {publicRecordFields(r)
+                          .filter(f =>
+                            ["carrier", "bandwidth", "tool"].includes(f.key)
+                          )
+                          .map(f =>
+                            f.status === "pending" ? (
+                              <span class="status-pending me-1.5">
+                                {f.label}待验证
+                              </span>
+                            ) : (
+                              <span class="me-1.5">{f.value}</span>
+                            )
+                          )}
+                        <span class="me-1.5">
+                          · {r.data.rows.length} 组数据
+                        </span>
+                        <span>· {r.data.sourceName}</span>
                       </p>
                     </li>
                   ))}
@@ -444,7 +466,7 @@ const recordEvidence = records.reduce(
                   href="/test-records/"
                   class="text-accent-strong underline underline-offset-2"
                 >
-                  机场测试档案
+                  机场实测档案
                 </a>
                 。
               </p>

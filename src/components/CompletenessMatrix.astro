@@ -1,0 +1,70 @@
+---
+/**
+ * 资料完整度一览表：每行一条测试记录，每列一个必须交代清楚的项目
+ * （测试地点、运营商、宽带、日期、工具、服务器、原始证据、来源）。
+ * 已注明写“已注明”，只写了一部分写“部分”，没写且本站也没核对到的写“待验证”。
+ */
+import { PENDING_TEXT, type FieldState } from "@/utils/dataCompleteness";
+
+type Props = {
+  /** 每行：第一列的名称 + 这条记录的各项状态 */
+  rows: {
+    label: string;
+    fields: FieldState[];
+    /** 额外的 HTML 属性（档案总页用来给每行加上筛选标记） */
+    attrs?: Record<string, string>;
+  }[];
+  caption: string;
+  /** 第一列表头 */
+  firstColumn?: string;
+};
+const { rows, caption, firstColumn = "记录" } = Astro.props;
+const columns = rows[0]?.fields ?? [];
+---
+
+<div
+  class="table-scroll card"
+  tabindex="0"
+  role="region"
+  aria-label={`${caption}（表格可横向滑动）`}
+>
+  <table class="w-full min-w-[640px] text-xs" data-completeness-matrix>
+    <caption class="sr-only">{caption}</caption>
+    <thead class="bg-muted/50 text-muted-foreground">
+      <tr>
+        <th scope="col" class="px-3 py-2 text-start">{firstColumn}</th>
+        {
+          columns.map(c => (
+            <th scope="col" class="px-3 py-2 text-start whitespace-nowrap">
+              {c.label}
+            </th>
+          ))
+        }
+      </tr>
+    </thead>
+    <tbody>
+      {
+        rows.map(r => (
+          <tr class="border-t align-top" {...r.attrs}>
+            <th scope="row" class="px-3 py-2 text-start font-semibold">
+              {r.label}
+            </th>
+            {r.fields.map(f => (
+              <td class="px-3 py-2" data-field={f.key} data-status={f.status}>
+                {f.status === "pending" ? (
+                  <span class="status-pending">{PENDING_TEXT}</span>
+                ) : f.status === "partial" ? (
+                  <span class="status-partial">部分</span>
+                ) : f.status === "na" ? (
+                  <span class="text-muted-foreground">不适用</span>
+                ) : (
+                  <span>已注明</span>
+                )}
+              </td>
+            ))}
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>

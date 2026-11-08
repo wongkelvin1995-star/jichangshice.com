@@ -39,9 +39,10 @@
   --accent-strong: #0f55d8;
   --accent-soft: #e8f1ff;
   --accent-foreground: #ffffff;
-  --signal: #0f9f8f;
+  /* 文字用色：在浅底上对比度 ≥ 4.5:1（原 #0f9f8f / #c27a05 只有约 3:1） */
+  --signal: #0b7a6e;
   --signal-soft: #e2f6f3;
-  --gold: #c27a05;
+  --gold: #9a5b00;
   --gold-soft: #fff3dc;
   --muted: #e9eef5;
   --border: #e1e9f5;

@@ -1,5 +1,6 @@
 ---
 /** 本站实测记录表：只接收已核验（verified）的记录，数值按导入值原样展示 */
+import { regionKey } from "@/data/regions";
 import {
   DATA_SOURCE_LABEL,
   TOOL_LABEL,
@@ -13,12 +14,19 @@ type Props = {
   /** slug → 品牌名；传入时显示品牌列（档案总页用） */
   brandNames?: Record<string, string>;
   caption: string;
+  /** 档案总页的筛选：给每一行加上品牌、地区、类型标记 */
+  filterable?: boolean;
 };
-const { runs, brandNames, caption } = Astro.props;
+const { runs, brandNames, caption, filterable = false } = Astro.props;
 const hasJitter = runs.some(r => r.jitterMs !== null);
 ---
 
-<div class="table-scroll card">
+<div
+  class="table-scroll card"
+  tabindex="0"
+  role="region"
+  aria-label={`${caption}（表格可横向滑动）`}
+>
   <table class="w-full min-w-[720px] text-sm" data-own-runs>
     <caption class="sr-only">{caption}</caption>
     <thead class="bg-muted/50 text-muted-foreground text-xs">
@@ -49,7 +57,17 @@ const hasJitter = runs.some(r => r.jitterMs !== null);
     <tbody>
       {
         runs.map(r => (
-          <tr class="border-t align-top" id={`run-${r.id}`}>
+          <tr
+            class="border-t align-top"
+            id={`run-${r.id}`}
+            {...(filterable && {
+              "data-filter-item": "row",
+              "data-kind": "speed",
+              "data-brand": r.brandSlug,
+              "data-regions": regionKey(r.nodeRegion) ?? "",
+              "data-evidence": "1",
+            })}
+          >
             {brandNames && (
               <td class="px-3 py-2 font-semibold whitespace-nowrap">
                 <a
@@ -90,8 +108,18 @@ const hasJitter = runs.some(r => r.jitterMs !== null);
               {r.toolName ?? TOOL_LABEL[r.tool]}
               <span class="text-muted-foreground block">
                 {DATA_SOURCE_LABEL[r.dataSource]}
-                {[r.isp, r.location, r.bandwidth].filter(Boolean).length > 0 &&
-                  ` · ${[r.isp, r.location, r.bandwidth].filter(Boolean).join(" ")}`}
+              </span>
+              <span class="text-muted-foreground block" data-field="server">
+                服务器：
+                {r.server ?? <span class="status-pending">待验证</span>}
+              </span>
+              <span class="text-muted-foreground block" data-field="env">
+                测试端：
+                {r.location ?? <span class="status-pending">地点待验证</span>}
+                {" · "}
+                {r.isp ?? <span class="status-pending">运营商待验证</span>}
+                {" · "}
+                {r.bandwidth ?? <span class="status-pending">宽带待验证</span>}
               </span>
             </td>
             <td class="px-3 py-2 text-xs whitespace-nowrap">
@@ -100,7 +128,7 @@ const hasJitter = runs.some(r => r.jitterMs !== null);
                   href={r.evidenceUrl}
                   target="_blank"
                   rel="nofollow noopener noreferrer"
-                  class="text-accent-strong block underline underline-offset-2"
+                  class="text-accent-strong block py-1 underline underline-offset-2"
                 >
                   结果链接
                 </a>
@@ -112,7 +140,7 @@ const hasJitter = runs.some(r => r.jitterMs !== null);
                     href={f.path}
                     target="_blank"
                     rel="noopener"
-                    class="text-accent-strong block underline underline-offset-2"
+                    class="text-accent-strong block py-1 underline underline-offset-2"
                   >
                     {f.kind === "screenshot" ? "测速截图" : "导出文件"}
                   </a>

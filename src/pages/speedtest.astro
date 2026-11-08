@@ -4,14 +4,18 @@ import Breadcrumbs from "@/components/Breadcrumbs.astro";
 import SpeedLab from "@/components/SpeedLab.astro";
 import SpeedPromo from "@/components/SpeedPromo.astro";
 import { getProviders } from "@/utils/plans";
-import { breadcrumbJsonLd, faqJsonLd } from "@/utils/jsonld";
+import {
+  breadcrumbJsonLd,
+  faqJsonLd,
+  webApplicationJsonLd,
+} from "@/utils/jsonld";
 import config from "@/config";
 
 const path = "/speedtest/";
 // 灵动云邀请入口取自 providers.json（含完整 #/?code= 邀请码），不在页面里写死
 const lingdong = (await getProviders()).find(p => p.slug === "lingdongyun");
 const crumbs = [
-  { name: "机场测试档案", href: "/test-records/" },
+  { name: "机场实测档案", href: "/test-records/" },
   { name: "机场网速测试" },
 ];
 const faq = [
@@ -46,7 +50,25 @@ const faq = [
   title={`机场测速｜机场网速测试：延迟、下载上传、满载延迟与网站连通性｜${config.site.title}`}
   description="机场测速与机场网速测试工具：开着代理一键测出口 IP 归属、空载延迟与抖动、下载和上传速度、满载延迟，以及 Google、YouTube、ChatGPT、Netflix 等 15 个网站的连通性，并可生成打码的测速报告图。"
   canonicalPath={path}
-  jsonLd={[breadcrumbJsonLd(crumbs, path), faqJsonLd(faq)]}
+  jsonLd={[
+    breadcrumbJsonLd(crumbs, path),
+    // 页面上确实提供的功能：在浏览器里运行、免费、结果不上传
+    webApplicationJsonLd({
+      name: "机场网速测试",
+      description:
+        "开着代理在浏览器里测机场节点：出口 IP 归属、空载延迟与抖动、下载和上传速度、满载延迟、15 个常用网站的连通性，并可生成打码的测速报告图。",
+      path,
+      features: [
+        "出口 IP 归属与地区检查（默认打码）",
+        "空载延迟与抖动",
+        "下载与上传速度",
+        "满载延迟",
+        "15 个常用网站连通性检测",
+        "生成打码的测速报告图",
+      ],
+    }),
+    faqJsonLd(faq),
+  ]}
 >
   <main id="main-content" data-pagefind-body>
     <section class="hero-band relative border-b">
@@ -126,7 +148,7 @@ const faq = [
         </li>
       </ul>
       <p>
-        想看各机场的实测结果，见<a href="/test-records/">机场测试档案</a
+        想看各机场的实测结果，见<a href="/test-records/">机场实测档案</a
         >；指标的详细解释见<a href="/methods/metrics-speed-latency-loss/"
           >速度、延迟、丢包和可用率</a
         >。

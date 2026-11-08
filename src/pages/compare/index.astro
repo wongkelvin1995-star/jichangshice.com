@@ -4,7 +4,7 @@ import Breadcrumbs from "@/components/Breadcrumbs.astro";
 import PlanTable from "@/components/PlanTable.astro";
 import CompareChips from "@/components/CompareChips.astro";
 import { getProviders, getPlans, sortPlans } from "@/utils/plans";
-import { breadcrumbJsonLd } from "@/utils/jsonld";
+import { breadcrumbJsonLd, collectionPageJsonLd } from "@/utils/jsonld";
 import config from "@/config";
 
 const providers = await getProviders();
@@ -21,13 +21,29 @@ const observed = plans
   .sort();
 const crumbs = [{ name: "套餐比较" }];
 const path = "/compare/";
+const description = `机场套餐比较：${brands} 个机场共 ${plans.length} 档套餐的价格对照表，按品牌、预算、付款周期和每月流量筛选。年付总额与折算月均分开列出，一次性流量包单独标注。`;
+// 页面是套餐价格表，对应 CollectionPage；条目只列出有独立资料页的品牌，不输出页面上没有的价格评分
+const listed = providers.filter(
+  p => p.hasProfile && plans.some(pl => pl.providerId === p.slug)
+);
 ---
 
 <Layout
   title={`机场套餐比较：月付、年付与流量包价格对照表｜${config.site.title}`}
-  description={`机场套餐比较：${brands} 个机场共 ${plans.length} 档套餐的价格对照表，按品牌、预算、付款周期和每月流量筛选。年付总额与折算月均分开列出，一次性流量包单独标注。`}
+  description={description}
   canonicalPath={path}
-  jsonLd={[breadcrumbJsonLd(crumbs, path)]}
+  jsonLd={[
+    breadcrumbJsonLd(crumbs, path),
+    collectionPageJsonLd({
+      name: "机场套餐比较与价格对照",
+      description,
+      path,
+      items: listed.map(p => ({
+        name: `${p.name}机场测评与套餐`,
+        url: `/airports/${p.slug}/`,
+      })),
+    }),
+  ]}
 >
   <main id="main-content" data-pagefind-body>
     <section class="hero-band relative border-b">

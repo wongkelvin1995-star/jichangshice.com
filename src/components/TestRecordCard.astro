@@ -1,6 +1,8 @@
 ---
 /** 公开测速参考的一条记录。数值按来源原样展示，不换算、不补全；不是本站实测。 */
 import type { CollectionEntry } from "astro:content";
+import DataCompleteness from "@/components/DataCompleteness.astro";
+import { publicRecordFields, summarize } from "@/utils/dataCompleteness";
 import { recordWindow } from "@/utils/testRecords";
 
 type Props = {
@@ -29,14 +31,15 @@ const hasMedia = r.rows.some(x => x.media);
 const hasNote = r.rows.some(x => x.note);
 const hasEvidence = r.rows.some(x => x.evidenceUrl);
 const hasNumbers = hasLatency || hasDl || hasUl || hasAi || hasMedia;
-const env = [
-  r.testLocation && `地点：${r.testLocation}`,
-  r.carrier && `运营商：${r.carrier}`,
-  r.bandwidthMbps &&
-    `测试端带宽：${r.bandwidthMbps >= 1000 ? `${r.bandwidthMbps / 1000}Gbps` : `${r.bandwidthMbps}M`}`,
+// 资料完整度：来源没写的项目一律标「待验证」，不推测、不补填
+const fields = publicRecordFields(record);
+const completeness = summarize(fields);
+const ENV_KEYS = ["location", "carrier", "bandwidth", "tool"];
+const envFields = fields.filter(f => ENV_KEYS.includes(f.key));
+// 来源额外给出的信息（有就写，没有就不写，不属于必填项）
+const extras = [
   r.device && `设备/网络：${r.device}`,
   r.client && `客户端：${r.client}`,
-  r.tool && `工具：${r.tool}`,
   r.protocol && `协议：${r.protocol}`,
   r.nodeCount && `节点数：${r.nodeCount}`,
 ].filter(Boolean) as string[];
@@ -64,8 +67,24 @@ const env = [
     <H class="mt-2 text-base leading-snug font-extrabold">
       {brandName ? `${brandName} · ` : ""}{r.sourceName}
     </H>
-    <p class="text-muted-foreground mt-1.5 text-xs leading-relaxed">
-      {env.join(" · ")}
+    <p
+      class="text-muted-foreground mt-1.5 text-xs leading-relaxed"
+      data-record-env
+    >
+      {
+        envFields.map((f, i) => (
+          <>
+            {i > 0 && " · "}
+            {f.label}：
+            {f.status === "pending" ? (
+              <span class="status-pending">待验证</span>
+            ) : (
+              f.value
+            )}
+          </>
+        ))
+      }
+      {extras.map(x => <> · {x}</>)}
       {r.timezone && <> · 时间：{r.timezone}</>}
     </p>
   </header>
@@ -84,7 +103,12 @@ const env = [
   }
   {
     hasNumbers && (
-      <div class="table-scroll">
+      <div
+        class="table-scroll"
+        tabindex="0"
+        role="region"
+        aria-label={`${r.sourceName}（${r.recordedAt}）测速表（表格可横向滑动）`}
+      >
         <table class="w-full min-w-[560px] text-sm">
           <caption class="sr-only">
             {r.sourceName}（{r.recordedAt}）测速数据，单位：{r.unit}
@@ -228,7 +252,13 @@ const env = [
         </p>
       )
     }
-    {r.notes && <p class="text-muted-foreground">{r.notes}</p>}
+    {
+      r.notes && (
+        <p class="text-muted-foreground" data-record-note>
+          {r.notes}
+        </p>
+      )
+    }
     {
       r.sharedData && (
         <p class="bg-warn-soft text-warn rounded-lg px-3 py-2 text-xs leading-relaxed">
@@ -237,6 +267,14 @@ const env = [
         </p>
       )
     }
+    <details class="text-muted-foreground" data-completeness-details>
+      <summary class="text-foreground cursor-pointer font-semibold"
+        >资料完整度：{completeness.ok}/{completeness.total} 项完整{
+          completeness.pending > 0 && `，${completeness.pending} 项待验证`
+        }</summary
+      >
+      <DataCompleteness fields={fields} noHeader class="mt-2" />
+    </details>
     <details class="text-muted-foreground">
       <summary class="text-foreground cursor-pointer font-semibold"
         >这组数据不能说明什么</summary

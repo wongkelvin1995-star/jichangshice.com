@@ -89,7 +89,7 @@ const { inline = false } = Astro.props;
         class="text-muted-foreground px-4 py-4 text-sm"
         aria-live="polite"
       >
-        输入关键词，例如“机场测试”“测速”“灵动云”“Clash”。
+        输入关键词，例如“机场测速”“灵动云”“晚高峰”“Clash”。
       </p>
       <ul
         id={inline ? "search-results-inline" : "search-results"}
@@ -107,7 +107,7 @@ const { inline = false } = Astro.props;
   import { prepare, search, escHtml, type Hit } from "@/utils/searchEngine";
   import type { SearchEntry } from "@/utils/searchIndex";
 
-  const HINT = "输入关键词，例如“机场测试”“测速”“灵动云”“Clash”。";
+  const HINT = "输入关键词，例如“机场测速”“灵动云”“晚高峰”“Clash”。";
 
   // 索引地址取自 <head> 中的 link，静态部署和子目录预览都能正确解析
   function indexUrl(): string {

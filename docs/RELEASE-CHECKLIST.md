@@ -6,7 +6,7 @@
 - [x] `pnpm run lint`、`pnpm exec prettier --check "src/**/*.{astro,ts}"`
 - [x] Playwright 375 / 1440 px 全站无溢出、无脚本错误
 - [x] 搜索、比较筛选、优惠码表、FAQ、收藏 / 个人中心、节点在线核验、推广链接 rel
-- [x] 编辑精选前 5 家顺序：灵动云、暮光加速、飞猫云、大佬云、微风网络（首页、推荐、目录、优惠码四处一致）
+- [x] 编辑精选前 5 家顺序：灵动云、暮光加速、微风网络、飞猫云、大佬云（2026-11-08 调整；首页、推荐、目录、优惠码四处一致）
 - [ ] 站长确认后合并到 main 并推送（目前**未推送**）
 - [ ] Cloudflare Pages 已连接 `wongkelvin1995-star/jichangshice.com`（见 INDEXING-CHECKLIST 第 0 步）
 

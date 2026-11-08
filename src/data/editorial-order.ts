@@ -6,9 +6,9 @@
 export const EDITORIAL_ORDER = [
   "lingdongyun", // 1. 灵动云
   "muguang", // 2. 暮光加速
-  "feimaoyun", // 3. 飞猫云
-  "dalaoyun", // 4. 大佬云
-  "breezenet", // 5. 微风网络
+  "breezenet", // 3. 微风网络
+  "feimaoyun", // 4. 飞猫云
+  "dalaoyun", // 5. 大佬云
   "flyv", // 6. 飞V
   "laddercloud", // 7. 梯子云
   "wavenet", // 8. 浪网
@@ -40,5 +40,8 @@ export const EDITORIAL_ORDER = [
   "yunjieyun", // 34. 云界云
 ] as const;
 
-/** 首页与目录顶部展示的“编辑精选”家数（站长 2026-10-16 确认为 5 家） */
+/**
+ * 首页与目录顶部展示的“编辑精选”家数（站长 2026-10-16 确认为 5 家）。
+ * 2026-11-08：前五家顺序调整为 灵动云、暮光加速、微风网络、飞猫云、大佬云（编辑顺序，不是测速排名）。
+ */
 export const FEATURED_COUNT = 5;

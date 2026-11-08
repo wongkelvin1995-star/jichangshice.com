@@ -7,10 +7,11 @@
 import Layout from "@/layouts/Layout.astro";
 import Breadcrumbs from "@/components/Breadcrumbs.astro";
 import { getProviders } from "@/utils/plans";
+import config from "@/config";
 
 const providers = await getProviders();
 const crumbs = [
-  { name: "机场测试档案", href: "/test-records/" },
+  { name: "机场实测档案", href: "/test-records/" },
   { name: "测速录入助手" },
 ];
 const regions = [
@@ -29,8 +30,8 @@ const field =
 ---
 
 <Layout
-  title="测速录入助手 - 机场测试"
-  description="机场测试的测速录入助手：校验 Speedtest 分享链接、解析 Cloudflare 测速导出数据、预览测速截图，生成待核验的本站测速记录。"
+  title={`测速录入助手｜${config.site.title}`}
+  description="机场实测的测速录入助手：校验 Speedtest 分享链接、解析 Cloudflare 测速导出数据、预览测速截图，生成待核验的本站测速记录。"
   canonicalPath="/test-records/submit/"
   noindex
 >
@@ -43,7 +44,7 @@ const field =
         </h1>
         <p class="text-muted-foreground mt-2 max-w-3xl text-sm leading-relaxed">
           把一次真实测速整理成本站记录：贴 Speedtest 分享链接、上传 Cloudflare
-          测速导出文件或测速截图，核对数值后生成记录。数据只在你的浏览器里处理，不会上传；生成的记录状态为「待核验」，核验后才会出现在测试档案并计入「本站测试」。
+          测速导出文件或测速截图，核对数值后生成记录。数据只在你的浏览器里处理，不会上传；生成的记录状态为「待核验」，核验后才会出现在机场实测档案并计入「速度实测」。
         </p>
       </div>
     </section>
@@ -339,7 +340,9 @@ const field =
               <li>
                 对照原始结果逐项核对，无误后运行 <code data-verify-cmd></code>。
               </li>
-              <li>重新构建网站，记录出现在测试档案，「本站测试」数量加 1。</li>
+              <li>
+                重新构建网站，记录出现在机场实测档案，「速度实测」数量加 1。
+              </li>
             </ol>
           </div>
         </section>

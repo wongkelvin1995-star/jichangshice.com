@@ -37,12 +37,13 @@
 | --- | --- | --- |
 | 机场资料页 | 34 家 | [机场目录](https://jichangshice.com.cn/airports/) |
 | 套餐档位 | 326 档（51 档已对照结算页核验） | [套餐比较](https://jichangshice.com.cn/compare/) |
-| 本站实测（已核验） | 5 条：灵动云 4 个节点测速 + 1 次节点在线核验 | [测试档案](https://jichangshice.com.cn/test-records/) |
-| 公开测速参考 | 37 批，涉及 21 家机场，逐条附来源链接 | [测试档案](https://jichangshice.com.cn/test-records/) |
+| 速度实测 | 4 条（灵动云，每条附原始截图） | [测试档案](https://jichangshice.com.cn/test-records/) |
+| 节点在线状态核验 | 1 条（灵动云 57 个节点在线；只说明节点在线，不代表速度） | [测试档案](https://jichangshice.com.cn/test-records/) |
+| 公开测速参考 | 37 批，涉及 21 家机场，他人公开发布的数据，本站只核对来源 | [测试档案](https://jichangshice.com.cn/test-records/) |
 | 教程文章 | 30 篇 | [新手教程](https://jichangshice.com.cn/guides/) |
 | 常见问题 | 104 问 | [常见问题](https://jichangshice.com.cn/faq/) |
 
-<sub>数量核对日期：2026-10-23。网站会持续更新，以官网显示为准。</sub>
+<sub>数量核对日期：2026-11-08。速度实测、节点在线状态核验、公开测速参考是三类不同的数据，分开统计、不相加。网站会持续更新，以官网显示为准。</sub>
 
 ## 套餐比较
 
@@ -52,15 +53,15 @@
 - 一次性流量包不折算成月度额度；价格为空不当作 0。
 - 每 GB 成本只对“按月重置流量、无来源冲突”的套餐计算。
 
-**编辑精选 5 家 · 月付起步价**
+**编辑精选 5 家 · 月付起步价**（顺序是编辑安排，不是测速排名）
 
 | 机场 | 月付起步 | 价格来源 |
 | --- | --- | --- |
 | [灵动云](https://jichangshice.com.cn/airports/lingdongyun/) | ¥20/月 · 100GB/月 | 历史参考 |
 | [暮光加速](https://jichangshice.com.cn/airports/muguang/) | ¥20/月 · 120GB/月 | 历史参考 |
+| [微风网络](https://jichangshice.com.cn/airports/breezenet/) | ¥27/月 · 200GB/月 | 历史参考 |
 | [飞猫云](https://jichangshice.com.cn/airports/feimaoyun/) | ¥25/月 · 150GB/月 | 历史参考 |
 | [大佬云](https://jichangshice.com.cn/airports/dalaoyun/) | ¥19.99/月 · 100GB/30天 | 结算页核验 |
-| [微风网络](https://jichangshice.com.cn/airports/breezenet/) | ¥27/月 · 200GB/月 | 历史参考 |
 
 价格可能随时变化，付款前请以机场官网结算页为准。全部 34 家的最低价套餐表已归档在 [docs/airport-plans-archive.md](docs/airport-plans-archive.md)，最新数据见 [套餐比较](https://jichangshice.com.cn/compare/) 与 [机场推荐](https://jichangshice.com.cn/recommendations/)。
 

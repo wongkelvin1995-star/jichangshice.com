@@ -8,6 +8,14 @@ import { getProviders, getPlans, priceLabel, trafficLabel } from "./plans";
 import { getPublishedPosts, postUrl } from "./posts";
 import { getVerifiedRuns, runsOf } from "./testRuns";
 import { getTestRecords, recordsOf } from "./testRecords";
+import { nodeChecksOf } from "@/data/node-checks";
+import {
+  brandStats,
+  brandStatsText,
+  computeTestStats,
+  statPhrase,
+} from "./testStats";
+import { collectRegions } from "./testRegions";
 
 export type SearchSection = {
   /** 小节标题（空字符串表示正文开头） */
@@ -220,36 +228,52 @@ export async function buildSearchIndex(): Promise<SearchEntry[]> {
     }
   );
 
-  // 机场测试档案：总页 + 每个有记录的品牌（数据来自 src/data/test-records.json）
+  // 机场实测档案：总页 + 地区专题 + 每个有记录的品牌（数据来自 src/data/）
+  // 三类数据（速度实测 / 节点在线状态核验 / 公开测速参考）分开统计，口径统一由 testStats.ts 提供
   const records = await getTestRecords();
   const runs = getVerifiedRuns();
+  const stats = computeTestStats(records);
   const tested = providers.filter(
-    p => recordsOf(records, p.slug).length || runsOf(runs, p.slug).length
+    p =>
+      recordsOf(records, p.slug).length ||
+      runsOf(runs, p.slug).length ||
+      nodeChecksOf(p.slug).length
   );
   entries.push({
-    t: "机场测试档案：本站测试与公开测速参考",
+    t: "机场实测档案：速度实测、节点在线核验与公开测速参考",
     u: "/test-records/",
     c: "测试档案",
-    d: `本站测试 ${runs.length} 条（已核验）；公开测速参考 ${records.length} 批，逐条注明来源；另有机场网速测试工具。`,
+    d: `${statPhrase("speed", stats.speed)}；${statPhrase("node", stats.node)}；${statPhrase("public", stats.public)}，三类分开统计，逐条注明来源；另有机场网速测试工具。`,
     k: [
+      "机场实测",
       "机场测试",
       "测速记录",
       "测试档案",
-      "本站测试",
+      "速度实测",
+      "节点在线状态核验",
       "公开测速参考",
       "Speedtest",
       ...tested.map(p => p.name),
     ],
     s: [],
   });
+  for (const r of collectRegions(records).filter(x => x.hasPage)) {
+    entries.push({
+      t: `${r.name}节点机场测速数据`,
+      u: `/test-records/region/${r.slug}/`,
+      c: "测试档案",
+      d: `${r.name}节点：${r.rows.length} 行公开测速参考（${r.brands.length} 家机场，${r.evidenceLinks} 条原始结果链接）${r.runs.length ? `；${statPhrase("speed", r.runs.length)}` : ""}，不换算、不求平均、不排名。`,
+      k: [`${r.name}节点`, `${r.name}测速`, "机场测速", "机场实测", "机场测试"],
+      s: [],
+    });
+  }
   for (const p of tested) {
     const rs = recordsOf(records, p.slug);
-    const own = runsOf(runs, p.slug);
     entries.push({
       t: `${p.name}测速记录`,
       u: `/test-records/${p.slug}/`,
       c: "测试档案",
-      d: `${p.name}：本站测试 ${own.length} 条，公开测速参考 ${rs.length} 批。`,
+      d: `${p.name}：${brandStatsText(brandStats(p.slug, records), { sep: "；" }) ?? "暂无测速记录"}。`,
       k: [
         p.name,
         ...p.aliases,

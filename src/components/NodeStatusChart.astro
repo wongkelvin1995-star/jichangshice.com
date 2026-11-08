@@ -5,8 +5,15 @@ type Props = {
   check: NodeCheck;
   brandName: string;
   headingLevel?: "h2" | "h3";
+  /** 汇总页用：只显示各地区在线数量，逐节点列表和数据表放在品牌记录页（避免汇总页过重） */
+  compact?: boolean;
 };
-const { check: c, brandName, headingLevel = "h3" } = Astro.props;
+const {
+  check: c,
+  brandName,
+  headingLevel = "h3",
+  compact = false,
+} = Astro.props;
 const H = headingLevel;
 
 const ORDER = ["香港", "日本", "新加坡", "台湾", "美国"];
@@ -51,7 +58,7 @@ const multipliers = [...new Set(c.nodes.map(n => n.multiplier))];
   <div class="border-b border-emerald-100 bg-emerald-50/60 px-5 py-4 sm:px-6">
     <div class="flex flex-wrap items-center gap-2">
       <span
-        class="inline-flex items-center gap-1 rounded-full bg-emerald-600 px-2.5 py-0.5 text-xs font-bold text-white"
+        class="inline-flex items-center gap-1 rounded-full bg-emerald-700 px-2.5 py-0.5 text-xs font-bold text-white"
       >
         <svg
           width="12"
@@ -62,12 +69,14 @@ const multipliers = [...new Set(c.nodes.map(n => n.multiplier))];
           stroke-width="3"
           aria-hidden="true"><path d="m5 12 5 5 9-10"></path></svg
         >
-        本站测试 · 已核验
+        已核验
       </span>
-      <span class="text-muted-foreground text-xs">节点在线状态</span>
+      <span class="text-muted-foreground text-xs"
+        >节点在线状态核验 · 不是速度测试</span
+      >
     </div>
     <H id={`${c.id}-title`} class="mt-2 text-lg font-extrabold sm:text-xl">
-      {brandName}节点在线核验（{c.date}）
+      {brandName}节点在线状态核验（{c.date}）
     </H>
     <p class="text-muted-foreground mt-1 text-sm">
       {
@@ -159,80 +168,105 @@ const multipliers = [...new Set(c.nodes.map(n => n.multiplier))];
         }
       </p>
 
-      <div class="mt-5 grid gap-3">
-        {
-          rows.map(r => (
-            <div>
-              <p class="mb-1.5 text-xs font-bold">{r.region}</p>
-              <ul class="flex flex-wrap gap-1.5">
-                {r.nodes.map(n => (
-                  <li
-                    class="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-white px-2 py-0.5 text-xs"
-                    title={`${n.name} · 节点 ID ${n.id} · ${n.status === "online" ? "在线" : "离线"} · ${n.multiplier} · 最后检查 ${c.date} ${n.checkedAt}`}
-                  >
-                    <span
-                      class:list={[
-                        "inline-block size-1.5 rounded-full",
-                        n.status === "online" ? "bg-emerald-500" : "bg-red-500",
-                      ]}
-                      aria-hidden="true"
-                    />
-                    {n.name}
-                  </li>
-                ))}
-                {r.missing.map(m => (
-                  <li
-                    class="text-muted-foreground inline-flex items-center rounded-full border border-dashed border-slate-300 px-2 py-0.5 text-xs"
-                    title={`${m.name} · 节点 ID ${m.id} · 未在截图中`}
-                  >
-                    {m.name}（未截图）
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))
-        }
-      </div>
+      {
+        compact && (
+          <p class="mt-4 text-sm">
+            <a
+              href={`/test-records/${c.brandSlug}/#node-title`}
+              class="text-accent-strong font-semibold underline underline-offset-2"
+            >
+              查看{brandName}的逐节点数据（{total} 个节点）→
+            </a>
+          </p>
+        )
+      }
+      {
+        !compact && (
+          <div class="mt-5 grid gap-3">
+            {rows.map(r => (
+              <div>
+                <p class="mb-1.5 text-xs font-bold">{r.region}</p>
+                <ul class="flex flex-wrap gap-1.5">
+                  {r.nodes.map(n => (
+                    <li
+                      class="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-white px-2 py-0.5 text-xs"
+                      title={`${n.name} · 节点 ID ${n.id} · ${n.status === "online" ? "在线" : "离线"} · ${n.multiplier} · 最后检查 ${c.date} ${n.checkedAt}`}
+                    >
+                      <span
+                        class:list={[
+                          "inline-block size-1.5 rounded-full",
+                          n.status === "online"
+                            ? "bg-emerald-500"
+                            : "bg-red-500",
+                        ]}
+                        aria-hidden="true"
+                      />
+                      {n.name}
+                    </li>
+                  ))}
+                  {r.missing.map(m => (
+                    <li
+                      class="text-muted-foreground inline-flex items-center rounded-full border border-dashed border-slate-300 px-2 py-0.5 text-xs"
+                      title={`${m.name} · 节点 ID ${m.id} · 未在截图中`}
+                    >
+                      {m.name}（未截图）
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        )
+      }
     </div>
   </div>
 
   <div class="border-t px-5 py-4 sm:px-6">
-    <details>
-      <summary class="text-accent-strong cursor-pointer text-sm font-semibold">
-        查看逐节点数据表（{total} 个节点）
-      </summary>
-      <div class="mt-3 max-h-96 overflow-auto rounded-lg border">
-        <table class="w-full text-sm">
-          <caption class="sr-only">{brandName}节点在线核验逐节点数据</caption>
-          <thead class="bg-muted sticky top-0">
-            <tr class="text-start">
-              <th class="px-3 py-2 text-start">节点</th>
-              <th class="px-3 py-2 text-start">节点 ID</th>
-              <th class="px-3 py-2 text-start">状态</th>
-              <th class="px-3 py-2 text-start">倍率</th>
-              <th class="px-3 py-2 text-start">最后检查</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y">
-            {
-              rows.flatMap(r =>
-                r.nodes.map(n => (
-                  <tr>
-                    <td class="px-3 py-1.5">{n.name}</td>
-                    <td class="num px-3 py-1.5">{n.id}</td>
-                    <td class="px-3 py-1.5">
-                      {n.status === "online" ? "✓ 在线" : "✗ 离线"}
-                    </td>
-                    <td class="num px-3 py-1.5">{n.multiplier}</td>
-                    <td class="num px-3 py-1.5">{n.checkedAt}</td>
-                  </tr>
-                ))
-              )
-            }
-          </tbody>
-        </table>
-      </div>
-    </details>
+    {
+      !compact && (
+        <details>
+          <summary class="text-accent-strong cursor-pointer text-sm font-semibold">
+            查看逐节点数据表（{total} 个节点）
+          </summary>
+          <div
+            class="mt-3 max-h-96 overflow-auto rounded-lg border"
+            tabindex="0"
+            role="region"
+            aria-label={`${brandName}逐节点在线核验数据（可滚动查看）`}
+          >
+            <table class="w-full text-sm">
+              <caption class="sr-only">
+                {brandName}节点在线核验逐节点数据
+              </caption>
+              <thead class="bg-muted sticky top-0">
+                <tr class="text-start">
+                  <th class="px-3 py-2 text-start">节点</th>
+                  <th class="px-3 py-2 text-start">节点 ID</th>
+                  <th class="px-3 py-2 text-start">状态</th>
+                  <th class="px-3 py-2 text-start">倍率</th>
+                  <th class="px-3 py-2 text-start">最后检查</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y">
+                {rows.flatMap(r =>
+                  r.nodes.map(n => (
+                    <tr>
+                      <td class="px-3 py-1.5">{n.name}</td>
+                      <td class="num px-3 py-1.5">{n.id}</td>
+                      <td class="px-3 py-1.5">
+                        {n.status === "online" ? "✓ 在线" : "✗ 离线"}
+                      </td>
+                      <td class="num px-3 py-1.5">{n.multiplier}</td>
+                      <td class="num px-3 py-1.5">{n.checkedAt}</td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </details>
+      )
+    }
 
     <p class="mt-4 text-xs font-semibold">原始截图（点开看大图）</p>
     <ul class="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">

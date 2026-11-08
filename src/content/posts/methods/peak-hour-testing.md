@@ -5,7 +5,7 @@ description: 机场晚高峰为什么会变慢？本文解释晚高峰拥堵发�
 category: methods
 pubDatetime: 2026-10-15T10:00:00+08:00
 primaryKeyword: 晚高峰稳定性
-modDatetime: 2026-10-23T11:30:00+08:00
+modDatetime: 2026-11-08T16:15:00+08:00
 related:
   - methods/record-node-speed-test
   - methods/metrics-speed-latency-loss
@@ -55,14 +55,14 @@ related:
 
 ## 结果怎么呈现
 
-建议用表格把白天和晚高峰放在一起，并写明样本：
+建议用表格把白天和晚高峰放在一起，并写明样本。下面只是**版式示例，不是测试结果**：数值用 xx 表示，本站不会用虚构数字演示。
 
 | 时段 | 测试天数 | 延迟中位数 | 下载中位数 | 失败次数 |
 |---|---|---|---|---|
 | 白天 09:00–12:00 | 3 | xx ms | xx Mbps | x / xx |
 | 晚高峰 20:00–23:00 | 3 | xx ms | xx Mbps | x / xx |
 
-表中 xx 为占位，实际发布时替换为真实记录。同时附上每一轮的原始记录，格式见[怎样记录一次可复核的节点测速](/methods/record-node-speed-test/)。
+自己测时，把 xx 换成真实记录，并附上每一轮的原始记录，格式见[怎样记录一次可复核的节点测速](/methods/record-node-speed-test/)。本站已公开、并标明了测试时段的记录见[机场实测档案](/test-records/)。
 
 ## 单次测速的局限
 

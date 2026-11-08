@@ -90,6 +90,15 @@
   box-shadow: var(--shadow-card);
 }
 
+/* 资料完整度：来源没写、本站也没核对到的项目标「待验证」，只写了一部分的标「部分」 */
+@utility status-pending {
+  @apply bg-warn-soft text-warn inline-flex items-center rounded px-1.5 py-px text-[0.7rem] font-bold;
+}
+
+@utility status-partial {
+  @apply bg-muted text-foreground inline-flex items-center rounded px-1.5 py-px text-[0.7rem] font-semibold;
+}
+
 @utility eyebrow {
   @apply text-accent-strong text-xs font-semibold tracking-[0.12em];
 }
@@ -218,4 +227,11 @@
   .site-bg__blob {
     animation: none;
   }
+}
+
+/* 长页面里首屏之外的大区块（表格多、节点多）：滚动到附近时才排版，减少首次加载的布局耗时。
+   内容仍在 HTML 里，搜索引擎、阅读器和页内搜索都能读到；auto 让浏览器记住渲染过的真实高度。 */
+.defer-render {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 1200px;
 }

@@ -1,0 +1,64 @@
+---
+/**
+ * 一批测试数据的“资料完整度”清单：测试地点、运营商、宽带、日期、工具、服务器、原始证据、来源。
+ * 已知的写出内容；只写了一部分的标「部分」；来源没写、本站也没核对到的标「待验证」。
+ */
+import {
+  PENDING_TEXT,
+  summarize,
+  type FieldState,
+} from "@/utils/dataCompleteness";
+
+type Props = {
+  fields: FieldState[];
+  class?: string;
+  /** 外层已有标题（例如 <summary>）时不再重复显示汇总行 */
+  noHeader?: boolean;
+};
+const { fields, class: className, noHeader = false } = Astro.props;
+const s = summarize(fields);
+---
+
+<div class:list={["text-sm", className]} data-completeness>
+  {
+    !noHeader && (
+      <p class="text-xs font-semibold">
+        资料完整度：{s.ok}/{s.total} 项完整
+        {s.partial > 0 && `，${s.partial} 项部分`}
+        {s.pending > 0 && `，${s.pending} 项待验证`}
+      </p>
+    )
+  }
+  <dl class="mt-2 grid gap-x-6 gap-y-1.5 sm:grid-cols-2">
+    {
+      fields.map(f => (
+        <div
+          class="flex min-w-0 gap-2"
+          data-field={f.key}
+          data-status={f.status}
+        >
+          <dt class="text-muted-foreground w-[4.6rem] shrink-0 text-xs leading-5">
+            {f.label}
+          </dt>
+          <dd class="min-w-0 text-xs leading-5 break-words">
+            {f.status === "pending" ? (
+              <span class="status-pending">{PENDING_TEXT}</span>
+            ) : f.status === "na" ? (
+              <span class="text-muted-foreground">不适用</span>
+            ) : (
+              <>
+                {f.value}
+                {f.status === "partial" && (
+                  <span class="status-partial ms-1">部分</span>
+                )}
+              </>
+            )}
+            {f.note && (
+              <span class="text-muted-foreground block">{f.note}</span>
+            )}
+          </dd>
+        </div>
+      ))
+    }
+  </dl>
+</div>

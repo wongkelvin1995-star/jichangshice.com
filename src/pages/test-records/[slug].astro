@@ -1,7 +1,12 @@
 ---
+/**
+ * 品牌测速记录页：一个品牌在三类测试数据（速度实测 / 节点在线状态核验 / 公开测速参考）里的全部内容。
+ * 三类分区展示、分开统计；资料较少的品牌如实写明，不用估算数据补充。
+ */
 import Layout from "@/layouts/Layout.astro";
 import Breadcrumbs from "@/components/Breadcrumbs.astro";
 import BrandAvatar from "@/components/BrandAvatar.astro";
+import CompletenessMatrix from "@/components/CompletenessMatrix.astro";
 import EntryLink from "@/components/EntryLink.astro";
 import TestRecordCard from "@/components/TestRecordCard.astro";
 import OwnRunsTable from "@/components/OwnRunsTable.astro";
@@ -12,6 +17,9 @@ import { nodeChecksOf } from "@/data/node-checks";
 import { getProviders } from "@/utils/plans";
 import { getTestRecords, recordsOf } from "@/utils/testRecords";
 import { getVerifiedRuns, runsOf } from "@/utils/testRuns";
+import { brandStatsText, isBrandTopic } from "@/utils/testStats";
+import { collectRegions } from "@/utils/testRegions";
+import { nodeCheckFields, runFields } from "@/utils/dataCompleteness";
 import { breadcrumbJsonLd } from "@/utils/jsonld";
 import config from "@/config";
 
@@ -35,19 +43,19 @@ export async function getStaticPaths() {
   const siblings = items.map(x => ({ slug: x.p.slug, name: x.p.name }));
   return items.map(x => ({
     params: { slug: x.p.slug },
-    props: { ...x, siblings },
+    props: { ...x, siblings, topic: isBrandTopic(x.p.slug, records) },
   }));
 }
-const { p, rs, own, siblings } = Astro.props;
+const { p, rs, own, siblings, topic } = Astro.props;
 const checks = nodeChecksOf(p.slug);
 const photos = photosOf(p.slug);
-const verified = own.length + checks.length;
-const checkSummary = checks[0]
-  ? `节点在线核验 ${checks[0].nodes.filter(n => n.status === "online").length}/${checks[0].nodes.length}`
-  : "";
+const allRecords = await getTestRecords();
+// 三类数据分开统计：速度实测（条）、节点在线状态核验（条）、公开测速参考（批）
+const counts = { speed: own.length, node: checks.length, public: rs.length };
+const statsText = brandStatsText(counts, { sep: "、" });
 const path = `/test-records/${p.slug}/`;
 const crumbs = [
-  { name: "机场测试档案", href: "/test-records/" },
+  { name: "机场实测档案", href: "/test-records/" },
   { name: `${p.name}测速记录` },
 ];
 const evidence = rs.reduce(
@@ -57,6 +65,7 @@ const evidence = rs.reduce(
 const dates = [
   ...rs.map(r => r.data.recordedAt),
   ...own.map(r => r.testedAt.slice(0, 10)),
+  ...checks.map(c => c.date),
 ].sort();
 const range =
   dates[0] === dates.at(-1) ? dates[0] : `${dates[0]} 至 ${dates.at(-1)}`;
@@ -65,13 +74,35 @@ const hasPeak = rs.some(r =>
     w?.includes("晚高峰")
   )
 );
+// 这个品牌出现在哪些地区专题页
+const regionLinks = collectRegions(allRecords).filter(
+  r =>
+    r.hasPage &&
+    (r.brands.includes(p.slug) ||
+      r.runs.some(x => x.brandSlug === p.slug) ||
+      r.nodeChecks.some(c => c.brandSlug === p.slug))
+);
+const runMatrix = own.map(r => ({
+  label: `${r.nodeRegion}节点`,
+  fields: runFields(r),
+}));
+const nodeMatrix = checks.map(c => ({
+  label: c.date,
+  fields: nodeCheckFields(c),
+}));
 ---
 
 <Layout
-  title={`${p.name}测速记录：${photos.length ? `机场实测图 ${photos.length} 张，` : ""}${verified ? `本站测试 ${verified} 条（已核验），` : ""}公开测速参考 ${rs.length} 批｜${config.site.title}`}
-  description={`${p.name}机场测试档案（${range}）：${verified ? `本站测试 ${verified} 条已核验${checkSummary ? `（${checkSummary}）` : ""}，` : "暂无本站实测，"}公开测速参考 ${rs.length} 批${evidence ? `（含 ${evidence} 条 Speedtest 原始结果）` : ""}，注明来源、测试时段、工具与数据局限。`}
+  title={`${p.name}测速记录：${statsText ?? "暂无测速记录"}｜${config.site.title}`}
+  description={`${p.name}测速记录（${range}）：${statsText ?? "暂无测速记录"}${evidence ? `，其中公开测速参考有 ${evidence} 条附 Speedtest 原始结果链接` : ""}。注明测试地点、运营商、宽带、工具、服务器与数据局限，未验证的项目标注待验证。`}
   canonicalPath={path}
   ogImage={photos[0]?.src}
+  ogImageAlt={photos[0]
+    ? `${p.name}机场实测图：${photos[0].date} ${photos[0].nodeRegion}节点测速汇总`
+    : undefined}
+  ogImageSize={photos[0]
+    ? { width: photos[0].width, height: photos[0].height }
+    : undefined}
   jsonLd={[
     breadcrumbJsonLd(crumbs, path),
     ...photos.map(t => ({
@@ -99,12 +130,17 @@ const hasPeak = rs.some(r =>
             >
               {p.name}测速记录
             </h1>
-            <p class="text-muted-foreground mt-2 max-w-3xl leading-relaxed">
-              本站测试 {verified} 条（已核验）；公开测速参考 {rs.length} 批{
-                evidence ? `，其中 ${evidence} 条附 Speedtest 原始结果链接` : ""
+            <p
+              class="text-muted-foreground mt-2 max-w-3xl leading-relaxed"
+              data-brand-stats
+            >
+              {statsText ?? "暂无测速记录"}{
+                evidence
+                  ? `；公开测速参考中 ${evidence} 条附 Speedtest 原始结果链接`
+                  : ""
               }{
                 hasPeak ? "，包含晚高峰时段" : ""
-              }。不同批次的工具和测试端不同，请勿横向比较。
+              }。三类数据口径不同、分开统计；不同批次的工具和测试端不同，请勿横向比较。
             </p>
           </div>
         </div>
@@ -126,51 +162,99 @@ const hasPeak = rs.some(r =>
       </div>
     </section>
 
-    <div class="app-layout grid grid-cols-[minmax(0,1fr)] gap-6 pt-8">
+    <div class="app-layout grid grid-cols-[minmax(0,1fr)] gap-8 pt-8">
       {
-        photos.length > 0 && (
-          <section aria-labelledby="test-photos">
-            <h2 id="test-photos" class="section-title">
-              {p.name}机场实测图
-            </h2>
-            <div class="mt-4 grid grid-cols-[minmax(0,1fr)] gap-5">
-              {photos.map(t => (
-                <TestPhotoCard photo={t} brandName={p.name} />
-              ))}
-            </div>
-          </section>
+        !topic && (
+          <p class="bg-warn-soft text-warn rounded-xl px-4 py-3 text-sm leading-relaxed">
+            {p.name}
+            目前资料较少：{own.length === 0 ? "没有本站速度实测，" : ""}
+            公开测速参考 {rs.length} 批
+            {evidence === 0 ? "，且没有附原始结果链接" : ""}
+            。本页只如实列出这些来源，不用估算数据补充；取得原始结果后再更新。
+          </p>
         )
       }
-      <section aria-labelledby="own-tests">
-        <h2 id="own-tests" class="section-title">本站测试</h2>
+
+      {/* id="own-tests"：旧版页面的锚点，保留以免外部链接（#own-tests）失效 */}
+      <section
+        id="own-tests"
+        class="scroll-mt-24"
+        aria-labelledby="speed-title"
+      >
+        <h2 id="speed-title" class="section-title">
+          速度实测（{own.length} 条）
+        </h2>
         {
-          verified > 0 ? (
+          own.length > 0 ? (
             <div class="mt-4 grid grid-cols-[minmax(0,1fr)] gap-5">
-              {checks.map(c => (
-                <NodeStatusChart check={c} brandName={p.name} />
-              ))}
-              {own.length > 0 && (
-                <OwnRunsTable runs={own} caption={`${p.name}本站测试记录`} />
+              <OwnRunsTable runs={own} caption={`${p.name}速度实测记录`} />
+              <div>
+                <h3 class="font-bold">资料完整度</h3>
+                <p class="text-muted-foreground mt-1 mb-2 text-xs leading-relaxed">
+                  「部分」表示只写了一部分；「待验证」表示截图和记录里都没有，本站不补填。
+                </p>
+                <CompletenessMatrix
+                  rows={runMatrix}
+                  firstColumn="实测记录"
+                  caption={`${p.name}速度实测资料完整度`}
+                />
+              </div>
+              {photos.length > 0 && (
+                <div
+                  id="test-photos"
+                  class="grid scroll-mt-24 grid-cols-[minmax(0,1fr)] gap-5"
+                >
+                  {photos.map(t => (
+                    <TestPhotoCard
+                      photo={t}
+                      brandName={p.name}
+                      headingLevel="h3"
+                    />
+                  ))}
+                </div>
               )}
             </div>
           ) : (
             <p class="text-muted-foreground mt-2 text-sm leading-relaxed">
-              暂无本站测试记录。本站只发布自己测得、附原始结果并核验通过的数据，
-              {p.name}
-              还没有这样的记录。
+              暂无本站速度实测。本站只发布自己测得、附原始截图并核验通过的数据，
+              {p.name}还没有这样的记录，也不会用公开测速参考或估算值代替。
             </p>
           )
         }
       </section>
+
+      {
+        checks.length > 0 && (
+          <section aria-labelledby="node-title">
+            <h2 id="node-title" class="section-title">
+              节点在线状态核验（{checks.length} 条）
+            </h2>
+            <p class="text-muted-foreground mt-2 text-sm leading-relaxed">
+              对照服务商用户面板「节点状态」页截图核对节点在检查时刻是否在线，不是速度测试。
+            </p>
+            <div class="mt-4 grid grid-cols-[minmax(0,1fr)] gap-5">
+              {checks.map(c => (
+                <NodeStatusChart check={c} brandName={p.name} />
+              ))}
+              <CompletenessMatrix
+                rows={nodeMatrix}
+                firstColumn="核验记录"
+                caption={`${p.name}节点在线状态核验资料完整度`}
+              />
+            </div>
+          </section>
+        )
+      }
+
       {
         rs.length > 0 && (
           <section aria-labelledby="public-refs" class="grid gap-6">
             <div>
               <h2 id="public-refs" class="section-title">
-                公开测速参考
+                公开测速参考（{rs.length} 批）
               </h2>
               <p class="text-muted-foreground mt-2 text-sm">
-                每条记录注明来源并链接原页面，不计入「本站测试」。
+                他人公开发布的测速记录，不是本站实测。每批注明来源并链接原页面，来源没写的项目标「待验证」。
               </p>
             </div>
             {rs.map(r => (
@@ -179,6 +263,32 @@ const hasPeak = rs.some(r =>
           </section>
         )
       }
+
+      {
+        regionLinks.length > 0 && (
+          <nav aria-labelledby="by-region" class="card p-5">
+            <h2 id="by-region" class="font-bold">
+              按地区查看
+            </h2>
+            <p class="text-muted-foreground mt-1 text-sm">
+              {p.name}出现在这些地区专题里（专题只列出数据，不排名）：
+            </p>
+            <ul class="mt-3 flex flex-wrap gap-2 text-sm">
+              {regionLinks.map(r => (
+                <li>
+                  <a
+                    href={`/test-records/region/${r.slug}/#brand-${p.slug}`}
+                    class="hover:border-accent/40 hover:text-accent-strong inline-block rounded-full border px-3 py-1"
+                  >
+                    {r.name}节点测速数据
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )
+      }
+
       <p class="text-muted-foreground text-sm">
         想自己复测？按<a
           href="/methods/record-node-speed-test/"
@@ -187,7 +297,7 @@ const hasPeak = rs.some(r =>
         >操作，并在 20:00–23:00 至少补测一次。其他机场的记录见<a
           href="/test-records/"
           class="text-accent-strong underline underline-offset-2"
-          >机场测试档案</a
+          >机场实测档案</a
         >。
       </p>
       <nav aria-labelledby="other-records" class="card p-5">

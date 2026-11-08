@@ -134,7 +134,7 @@ const chips = [...(claims?.lineTypes ?? []), ...(claims?.protocols ?? [])];
     }
   </div>
 
-  <aside
+  <div
     class="bg-surface flex flex-col justify-center gap-3 border-t p-5 md:border-s md:border-t-0"
   >
     {
@@ -186,5 +186,5 @@ const chips = [...(claims?.lineTypes ?? []), ...(claims?.protocols ?? [])];
       label={p.coupon ? "使用优惠码查看当前套餐" : "查看当前套餐"}
       class="btn btn-primary w-full px-3 text-[0.9rem] whitespace-nowrap"
     />
-  </aside>
+  </div>
 </article>
